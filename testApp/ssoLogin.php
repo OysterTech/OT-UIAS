@@ -3,7 +3,7 @@
  * @name XX应用-SSO登录处理页
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-12-01
- * @version 2018-12-14
+ * @version 2018-12-21
  */
 require_once 'include/public.func.php';
 ?>
@@ -14,43 +14,24 @@ require_once 'include/public.func.php';
 </head>
 
 <body>
-Token：<?php echo $_GET['token']; ?><br>
-通过Ajax到sso中心换取用户信息<br>
-<a href="http://ssouc.xshgzs.com/logout.php">登出</a>
-<?php include 'include/footer.php'; ?>
+<p id="loginTips">正在登录，请稍候……</p>
+<a id="logout_a" href="http://ssouc.xshgzs.com/logout.php" style="display:none;">登出</a>
+<div id="footer" style="display:none;"><?php include 'include/footer.php'; ?></div>
 
 <script>
+var appId="otsa_09732d2db0749fb7cdc6";
+var returnUrl="<?=ROOT_PATH;?>ssoLogin.php";
+var ssoLoginUrl=OTSSO.ssoServiceUrl+"login.php?appId="+appId+"&returnUrl="+encodeURIComponent(returnUrl);
 var token=getURLParam("token");
-getUserInfo();
 
-function getUserInfo(){
-	$.ajax({
-		url:"<?=SSO_SERVICE_PATH;?>api/getUserInfo.php",
-		//type:"post"
-		data:{"token":token},
-		dataType:"json",
-		error:function(e){
-			showModalTips("服务器错误！"+e.status);
-			console.log(e);
-			return false;
-		},
-		success:function(ret){
-			if(ret.code==200){
-				data=ret.data;
-				alert("认证成功！用户名:"+data['userName']);
-				return true;
-			}else if(ret.code==403){
-				window.location.href="<?=ROOT_PATH;?>login.php";
-				return false;
-			}else if(ret.code==0){
-				showModalTips("参数缺失！请联系技术支持！");
-				return false;
-			}else{
-				showModalTips("未知错误！请提交错误码["+ret.code+"]并联系技术支持");
-				return false;
-			}
-		}
-	});
+if(token=="" || token==null){
+	window.location.href=ssoLoginUrl;
+}else{
+	$("#loginTips").attr("style","display:none;");
+	$("#logout_a").attr("style","");
+	$("#footer").attr("style","");
+	userInfo=OTSSO.getUserInfo(token,appId,returnUrl);
+	alert("用户unionId:"+userInfo['unionId']);
 }
 </script>
 

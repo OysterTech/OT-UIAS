@@ -1,16 +1,14 @@
 <?php
 /**
- * @name 生蚝科技SSO系统-公用函数库
+ * @name 生蚝科技统一身份认证中心-公用函数库
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-11-30
- * @version 2018-11-30
+ * @version 2018-12-20
  */
 
 session_start();
-require_once 'PDOConn.php';
 
-define('SSO_SERVICE_PATH','http://ssouc.xshgzs.com/');
-define('ROOT_PATH','http://ssouc.xshgzs.com/test2/');
+define('ROOT_PATH','https://ssouc.xshgzs.com/test2/');
 define('JS_PATH',ROOT_PATH.'resource/js/');
 define('IMG_PATH',ROOT_PATH.'resource/image/');
 define('CSS_PATH',ROOT_PATH.'resource/css/');

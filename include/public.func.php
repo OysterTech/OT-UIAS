@@ -1,15 +1,15 @@
 <?php
 /**
- * @name 生蚝科技SSO系统-公用函数库
+ * @name 生蚝科技统一身份认证平台-公用函数库
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-11-30
- * @version 2018-11-30
+ * @version 2018-12-20
  */
 
 session_start();
 require_once 'PDOConn.php';
 
-define('ROOT_PATH','http://ssouc.xshgzs.com/');
+define('ROOT_PATH','https://ssouc.xshgzs.com/');
 define('JS_PATH',ROOT_PATH.'resource/js/');
 define('IMG_PATH',ROOT_PATH.'resource/image/');
 define('CSS_PATH',ROOT_PATH.'resource/css/');
@@ -103,5 +103,22 @@ function setSess($sessionName="",$value="")
  */
 function gotoUrl($url="")
 {
-	header("location:".$url);
+	die(header("location:".$url));
+}
+
+
+/**
+ * checkPassword 校验密码有效性
+ * @param string $password      原密码
+ * @param string $password_indb 存于数据库的密码
+ * @param string $salt          存于数据库的盐
+ * @return bool                 校验结果
+ */
+function checkPassword($password,$password_indb,$salt){
+	$hashPassword=sha1(md5($password).$salt);
+	if($hashPassword===$password_indb){
+		return true;
+	}else{
+		return false;
+	}
 }

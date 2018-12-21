@@ -1,6 +1,6 @@
 <?php
 /**
- * @name 生蚝科技SSO系统-登出
+ * @name 生蚝科技统一身份认证平台-登出
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-12-13
  * @version 2018-12-14
@@ -19,7 +19,7 @@ gotoUrl($url);
 ?>
 <html>
 <head>
-	<title>登出 / 生蚝SSO用户集群中心</title>
+	<title>登出 / 生蚝科技统一身份认证平台</title>
 	<?php include 'include/header.php'; ?>
 </head>
 </html>
