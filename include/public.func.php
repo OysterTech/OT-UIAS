@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-公用函数库
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-11-30
- * @version 2018-12-20
+ * @version 2018-12-23
  */
 
 session_start();
@@ -121,4 +121,25 @@ function checkPassword($password,$password_indb,$salt){
 	}else{
 		return false;
 	}
+}
+
+
+/**
+ * getIP 获取IP地址
+ * @return string IP地址
+ */
+function GetIP(){
+	if(!empty($_SERVER["HTTP_CLIENT_IP"])){
+		$cip = $_SERVER["HTTP_CLIENT_IP"];
+	}
+	elseif(!empty($_SERVER["HTTP_X_FORWARDED_FOR"])){
+		$cip = $_SERVER["HTTP_X_FORWARDED_FOR"];
+	}
+	elseif(!empty($_SERVER["REMOTE_ADDR"])){
+		$cip = $_SERVER["REMOTE_ADDR"];
+	}
+	else{
+		$cip = "0.0.0.0";
+	}
+	return $cip;
 }

@@ -3,20 +3,20 @@
  * @name XX应用-SSO登录处理页
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-12-01
- * @version 2018-12-14
+ * @version 2018-12-21
  */
 require_once 'include/public.func.php';
 ?>
 <html>
 <head>
-	<title>2SSO登录 / 生蚝科技</title>
+	<title>测试2SSO登录 / 生蚝科技</title>
 	<?php include 'include/header.php'; ?>
 </head>
 
 <body>
-Token：<?php if(isset($_GET['token'])) echo $_GET['token']; ?><br>
-<a href="http://ssouc.xshgzs.com/logout.php">登出</a>
-<?php include 'include/footer.php'; ?>
+<p id="loginTips">正在登录，请稍候……</p>
+<a id="logout_a" href="http://ssouc.xshgzs.com/logout.php" style="display:none;">登出</a>
+<div id="footer" style="display:none;"><?php include 'include/footer.php'; ?></div>
 
 <script>
 var appId="otsa_a8868b87c9ea27d624c4";
@@ -27,7 +27,11 @@ var token=getURLParam("token");
 if(token=="" || token==null){
 	window.location.href=ssoLoginUrl;
 }else{
-	OTSSO.getUserInfo(token,appId,returnUrl);
+	$("#loginTips").attr("style","display:none;");
+	$("#logout_a").attr("style","");
+	$("#footer").attr("style","");
+	userInfo=OTSSO.getUserInfo(token,appId,returnUrl);
+	alert("用户unionId:"+userInfo['unionId']);
 }
 </script>
 
