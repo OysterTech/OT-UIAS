@@ -25,13 +25,14 @@ var ssoLoginUrl=OTSSO.ssoServiceUrl+"login.php?appId="+appId+"&returnUrl="+encod
 var token=getURLParam("token");
 
 if(token=="" || token==null){
+	delCookie("OTSSO_userInfo");
 	window.location.href=ssoLoginUrl;
 }else{
 	$("#loginTips").attr("style","display:none;");
 	$("#logout_a").attr("style","");
 	$("#footer").attr("style","");
-	userInfo=OTSSO.getUserInfo(token,appId,returnUrl);
-	alert("用户unionId:"+userInfo['unionId']);
+	OTSSO.getUserInfo(token,appId,returnUrl);
+	alert(getCookie("OTSSO_userInfo"));
 }
 </script>
 

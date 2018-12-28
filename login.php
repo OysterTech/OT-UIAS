@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-登录页
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-11-30
- * @version 2018-12-23
+ * @version 2018-12-28
  */
 
 require_once 'include/public.func.php';
@@ -19,9 +19,11 @@ if($query[1]!=1){
 		gotoUrl(ROOT_PATH."noAccess.php?mod=appInfo");
 	}else{
 		$appName="统一认证平台用户中心";
+		$method="常规登录";
 	}
 }else{
 	$appName=$query[0][0]['name'];
+	$method="第三方应用登录";
 }
 
 setSess(['appId'=>$appId,'returnUrl'=>$returnUrl]);
@@ -31,6 +33,8 @@ if(getSess("isLogin")==1){
 	$token=sha1(md5($appId).time());
 	setSess(['token'=>$token]);
 	
+	$userInfo=getSess("userInfo");
+	$addLog=PDOQuery($dbcon,"INSERT INTO log(user_id,app_id,method,content,ip) VALUES (?,?,?,'登录',?)",[$userInfo['id'],$query[0][0]['id'],$method,getIP()],[PDO::PARAM_INT,PDO::PARAM_INT,PDO::PARAM_STR,PDO::PARAM_STR]);
 	gotoUrl($returnUrl."?token=".getSess('token'));
 }
 ?>
@@ -94,10 +98,18 @@ if(getSess("isLogin")==1){
 		</div>
 		<!-- Login Form -->
 		<div class="form-signin">
-			<input type="hidden" id="appId" value="<?=$appId;?>">
-			<input type="text" id="userName" class="fadeIn second" maxlength="20" placeholder="键入您的统一身份认证账号" onkeyup='if(event.keyCode==13)$("#password").focus();'>
-			<input type="password" id="password" class="fadeIn third" maxlength="30" placeholder="键入您账号对应的密码" onkeyup='if(event.keyCode==13)toLogin();'>
+			<input type="hidden" id="OTSSO_appId" value="<?=$appId;?>">
+			<input type="text" id="OTSSO_userName" class="fadeIn second" maxlength="20" placeholder="键入您的统一身份认证账号" onkeyup='if(event.keyCode==13)$("#OTSSO_password").focus();'>
+			<input type="password" id="OTSSO_password" class="fadeIn third" maxlength="30" placeholder="键入您账号对应的密码" onkeyup='if(event.keyCode==13)toLogin();'>
 			<input type="button" class="fadeIn fourth" style="font-size:18px;" value="登 录" onclick="toLogin()">
+			<br>
+			<p style="text-align:left;padding-left:25px;font-size:17px;">
+				第三方登录：
+				<a><i class="fa fa-2x fa-github" aria-hidden="true"></i></a>&nbsp;&nbsp;
+				<a onclick="alert('目前仅支持生蚝科技内部企业微信！\n请直接点击右上角扫码登录！\n\n普通用户暂不支持，敬请期待！');"><i class="fa fa-2x fa-weixin" aria-hidden="true"></i></a>&nbsp;&nbsp;
+				</font>
+			</p>
+			<p style="line-height:6px;">&nbsp;</p>
 		</div>
 		<!-- Remind Passowrd -->
 		<div id="formFooter">
@@ -110,9 +122,9 @@ if(getSess("isLogin")==1){
 
 <script>
 function toLogin(){
-	appId=$("#appId").val();
-	userName=$("#userName").val();
-	password=$("#password").val();
+	appId=$("#OTSSO_appId").val();
+	userName=$("#OTSSO_userName").val();
+	password=$("#OTSSO_password").val();
 	
 	$.ajax({
 		url:"toLogin.php",

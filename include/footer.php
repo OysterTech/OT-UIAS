@@ -19,6 +19,9 @@
 
 <script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/datatables/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.bootcss.com/datatables/1.10.16/js/dataTables.bootstrap.min.js"></script>
+<script src="<?=JS_PATH;?>dataTables.responsive.js"></script>
 <script src="<?=JS_PATH;?>utils.js"></script>
 
 <script>
@@ -30,3 +33,23 @@ function launchQQ(){
 	}
 }
 </script>
+
+<div class="modal fade" id="tipsModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true"></span><span class="sr-only">Close</span></button>
+				<h3 class="modal-title" id="ModalTitle">温馨提示</h3>
+			</div>
+			<div class="modal-body">
+				<font color="red" style="font-weight:bold;font-size:24px;text-align:center;">
+					<p id="tips"></p>
+				</font>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" data-dismiss="modal">关闭 &gt;</button>
+			</div>
+		</div>
+	</div>
+</div>
+
