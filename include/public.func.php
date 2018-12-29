@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-公用函数库
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-11-30
- * @version 2018-12-23
+ * @version 2018-12-29
  */
 
 session_start();
@@ -114,7 +114,8 @@ function gotoUrl($url="")
  * @param string $salt          存于数据库的盐
  * @return bool                 校验结果
  */
-function checkPassword($password,$password_indb,$salt){
+function checkPassword($password,$password_indb,$salt)
+{
 	$hashPassword=sha1(md5($password).$salt);
 	if($hashPassword===$password_indb){
 		return true;
@@ -128,7 +129,8 @@ function checkPassword($password,$password_indb,$salt){
  * getIP 获取IP地址
  * @return string IP地址
  */
-function GetIP(){
+function getIP()
+{
 	if(!empty($_SERVER["HTTP_CLIENT_IP"])){
 		$cip = $_SERVER["HTTP_CLIENT_IP"];
 	}
@@ -142,4 +144,21 @@ function GetIP(){
 		$cip = "0.0.0.0";
 	}
 	return $cip;
+}
+
+
+/**
+ * addLoginToken 新增登录Token
+ * @param string $token  token值
+ * @param string $ip     IP地址
+ * @param int    $userId 用户ID
+ */
+function addLoginToken($dbcon,$token,$userId)
+{
+	$expTime=date("Y-m-d H:i:s",strtotime("-15 minutes"));
+	PDOQuery($dbcon,"DELETE FROM login_token WHERE create_time<=?",[$expTime],[PDO::PARAM_STR]);
+	$add=PDOQuery($dbcon,"INSERT INTO login_token(token,ip,user_id) VALUES (?,?,?)",[$token,getIP(),$userId],[PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_INT]);
+
+	if($add[1]==1) return true;
+	else return false;
 }

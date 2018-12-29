@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-处理登录
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-12-20
- * @version 2018-12-28
+ * @version 2018-12-29
  */
 
 require_once 'include/public.func.php';
@@ -43,8 +43,11 @@ if($userQuery[1]!=1){
 				$method="第三方应用登录";
 			}
 			
+			$tokenQuery=addLoginToken($dbcon,$token,$userInfo['id']);
 			$addLog=PDOQuery($dbcon,"INSERT INTO log(user_id,app_id,method,content,ip) VALUES (?,?,?,'登录',?)",[$userInfo['id'],$appInfo[0][0]['id'],$method,getIP()],[PDO::PARAM_INT,PDO::PARAM_INT,PDO::PARAM_STR,PDO::PARAM_STR]);
-			die(returnAjaxData(200,"success",['returnUrl'=>getSess("returnUrl")."?token=".$token]));
+			
+			if($tokenQuery===TRUE) die(returnAjaxData(200,"success",['returnUrl'=>getSess("returnUrl")."?token=".$token]));
+			else die(returnAjaxData(1,"database Error"));
 		}
 	}else{
 		die(returnAjaxData(4031,"failed To Auth"));

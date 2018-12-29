@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-登录页
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-11-30
- * @version 2018-12-28
+ * @version 2018-12-29
  */
 
 require_once 'include/public.func.php';
@@ -33,9 +33,10 @@ if(getSess("isLogin")==1){
 	$token=sha1(md5($appId).time());
 	setSess(['token'=>$token]);
 	
-	$userInfo=getSess("userInfo");
-	$addLog=PDOQuery($dbcon,"INSERT INTO log(user_id,app_id,method,content,ip) VALUES (?,?,?,'登录',?)",[$userInfo['id'],$query[0][0]['id'],$method,getIP()],[PDO::PARAM_INT,PDO::PARAM_INT,PDO::PARAM_STR,PDO::PARAM_STR]);
-	gotoUrl($returnUrl."?token=".getSess('token'));
+	$addLog=PDOQuery($dbcon,"INSERT INTO log(user_id,app_id,method,content,ip) VALUES (?,?,?,'登录',?)",[getSess("user_id"),$query[0][0]['id'],$method,getIP()],[PDO::PARAM_INT,PDO::PARAM_INT,PDO::PARAM_STR,PDO::PARAM_STR]);
+
+	$tokenQuery=addLoginToken($dbcon,$token,getSess("user_id"));
+	if($tokenQuery===TRUE) gotoUrl($returnUrl."?token=".getSess('token'));
 }
 ?>
 <html>
