@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-登录页
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-11-30
- * @version 2018-12-29
+ * @version 2018-12-30
  */
 
 require_once 'include/public.func.php';
@@ -48,11 +48,11 @@ if(getSess("isLogin")==1){
 <body>
 <div class="wrapper fadeInDown">
 	<div id="formContent">
-		<!--a id="qrbtn" href="javascript:toQrLogin();" target="_self"><div style="width: 60px; height: 60px; background-image: url(https://passport.dingstudio.cn/sso/static/images/qrCode.png); background-size: 120px 120px; background-repeat: no-repeat; background-position: 0 0; position: absolute; top: 5px; right: 5px"></div></a-->
-		<!-- Tabs Titles -->
-		<h2 class="active" style="line-height:32px;"> 欢迎登录 生蚝科技统一身份认证平台<br>正在通过统一认证平台快速登录：<?=$appName;?> </h2>
-		<!-- Icon -->
-		<div class="fadeIn first">
+		<a id="changeLoginMethodBtn" class="loginMethodButton" style="background-position:0 0;" onclick="changeLoginMethod();"></a>
+
+		<h2 class="active" style="line-height:32px;">欢迎登录 生蚝科技统一身份认证平台<br>正在通过统一认证平台快速登录：<?=$appName;?> </h2>
+
+		<div id="userIcon" class="fadeIn first">
 			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px"
 			y="0px" width="210.25px" height="159.942px" viewBox="0 0 105.125 79.971" enable-background="new 0 0 105.125 79.971"
 			xml:space="preserve">
@@ -97,8 +97,8 @@ if(getSess("isLogin")==1){
 			</g>
 			</svg>
 		</div>
-		<!-- Login Form -->
-		<div class="form-signin">
+
+		<div id="loginForm" class="form-signin">
 			<input type="hidden" id="OTSSO_appId" value="<?=$appId;?>">
 			<input type="text" id="OTSSO_userName" class="fadeIn second" maxlength="20" placeholder="键入您的统一身份认证账号" onkeyup='if(event.keyCode==13)$("#OTSSO_password").focus();'>
 			<input type="password" id="OTSSO_password" class="fadeIn third" maxlength="30" placeholder="键入您账号对应的密码" onkeyup='if(event.keyCode==13)toLogin();'>
@@ -106,13 +106,17 @@ if(getSess("isLogin")==1){
 			<br>
 			<p style="text-align:left;padding-left:25px;font-size:17px;">
 				第三方登录：
-				<a><i class="fa fa-2x fa-github" aria-hidden="true"></i></a>&nbsp;&nbsp;
+				<a href="https://github.com/login/oauth/authorize?client_id=&scope=user"><i class="fa fa-2x fa-github" aria-hidden="true"></i></a>&nbsp;&nbsp;
 				<a onclick="alert('目前仅支持生蚝科技内部企业微信！\n请直接点击右上角扫码登录！\n\n普通用户暂不支持，敬请期待！');"><i class="fa fa-2x fa-weixin" aria-hidden="true"></i></a>&nbsp;&nbsp;
 				</font>
 			</p>
 			<p style="line-height:6px;">&nbsp;</p>
 		</div>
-		<!-- Remind Passowrd -->
+
+		<!-- ▼ 企业微信登录二维码 ▼ -->
+		<div id="loginQrcode" style="display:none;"></div>
+		<!-- ▲ 企业微信登录二维码 ▲ -->
+
 		<div id="formFooter">
 			<span style="color: #56baed;line-height:28px;">本系统已整合统一身份认证<br>单点登录服务由 生蚝科技 提供</span>
 		</div>
@@ -120,8 +124,46 @@ if(getSess("isLogin")==1){
 </div>
 
 <?php include 'include/footer.php'; ?>
+<script src="https://rescdn.qqmail.com/node/ww/wwopenmng/js/sso/wwLogin-1.0.0.js"></script>
 
 <script>
+const CORP_ID="";
+const AGENT_ID="";
+const REDIRECT_URI=encodeURI("");
+var nowLoginMethod="password";
+var pwdMethodBtnStyle="background-position:0 -57;";
+var qrMethodBtnStyle="background-position:0 0;";
+
+function changeLoginMethod(){
+	if(nowLoginMethod=="password"){
+		nowLoginMethod="qr";
+		loadWxLoginQrCode();
+		$("#changeLoginMethodBtn").attr("style",qrMethodBtnStyle);
+		$("#userIcon").attr("style","display:none");
+		$("#loginForm").attr("style","display:none");
+		$("#loginQrcode").attr("style","height:40%");
+	}else if(nowLoginMethod=="qr"){
+		nowLoginMethod="password";
+		loadWxLoginQrCode();
+		$("#changeLoginMethodBtn").attr("style",pwdMethodBtnStyle);
+		$("#userIcon").attr("style","");
+		$("#loginForm").attr("style","");
+		$("#loginQrcode").attr("style","display:none");
+	}
+}
+
+function loadWxLoginQrCode(){
+	window.WwLogin({
+		"id" : "loginQrcode",
+		"appid" : CORP_ID,
+		"agentid" : AGENT_ID,
+		"redirect_uri" :REDIRECT_URI,
+		"state" : "",
+		"href" : "<?=CSS_PATH;?>workWechatQR.css"
+	});
+}
+
+
 function toLogin(){
 	appId=$("#OTSSO_appId").val();
 	userName=$("#OTSSO_userName").val();
@@ -129,7 +171,7 @@ function toLogin(){
 	
 	$.ajax({
 		url:"toLogin.php",
-		//type:"post"
+		type:"post",
 		data:{"appId":appId,"userName":userName,"password":password},
 		dataType:"json",
 		error:function(e){

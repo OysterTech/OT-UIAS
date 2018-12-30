@@ -8,13 +8,13 @@
 
 ▲ 开发商：生蚝科技
 
-▲ 代码版本信息：***Build 00093***
+▲ 代码版本信息：***Build 00103***
 
 ▲ 系统版本信息：***Build***
 
 ▲ 遵循协议：GNU GPLv3
 
-▲ 特点：允许跨父域/二级域名/文件夹 | 每个用户拥有唯一的SSO-UnionID便于管理
+▲ 特点：允许跨父域/二级域名/文件夹 | 每个用户拥有唯一的SSO-UnionID便于管理 | 支持第三方互联登录
 
 ---
 
@@ -29,3 +29,11 @@
 ① 在SSO中心数据库的app表添加你的app信息（appId尽量用同一套算法生成25位字符串！！）
 
 ② 仿照testApp的ssoLogin.php，发送请求到SSO中心API获取用户信息
+
+---
+
+## 第三方登录配置 Third-party Login Setting
+
+▲ Github：[`login.php`](https://github.com/OysterTech/OT-SSO/blob/master/login.php#L109)填入clientId，[`github.php`](https://github.com/OysterTech/OT-SSO/blob/master/thirdLogin/github.php)填入clientId和clientSecret
+
+▲ 企业微信：[`login.php`](https://github.com/OysterTech/OT-SSO/blob/master/login.php#L130)和[`workWechat.php`](https://github.com/OysterTech/OT-SSO/blob/master/thirdLogin/workWechat.php)按照常量名称填入各参数

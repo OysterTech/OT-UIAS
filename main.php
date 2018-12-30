@@ -13,7 +13,7 @@ if(getSess("isLogin")!=1){
 }
 
 // 查询登录记录
-$logQuery=PDOQuery($dbcon,"SELECT * FROM log WHERE user_id=? AND content='登录' ORDER BY create_time DESC LIMIT 0,10",[getSess("user_id")],[PDO::PARAM_INT]);
+$logQuery=PDOQuery($dbcon,"SELECT * FROM log WHERE user_id=? AND content LIKE '登录-%' ORDER BY create_time DESC LIMIT 0,10",[getSess("user_id")],[PDO::PARAM_INT]);
 $logInfos=$logQuery[0];
 ?>
 <html>

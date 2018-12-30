@@ -32,6 +32,16 @@ CREATE TABLE `login_token` (
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE `union_user` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL COMMENT '对应user表的id',
+  `method` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '第三方英文名称小写（可选github/workwechat）',
+  `union_id` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '第三方用户ID',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `last_login` varchar(19) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE `user` (
   `id` int(11) NOT NULL,
   `union_id` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -60,6 +70,9 @@ ALTER TABLE `login_token`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `token` (`token`);
 
+ALTER TABLE `union_user`
+  ADD PRIMARY KEY (`id`);
+
 ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `union_id` (`union_id`),
@@ -72,6 +85,8 @@ ALTER TABLE `app`
 ALTER TABLE `log`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `login_token`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `union_user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
