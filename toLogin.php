@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-处理登录
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-12-20
- * @version 2018-12-30
+ * @version 2019-01-05
  */
 
 require_once 'include/public.func.php';
@@ -22,7 +22,7 @@ if($userQuery[1]!=1){
 	// 判断密码有效性
 	if($checkPwd===true){
 		$token=sha1(md5($appId).time());
-		setSess(['isLogin'=>1,'token'=>$token,'userName'=>$userName,'nickName'=>$userInfo['nick_name'],'role'=>$userInfo['role'],'user_id'=>$userInfo['id']]);
+		setSess(['isLogin'=>1,'token'=>$token,'userName'=>$userName,'nickName'=>$userInfo['nick_name'],'role'=>$userInfo['role_id'],'user_id'=>$userInfo['id'],'unionId'=>$userInfo['union_id']]);
 
 		// 校验是否有权限
 		$appPermission=explode(",",$userInfo['app_permission']);

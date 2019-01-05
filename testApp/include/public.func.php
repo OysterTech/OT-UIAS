@@ -8,7 +8,7 @@
 
 session_start();
 
-define('ROOT_PATH','https://ssouc.xshgzs.com/testApp/');
+define('ROOT_PATH','https://ssouc.itrclub.com/testApp/');
 define('JS_PATH',ROOT_PATH.'resource/js/');
 define('IMG_PATH',ROOT_PATH.'resource/image/');
 define('CSS_PATH',ROOT_PATH.'resource/css/');

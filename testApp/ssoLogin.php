@@ -9,11 +9,11 @@ require_once 'include/public.func.php';
 
 $appId="otsa_09732d2db0749fb7cdc6";
 $returnUrl=ROOT_PATH."ssoLogin.php";
-$ssoLoginUrl="https://ssouc.xshgzs.com/login.php?appId=".$appId."&returnUrl=".urlencode($returnUrl);
+$ssoLoginUrl="https://ssouc.itrclub.com/login.php?appId=".$appId."&returnUrl=".urlencode($returnUrl);
 $token=isset($_GET['token'])&&$_GET['token']!=""?$_GET['token']:toSSOLogin($ssoLoginUrl);
 
 $postData=array("token"=>$token,"appId"=>$appId,"returnUrl"=>$returnUrl);
-$ch=curl_init("https://ssouc.xshgzs.com/api/getUserInfo.php");
+$ch=curl_init("https://ssouc.itrclub.com/api/getUserInfo.php");
 curl_setopt($ch,CURLOPT_HEADER,false);
 curl_setopt($ch,CURLOPT_POST,true);
 curl_setopt($ch,CURLOPT_POSTFIELDS,$postData);

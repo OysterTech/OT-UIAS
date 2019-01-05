@@ -11,7 +11,7 @@ require_once 'include/public.func.php';
 if(getSess("isLogin")!=1){
 	gotoUrl(ROOT_PATH."login.php");
 }else{
-	gotoUrl(ROOT_PATH."main.php");
+	gotoUrl(ROOT_PATH."dashborad.php");
 }
 
 ?>

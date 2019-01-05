@@ -1,105 +1,64 @@
 <?php
 /**
- * @name 生蚝科技统一身份认证平台-平台导航栏
+ * @name 生蚝科技统一身份认证平台-导航栏
  * @author Jerry Cheung <master@smhgzs.com>
- * @since 2018-12-22
- * @version 2018-12-28
+ * @since 2018-12-31
+ * @version 2019-01-05
  */
- 
-function getGreeting(){
-	$nowHour=date("H");
-	if($nowHour>=0 && $nowHour<6) $ret="晚安！";
-	elseif($nowHour>=6 && $nowHour<10) $ret="早安！";
-	elseif($nowHour>=10 && $nowHour<12) $ret="上午好！";
-	elseif($nowHour>=12 && $nowHour<15) $ret="中午好！";
-	elseif($nowHour>=15 && $nowHour<17) $ret="下午好！";
-	elseif($nowHour>=17 && $nowHour<20) $ret="傍晚好！";
-	elseif($nowHour>=20 && $nowHour<24) $ret="晚上好！";
-
-	return $ret;
-}
-
-$role=getSess("role");
-switch($role){
-	case "0":
-		$roleName="普通会员";
-		break;
-	case "1":
-		$roleName="开发者";
-		break;
-	case "2":
-		$roleName="管理员";
-		break;
-}
-
 ?>
-<nav class="navbar navbar-default navbar-fixed-top"> 
-	<div class="container-fluid">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" href="<?=ROOT_PATH;?>main.php">生蚝科技统一身份认证平台</a>
-		</div>
 
-		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+<input type="hidden" id="<?=SESSION_PREFIX;?>unionId" name="<?=SESSION_PREFIX;?>unionId" value="<?=getSess('unionId');?>">
+
+<header class="main-header">
+	<a href="<?=ROOT_PATH;?>dashborad.php" class="logo">
+		<span class="logo-mini"><img src="https://www.itrclub.com/resource/index/img/logo.png" style="width:85%"></span>
+		<span class="logo-lg"><img src="https://www.itrclub.com/resource/index/img/logo.png" style="width:20%"> <b>ITRClub</b></span>
+	</a>
+	<nav class="navbar navbar-static-top">
+		<a class="sidebar-toggle" data-toggle="push-menu" role="button"><span class="sr-only">Toggle navigation</span></a>
+
+		<div class="navbar-custom-menu">
 			<ul class="nav navbar-nav">
-				<li><a href="<?=ROOT_PATH;?>">首页</a></li>
-				<li><a href="<?=ROOT_PATH;?>notice/list.php"><i class="fa fa-bullhorn" aria-hidden="true"></i> 通知中心</a></li>
-				<li><a href="<?=ROOT_PATH;?>app/list.php"><i class="fa fa-window-restore" aria-hidden="true"></i> 应用列表</a></li>
-				<li><a href="<?=ROOT_PATH;?>log/list.php"><i class="fa fa-list" aria-hidden="true"></i> 登录记录</a></li>
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-code" aria-hidden="true"></i> 开发者中心 <span class="caret"></span></a>
+				<li class="dropdown notifications-menu">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						<i class="fa fa-bell-o"></i>
+						<span class="label label-warning" id="navbarNoticeNum"></span>
+					</a>
 					<ul class="dropdown-menu">
-						<?php if($role<1){ ?>
-						<li><!--a href="<?=ROOT_PATH;?>developer/joinIn.php"><i class="fa fa-check-circle-o" aria-hidden="true"></i> 申请加入</a--><a onclick="alert('暂未对外开放申请！敬请期待！');"><i class="fa fa-check-circle-o" aria-hidden="true"></i> 申请加入(暂未开放)</a></li>
-						<?php }else{ ?>
-						<li><a href="<?=ROOT_PATH;?>developer/toMyAppList.php"><i class="fa fa-list-alt" aria-hidden="true"></i> 我的应用列表</a></li>
-						<li><a href="<?=ROOT_PATH;?>developer/help.php"><i class="fa fa-info-circle" aria-hidden="true"></i> 帮助中心</a></li>
-						<?php } ?>
+						<li class="header">最近一个月的通知公告</li>
+						<li>
+							<ul class="menu" id="navbarNoticeList">
+							</ul>
+						</li>
+						<li class="footer"><a href="<?=ROOT_PATH;?>notice/list.php">查看所有通知 &gt;</a></li>
 					</ul>
 				</li>
-				<?php if($role>=2){ ?>			
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-lock" aria-hidden="true"></i> 管理后台 <span class="caret"></span></a>
+				<li class="dropdown user user-menu">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						<img src="<?=IMG_PATH;?>user.png" class="user-image">
+						<span class="hidden-xs" id="nickNameNavbarBoxShow"></span>
+					</a>
 					<ul class="dropdown-menu">
-						<li><a href="<?=ROOT_PATH;?>admin/user/list.php"><i class="fa fa-users" aria-hidden="true"></i> 用户列表</a></li>
-						<li><a href="<?=ROOT_PATH;?>admin/app/list.php"><i class="fa fa-window-restore" aria-hidden="true"></i> 所有应用</a></li>
-						<li><a href="<?=ROOT_PATH;?>admin/log/list.php"><i class="fa fa-list-alt" aria-hidden="true"></i> 操作记录列表</a></li>
-					</ul>
-				</li>
-				<?php } ?>
-			</ul>
-		
-			<ul class="nav navbar-nav navbar-right">
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user-circle" aria-hidden="true"> </i><span class="caret"></span></a>
-					<ul class="dropdown-menu">
-						<li><a href="javascript:void(0)"><font color="green"><b><?=getSess("nickName");?></b></font>，<?=getGreeting(); ?></a></li>
-						<li><a href="javascript:void(0)">角色：<font color="#F57C00"><b><?=$roleName;?></b></font></a></li>
-						<li class="divider"></li>
-						<li><a href="<?=ROOT_PATH;?>profile/index.php"><i class="fa fa-user" aria-hidden="true"></i> 个人中心</a></li>
-						<li><a onclick="changePassword();"><i class="fa fa-key" aria-hidden="true"></i> 修改密码</a></li>
-						<li><a href="<?=ROOT_PATH;?>safe/index.php"><i class="fa fa-shield" aria-hidden="true"></i> 安全防护中心</a></li>
-						<li class="divider"></li>
-						<li><a onclick="logout();"><i class="fa fa-sign-out" aria-hidden="true"></i> 登出</a></li>
+						<li class="user-header">
+							<img src="<?=IMG_PATH;?>user.png" class="img-circle">
+							<p id="nameNavbarBoxShow"><!--small>Member since ?</small--></p>
+						</li>
+						<!-- Menu Footer-->
+						<li class="user-footer">
+							<div class="pull-left">
+								<a href="<?=ROOT_PATH;?>profile/my.php" class="btn btn-default btn-flat">个人中心</a>
+								<a data-toggle="modal" data-target="#changePasswordModal" class="btn btn-default btn-flat">修改密码</a>
+							</div>
+							<div class="pull-right">
+								<button data-toggle="modal" data-target="#logoutModal" class="btn btn-default btn-flat">登出</button>
+							</div>
+						</li>
 					</ul>
 				</li>
 			</ul>
 		</div>
-	</div>
-</nav>
-
-<script>
-function logout(){
-	if(confirm("确认要退出统一认证平台吗？\n退出后将会登出所有系统！")){
-		window.location.href="<?=ROOT_PATH;?>logout.php";
-	}
-}
-</script>
+	</nav>
+</header>
 
 <div class="modal fade" id="changePasswordModal">
 	<div class="modal-dialog">
@@ -109,7 +68,7 @@ function logout(){
 				<h3 class="modal-title" id="ModalTitle">修改密码</h3>
 			</div>
 			<div class="modal-body">
-				<div class="alert alert-warning">
+				<div class="alert alert-info">
 					<center>
 						<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> 新密码需包含6~20位的字符！
 					</center>
@@ -137,11 +96,6 @@ function logout(){
 </div>
 
 <script>
-function changePassword(){
-	$("#changePasswordModal").modal("show");
-}
-
-
 function toChangePassword(){
 	lockScreen();
 	oldPwd=$("#oldPwd").val();
@@ -185,7 +139,10 @@ function toChangePassword(){
 		
 			if(ret.code==200){
 				$("#changePasswordModal").modal("hide");
-				showModalTips("修改密码成功！");
+				$("#oldPwd").val("");
+				$("#newPwd").val("");
+				$("#surePwd").val("");
+				showModalTips("修改密码成功！<br>下次登录请使用新密码登录！");
 				return true;
 			}else if(ret.code==403){
 				showModalTips("旧密码错误！");
@@ -203,3 +160,203 @@ function toChangePassword(){
 }
 </script>
 
+<div class="modal modal-warning fade" id="logoutModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">登出提示</h4>
+			</div>
+			<div class="modal-body">
+				<h3 style="line-height:38px;">确认要退出统一认证平台吗？<br>退出后将会登出所有系统！</h3>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline pull-left" data-dismiss="modal">&lt; 取消</button>
+				<a href="<?=ROOT_PATH;?>logout.php" class="btn btn-outline">确认登出 &gt;</a>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+
+<!-- 侧边导航栏 -->
+<aside class="main-sidebar">
+	<section class="sidebar">
+		<div class="user-panel">
+			<div class="pull-left image">
+				<img src="<?=IMG_PATH;?>user.png" class="img-circle">
+			</div>
+			<div class="pull-left info">
+				<p id="nickNameTreeShow"></p>
+				<small id="roleNameTreeShow"></small>
+			</div>
+		</div>
+		<ul class="sidebar-menu" data-widget="tree" id="menuTree"></ul>
+	</section>
+</aside>
+<!-- ./侧边导航栏 -->
+
+<script>
+getUserInfo();
+getMenuTree();
+getNavbarNotice();
+
+
+function getUserInfo(){
+	lockScreen();
+	unionId=$("#<?=SESSION_PREFIX;?>unionId").val();
+
+	$.ajax({
+		url:"<?=API_PATH;?>user/getUserInfo.php",
+		type:"post",
+		data:{"method":"unionId","unionId":unionId},
+		dataType:"json",
+		error:function(e){
+			unlockScreen();
+			showModalTips("服务器错误！"+e.status);
+			console.log(e);
+			return false;
+		},
+		success:function(ret){
+			if(ret.code==200){
+				info=ret.data['userInfo'];
+				userName=info['userName'];
+				nickName=info['nickName'];
+				roleName=info['roleName'];
+
+				$("#nameNavbarBoxShow").html(userName+" - "+nickName);
+				$("#nickNameNavbarBoxShow").html(nickName);
+				$("#nickNameTreeShow").html(nickName);
+				$("#roleNameTreeShow").html(roleName);
+
+				unlockScreen();
+				return true;
+			}else{
+				unlockScreen();
+				showModalTips("系统错误！<br>请联系技术支持并提供错误码【USIF"+ret.code+"】");
+				return false;
+			}
+		}
+	});
+}
+
+
+function getMenuTree(){
+	lockScreen();
+
+	$.ajax({
+		url:"<?=API_PATH;?>user/getUserMenu.php",
+		dataType:"json",
+		error:function(e){
+			unlockScreen();
+			showModalTips("服务器错误！"+e.status);
+			console.log(e);
+			return false;
+		},
+		success:function(ret){
+			if(ret.code==200){
+				treeData=ret.data['treeData'];
+
+				// 显示父菜单
+				for(i in treeData){
+					fatherInfo=treeData[i];
+					
+					if(fatherInfo['hasChild']!=1){
+						html='<li><a href="'+fatherInfo['uri']+'"><i class="fa fa-'+fatherInfo['icon']+'"></i> '+fatherInfo['name']+'</a></li>';
+						$("#menuTree").append(html);
+					}else{
+						html='<li class="treeview">'
+						    +'<a href="#">'
+						    +'<i class="fa fa-'+fatherInfo['icon']+'"></i> <span>'+fatherInfo['name']+'</span>'
+						    +'<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>'
+						    +'</a>'
+						    +'<ul class="treeview-menu" id="tree_father_'+fatherInfo['id']+'">';
+						$("#menuTree").append(html);
+
+						// 显示二级菜单
+						for(j in fatherInfo['child']){
+							childInfo=fatherInfo['child'][j];
+							
+							if(childInfo['hasChild']!=1){
+								html='<li><a href="'+childInfo['uri']+'"><i class="fa fa-'+childInfo['icon']+'"></i> '+childInfo['name']+'</a></li>'
+								    +'</ul>'
+								    +'</li>';// 闭合父菜单标签
+								$("#tree_father_"+fatherInfo['id']).append(html);
+							}else{
+								html='<li class="treeview">'
+								    +'<a href="#">'
+								    +'<i class="fa fa-'+childInfo['icon']+'"></i> <span>'+childInfo['name']+'</span>'
+								    +'<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>'
+								    +'</a>'
+								    +'<ul class="treeview-menu" id="tree_child_'+childInfo['id']+'">';
+								$("#tree_father_"+fatherInfo['id']).append(html);
+
+								// 显示三级菜单
+								for(k in childInfo['child']){
+									grandsonInfo=childInfo['child'][k];
+									html='<li><a href="'+grandsonInfo['uri']+'"><i class="fa fa-'+grandsonInfo['icon']+'"></i> '+grandsonInfo['name']+'</a></li>'
+									    +'</ul>'
+									    +'</li>';// 闭合二级菜单标签
+									$("#tree_child_"+childInfo['id']).append(html);
+								}
+							}
+						}
+					}
+				}
+
+				unlockScreen();
+				return true;
+			}else if(ret.code==403){
+				unlockScreen();
+				showModalTips("用户菜单获取失败！");
+				return false;
+			}else{
+				unlockScreen();
+				showModalTips("系统错误！<br>请联系技术支持并提供错误码【MN"+ret.code+"】");
+				return false;
+			}
+		}
+	});
+}
+
+
+function getNavbarNotice(){
+	$.ajax({
+		url:"<?=API_PATH;?>notice/get.php",
+		data:{"type":"navbar"},
+		dataType:"json",
+		error:function(e){
+			showModalTips("服务器错误！"+e.status);
+			console.log(e);
+			return false;
+		},
+		success:function(ret){
+			if(ret.code==200){
+				list=ret.data['list'];
+				count=list.length;
+
+				if(count>0) $("#navbarNoticeNum").html(count);
+				else $("#navbarNoticeNum").remove();
+
+				for(info in list){
+					id=list[info]['id'];
+					title=list[info]['title'];
+					html='<li><a href="<?=ROOT_PATH;?>notice/detail.php?id='+id+'"><i class="fa fa-bullhorn"></i> '+title+'</a></li>';
+					$("#navbarNoticeList").append(html);
+				}
+				
+				if(list==""){
+					html="<li>"
+					    +"<a><font color='blue'><b>暂无公告！</b></font></a>"
+					    +"</li>";
+					$("#navbarNoticeList").append(html);
+				}
+
+			}
+		}
+	});
+}
+</script>

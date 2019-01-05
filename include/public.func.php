@@ -3,13 +3,14 @@
  * @name 生蚝科技统一身份认证平台-公用函数库
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-11-30
- * @version 2018-12-29
+ * @version 2019-01-03
  */
 
 session_start();
 require_once 'PDOConn.php';
 
 define('ROOT_PATH','https://ssouc.xshgzs.com/');
+define('API_PATH',ROOT_PATH.'api/');
 define('JS_PATH',ROOT_PATH.'resource/js/');
 define('IMG_PATH',ROOT_PATH.'resource/image/');
 define('CSS_PATH',ROOT_PATH.'resource/css/');
@@ -161,4 +162,24 @@ function addLoginToken($dbcon,$token,$userId)
 
 	if($add[1]==1) return true;
 	else return false;
+}
+
+
+/**
+ * logout 强行自动登出
+ */
+function logout()
+{
+	die(header("location:".ROOT_PATH."logout.php?service=".urlencode('https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'])));
+}
+
+
+/**
+ * checkLogin 检查是否已登录
+ */
+function checkLogin()
+{
+	if(getSess("isLogin")!=1){
+		logout();
+	}
 }

@@ -8,7 +8,7 @@
 
 ▲ 开发商：生蚝科技
 
-▲ 代码版本信息：***Build 00103***
+▲ 代码版本信息：***Build 00135***
 
 ▲ 系统版本信息：***Build***
 
@@ -20,7 +20,7 @@
 
 ## 待开发 TODO
 
-▲ SSO平台
+▲ SSO平台管理平台
 
 ---
 
@@ -37,3 +37,9 @@
 ▲ Github：[`login.php`](https://github.com/OysterTech/OT-SSO/blob/master/login.php#L109)填入clientId，[`github.php`](https://github.com/OysterTech/OT-SSO/blob/master/thirdLogin/github.php)填入clientId和clientSecret
 
 ▲ 企业微信：[`login.php`](https://github.com/OysterTech/OT-SSO/blob/master/login.php#L130)和[`workWechat.php`](https://github.com/OysterTech/OT-SSO/blob/master/thirdLogin/workWechat.php)按照常量名称填入各参数
+
+---
+
+## 鸣谢
+
+* [`AdminLTE UI框架`](https://github.com/almasaeed2010/AdminLTE)

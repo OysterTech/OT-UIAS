@@ -3,27 +3,25 @@
  * @name 生蚝科技统一身份认证平台-登录页
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-11-30
- * @version 2018-12-30
+ * @version 2019-01-05
  */
 
 require_once 'include/public.func.php';
 
 $appId=isset($_GET['appId'])?$_GET['appId']:"";
-$returnUrl=isset($_GET['returnUrl'])?urldecode($_GET['returnUrl']):ROOT_PATH."main.php";
+$returnUrl=isset($_GET['returnUrl'])?urldecode($_GET['returnUrl']):ROOT_PATH."dashborad.php";
 
 // 查询应用信息
 $query=PDOQuery($dbcon,"SELECT * FROM app WHERE app_id=? AND return_url=?",[$appId,$returnUrl],[PDO::PARAM_STR,PDO::PARAM_STR]);
 if($query[1]!=1){
 	// 没有此应用
-	if($appId!="" && $returnUrl!=ROOT_PATH."main.php"){
+	if($appId!="" && $returnUrl!=ROOT_PATH."dashborad.php"){
 		gotoUrl(ROOT_PATH."noAccess.php?mod=appInfo");
 	}else{
-		$appName="统一认证平台用户中心";
-		$method="常规登录";
+		$appName="用户中心";
 	}
 }else{
 	$appName=$query[0][0]['name'];
-	$method="第三方应用登录";
 }
 
 setSess(['appId'=>$appId,'returnUrl'=>$returnUrl]);
@@ -33,7 +31,7 @@ if(getSess("isLogin")==1){
 	$token=sha1(md5($appId).time());
 	setSess(['token'=>$token]);
 	
-	$addLog=PDOQuery($dbcon,"INSERT INTO log(user_id,app_id,method,content,ip) VALUES (?,?,?,'登录',?)",[getSess("user_id"),$query[0][0]['id'],$method,getIP()],[PDO::PARAM_INT,PDO::PARAM_INT,PDO::PARAM_STR,PDO::PARAM_STR]);
+	$addLog=PDOQuery($dbcon,"INSERT INTO log(user_id,app_id,method,content,ip) VALUES (?,?,'登录','登录-".$appName."',?)",[getSess("user_id"),$query[0][0]['id'],getIP()],[PDO::PARAM_INT,PDO::PARAM_INT,PDO::PARAM_STR]);
 
 	$tokenQuery=addLoginToken($dbcon,$token,getSess("user_id"));
 	if($tokenQuery===TRUE) gotoUrl($returnUrl."?token=".getSess('token'));
@@ -108,7 +106,6 @@ if(getSess("isLogin")==1){
 				第三方登录：
 				<a href="https://github.com/login/oauth/authorize?client_id=&scope=user"><i class="fa fa-2x fa-github" aria-hidden="true"></i></a>&nbsp;&nbsp;
 				<a onclick="alert('目前仅支持生蚝科技内部企业微信！\n请直接点击右上角扫码登录！\n\n普通用户暂不支持，敬请期待！');"><i class="fa fa-2x fa-weixin" aria-hidden="true"></i></a>&nbsp;&nbsp;
-				</font>
 			</p>
 			<p style="line-height:6px;">&nbsp;</p>
 		</div>
@@ -123,7 +120,9 @@ if(getSess("isLogin")==1){
 	</div>
 </div>
 
-<?php include 'include/footer.php'; ?>
+<script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="<?=JS_PATH;?>utils.js"></script>
 <script src="https://rescdn.qqmail.com/node/ww/wwopenmng/js/sso/wwLogin-1.0.0.js"></script>
 
 <script>
@@ -182,14 +181,19 @@ function toLogin(){
 		success:function(ret){
 			if(ret.code==200){
 				data=ret.data;
-				window.location.href=data['returnUrl'];
+
+				if(appId=="" && getURLParam("service")!=null){url=decodeURIComponent(getURLParam("service"));}
+				else if(appId==""){url="dashborad.php";}
+				else{url=data['returnUrl'];}
+
+				window.location.href=url;
 				return true;
 			}else if(ret.code==4031){
 				showModalTips("用户名或密码错误！");
 				return false;
 			}else if(ret.code==4032){
 				alert("登录成功~\n当前用户暂无访问此应用权限！\n即将跳转至平台用户中心！");
-				window.location.href="<?=ROOT_PATH;?>main.php";
+				window.location.href="<?=ROOT_PATH;?>dashborad.php";
 				return false;
 			}else if(ret.code==0){
 				showModalTips("参数缺失！请联系技术支持！");
