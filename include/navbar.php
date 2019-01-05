@@ -245,6 +245,7 @@ function getUserInfo(){
 
 
 function getMenuTree(){
+	rootUrl="<?=ROOT_PATH;?>";
 	lockScreen();
 
 	$.ajax({
@@ -265,7 +266,7 @@ function getMenuTree(){
 					fatherInfo=treeData[i];
 					
 					if(fatherInfo['hasChild']!=1){
-						html='<li><a href="'+fatherInfo['uri']+'"><i class="fa fa-'+fatherInfo['icon']+'"></i> '+fatherInfo['name']+'</a></li>';
+						html='<li><a href="'+rootUrl+fatherInfo['uri']+'"><i class="fa fa-'+fatherInfo['icon']+'"></i> '+fatherInfo['name']+'</a></li>';
 						$("#menuTree").append(html);
 					}else{
 						html='<li class="treeview">'
@@ -281,7 +282,7 @@ function getMenuTree(){
 							childInfo=fatherInfo['child'][j];
 							
 							if(childInfo['hasChild']!=1){
-								html='<li><a href="'+childInfo['uri']+'"><i class="fa fa-'+childInfo['icon']+'"></i> '+childInfo['name']+'</a></li>'
+								html='<li><a href="'+rootUrl+childInfo['uri']+'"><i class="fa fa-'+childInfo['icon']+'"></i> '+childInfo['name']+'</a></li>'
 								    +'</ul>'
 								    +'</li>';// 闭合父菜单标签
 								$("#tree_father_"+fatherInfo['id']).append(html);
@@ -297,7 +298,7 @@ function getMenuTree(){
 								// 显示三级菜单
 								for(k in childInfo['child']){
 									grandsonInfo=childInfo['child'][k];
-									html='<li><a href="'+grandsonInfo['uri']+'"><i class="fa fa-'+grandsonInfo['icon']+'"></i> '+grandsonInfo['name']+'</a></li>'
+									html='<li><a href="'+rootUrl+grandsonInfo['uri']+'"><i class="fa fa-'+grandsonInfo['icon']+'"></i> '+grandsonInfo['name']+'</a></li>'
 									    +'</ul>'
 									    +'</li>';// 闭合二级菜单标签
 									$("#tree_child_"+childInfo['id']).append(html);
