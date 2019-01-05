@@ -8,7 +8,7 @@
 
 ▲ 开发商：生蚝科技
 
-▲ 代码版本信息：***Build 00135***
+▲ 代码版本信息：***Build 00138***
 
 ▲ 系统版本信息：***Build***
 
@@ -42,4 +42,4 @@
 
 ## 鸣谢
 
-* [`AdminLTE UI框架`](https://github.com/almasaeed2010/AdminLTE)
+* [`AdminLTE`](https://github.com/almasaeed2010/AdminLTE) UI框架

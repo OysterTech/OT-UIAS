@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-第三方登录-企业微信
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-12-30
- * @version 2018-12-30
+ * @version 2019-01-05
  */
 require_once '../include/public.func.php';
 
@@ -69,7 +69,7 @@ if($unionInfo[1]!=1){
 	}else{
 		$userInfo=$userQuery[0][0];
 		$token=sha1(md5($appId).time());
-		setSess(['isLogin'=>1,'token'=>$token,'userName'=>$userInfo['user_name'],'nickName'=>$userInfo['nick_name'],'role'=>$userInfo['role'],'user_id'=>$userId]);
+		setSess(['isLogin'=>1,'token'=>$token,'userName'=>$userInfo['user_name'],'nickName'=>$userInfo['nick_name'],'role'=>$userInfo['role'],'user_id'=>$userId,'unionId'=>$userInfo['union_id']]);
 
 		// 校验是否有权限
 		$appPermission=explode(",",$userInfo['app_permission']);
