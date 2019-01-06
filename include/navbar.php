@@ -3,12 +3,13 @@
  * @name 生蚝科技统一身份认证平台-导航栏
  * @author Jerry Cheung <master@smhgzs.com>
  * @since 2018-12-31
- * @version 2019-01-05
+ * @version 2019-01-06
  */
 ?>
 
 <input type="hidden" id="<?=SESSION_PREFIX;?>unionId" name="<?=SESSION_PREFIX;?>unionId" value="<?=getSess('unionId');?>">
 
+<div id="header">
 <header class="main-header">
 	<a href="<?=ROOT_PATH;?>dashborad.php" class="logo">
 		<span class="logo-mini"><img src="https://www.itrclub.com/resource/index/img/logo.png" style="width:85%"></span>
@@ -19,34 +20,39 @@
 
 		<div class="navbar-custom-menu">
 			<ul class="nav navbar-nav">
+				<!-- 导航栏通知列表 -->
 				<li class="dropdown notifications-menu">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 						<i class="fa fa-bell-o"></i>
-						<span class="label label-warning" id="navbarNoticeNum"></span>
+						<span v-if="navNoticeTotal>0" class="label label-warning">{{navNoticeTotal}}</span>
 					</a>
 					<ul class="dropdown-menu">
 						<li class="header">最近一个月的通知公告</li>
 						<li>
-							<ul class="menu" id="navbarNoticeList">
+							<ul class="menu">
+								<li v-if="navNoticeList!={}" v-for="navNoticeInfo in navNoticeList"><a v-bind:href="[rootUrl+'notice/detail.php?id='+navNoticeInfo['id']]"><i class="fa fa-bullhorn"></i> {{navNoticeInfo['title']}}</a></li>
+								<li v-else><a><font color='blue'><b>暂无公告！</b></font></a></li>
 							</ul>
 						</li>
-						<li class="footer"><a href="<?=ROOT_PATH;?>notice/list.php">查看所有通知 &gt;</a></li>
+						<li class="footer"><a v-bind:href="[rootUrl+'notice/list.php']">查看所有通知 &gt;</a></li>
 					</ul>
 				</li>
+				<!-- ./导航栏通知列表 -->
+
 				<li class="dropdown user user-menu">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 						<img src="<?=IMG_PATH;?>user.png" class="user-image">
-						<span class="hidden-xs" id="nickNameNavbarBoxShow"></span>
+						<span class="hidden-xs">{{userInfo['nickName']}}</span>
 					</a>
 					<ul class="dropdown-menu">
 						<li class="user-header">
 							<img src="<?=IMG_PATH;?>user.png" class="img-circle">
-							<p id="nameNavbarBoxShow"><!--small>Member since ?</small--></p>
+							<p>{{userInfo['userName']}} - {{userInfo['nickName']}}<!--small>Member since ?</small--></p>
 						</li>
 						<!-- Menu Footer-->
 						<li class="user-footer">
 							<div class="pull-left">
-								<a href="<?=ROOT_PATH;?>profile/my.php" class="btn btn-default btn-flat">个人中心</a>
+								<a v-bind:href="[rootUrl+'profile/my.php']" class="btn btn-default btn-flat">个人中心</a>
 								<a data-toggle="modal" data-target="#changePasswordModal" class="btn btn-default btn-flat">修改密码</a>
 							</div>
 							<div class="pull-right">
@@ -93,6 +99,74 @@
 			</div>
 		</div>
 	</div>
+</div>
+
+<div class="modal modal-warning fade" id="logoutModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">登出提示</h4>
+			</div>
+			<div class="modal-body">
+				<h3 style="line-height:38px;">确认要退出统一认证平台吗？<br>退出后将会登出所有系统！</h3>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline pull-left" data-dismiss="modal">&lt; 取消</button>
+				<a href="<?=ROOT_PATH;?>logout.php" class="btn btn-outline">确认登出 &gt;</a>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<!-- 侧边导航栏 -->
+<aside class="main-sidebar">
+	<section class="sidebar">
+		<div class="user-panel">
+			<div class="pull-left image">
+				<img src="<?=IMG_PATH;?>user.png" class="img-circle">
+			</div>
+			<div class="pull-left info">
+				<p>{{userInfo['nickName']}}</p>
+				<small>{{userInfo['roleName']}}</small>
+			</div>
+		</div>
+		<!-- 菜单树 -->
+		<!-- 父菜单 -->
+		<ul class="sidebar-menu" data-widget="tree">
+			<li v-for="fatherInfo in treeData" v-if="fatherInfo['hasChild']!=1"><a v-bind:href="[rootUrl+fatherInfo['name']]"><i v-bind:class="['fa fa-'+fatherInfo['icon']]"></i> {{fatherInfo['name']}}</a></li>
+			<!-- 二级菜单 -->
+			<li v-else class="treeview">
+				<a href="#">
+					<i v-bind:class="['fa fa-'+fatherInfo['icon']]"></i> <span>{{fatherInfo['name']}}</span>
+					<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+				</a>
+				<ul class="treeview-menu">
+					<li v-for="childInfo in fatherInfo['child']" v-if="childInfo['hasChild']!=1"><a v-bind:href="[rootUrl+childInfo['name']]"><i v-bind:class="['fa fa-'+childInfo['icon']]"></i> {{childInfo['name']}}</a></li>
+					<!-- 三级菜单 -->
+					<li v-else class="treeview">
+						<a href="#">
+							<i v-bind:class="['fa fa-'+childInfo['icon']]"></i> <span>{{childInfo['name']}}</span>
+							<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+						</a>
+						<ul class="treeview-menu">
+							<li v-for="grandsonInfo in childInfo['child']"><a v-bind:href="[rootUrl+grandsonInfo['name']]"><i v-bind:class="['fa fa-'+grandsonInfo['icon']]"></i> {{grandsonInfo['name']}}</a></li>
+						</ul>
+					</li>
+					<!-- ./三级菜单 -->
+				</ul>
+			</li>
+			<!-- ./二级菜单 -->
+		</ul>
+		<!-- ./父菜单 -->
+		<!-- ./菜单树 -->
+	</section>
+</aside>
+<!-- ./侧边导航栏 -->
+
 </div>
 
 <script>
@@ -160,204 +234,100 @@ function toChangePassword(){
 }
 </script>
 
-<div class="modal modal-warning fade" id="logoutModal">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">登出提示</h4>
-			</div>
-			<div class="modal-body">
-				<h3 style="line-height:38px;">确认要退出统一认证平台吗？<br>退出后将会登出所有系统！</h3>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-outline pull-left" data-dismiss="modal">&lt; 取消</button>
-				<a href="<?=ROOT_PATH;?>logout.php" class="btn btn-outline">确认登出 &gt;</a>
-			</div>
-		</div>
-		<!-- /.modal-content -->
-	</div>
-	<!-- /.modal-dialog -->
-</div>
-<!-- /.modal -->
-
-
-<!-- 侧边导航栏 -->
-<aside class="main-sidebar">
-	<section class="sidebar">
-		<div class="user-panel">
-			<div class="pull-left image">
-				<img src="<?=IMG_PATH;?>user.png" class="img-circle">
-			</div>
-			<div class="pull-left info">
-				<p id="nickNameTreeShow"></p>
-				<small id="roleNameTreeShow"></small>
-			</div>
-		</div>
-		<ul class="sidebar-menu" data-widget="tree" id="menuTree"></ul>
-	</section>
-</aside>
-<!-- ./侧边导航栏 -->
-
 <script>
-getUserInfo();
-getMenuTree();
-getNavbarNotice();
+var headerVm = new Vue({
+	el:'#header',
+	data:{
+		rootUrl:"<?=ROOT_PATH;?>",
+		userInfo:{},
+		treeData:{},
+		navNoticeList:{},
+		navNoticeTotal:0
+	},
+	methods:{
+		getUserInfo:function(){
+			lockScreen();
+			unionId=$("#<?=SESSION_PREFIX;?>unionId").val();
 
-
-function getUserInfo(){
-	lockScreen();
-	unionId=$("#<?=SESSION_PREFIX;?>unionId").val();
-
-	$.ajax({
-		url:"<?=API_PATH;?>user/getUserInfo.php",
-		type:"post",
-		data:{"method":"unionId","unionId":unionId},
-		dataType:"json",
-		error:function(e){
-			unlockScreen();
-			showModalTips("服务器错误！"+e.status);
-			console.log(e);
-			return false;
-		},
-		success:function(ret){
-			if(ret.code==200){
-				info=ret.data['userInfo'];
-				userName=info['userName'];
-				nickName=info['nickName'];
-				roleName=info['roleName'];
-
-				$("#nameNavbarBoxShow").html(userName+" - "+nickName);
-				$("#nickNameNavbarBoxShow").html(nickName);
-				$("#nickNameTreeShow").html(nickName);
-				$("#roleNameTreeShow").html(roleName);
-
-				unlockScreen();
-				return true;
-			}else{
-				unlockScreen();
-				showModalTips("系统错误！<br>请联系技术支持并提供错误码【USIF"+ret.code+"】");
-				return false;
-			}
-		}
-	});
-}
-
-
-function getMenuTree(){
-	rootUrl="<?=ROOT_PATH;?>";
-	lockScreen();
-
-	$.ajax({
-		url:"<?=API_PATH;?>user/getUserMenu.php",
-		dataType:"json",
-		error:function(e){
-			unlockScreen();
-			showModalTips("服务器错误！"+e.status);
-			console.log(e);
-			return false;
-		},
-		success:function(ret){
-			if(ret.code==200){
-				treeData=ret.data['treeData'];
-
-				// 显示父菜单
-				for(i in treeData){
-					fatherInfo=treeData[i];
-					
-					if(fatherInfo['hasChild']!=1){
-						html='<li><a href="'+rootUrl+fatherInfo['uri']+'"><i class="fa fa-'+fatherInfo['icon']+'"></i> '+fatherInfo['name']+'</a></li>';
-						$("#menuTree").append(html);
+			$.ajax({
+				url:"<?=API_PATH;?>user/getUserInfo.php",
+				type:"post",
+				data:{"method":"unionId","unionId":unionId},
+				dataType:"json",
+				error:function(e){
+					unlockScreen();
+					showModalTips("服务器错误！"+e.status);
+					console.log(e);
+					return false;
+				},
+				success:function(ret){
+					if(ret.code==200){
+						unlockScreen();
+						info=ret.data['userInfo'];
+						headerVm.userInfo=info;
+						return true;
 					}else{
-						html='<li class="treeview">'
-						    +'<a href="#">'
-						    +'<i class="fa fa-'+fatherInfo['icon']+'"></i> <span>'+fatherInfo['name']+'</span>'
-						    +'<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>'
-						    +'</a>'
-						    +'<ul class="treeview-menu" id="tree_father_'+fatherInfo['id']+'">';
-						$("#menuTree").append(html);
-
-						// 显示二级菜单
-						for(j in fatherInfo['child']){
-							childInfo=fatherInfo['child'][j];
-							
-							if(childInfo['hasChild']!=1){
-								html='<li><a href="'+rootUrl+childInfo['uri']+'"><i class="fa fa-'+childInfo['icon']+'"></i> '+childInfo['name']+'</a></li>'
-								    +'</ul>'
-								    +'</li>';// 闭合父菜单标签
-								$("#tree_father_"+fatherInfo['id']).append(html);
-							}else{
-								html='<li class="treeview">'
-								    +'<a href="#">'
-								    +'<i class="fa fa-'+childInfo['icon']+'"></i> <span>'+childInfo['name']+'</span>'
-								    +'<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>'
-								    +'</a>'
-								    +'<ul class="treeview-menu" id="tree_child_'+childInfo['id']+'">';
-								$("#tree_father_"+fatherInfo['id']).append(html);
-
-								// 显示三级菜单
-								for(k in childInfo['child']){
-									grandsonInfo=childInfo['child'][k];
-									html='<li><a href="'+rootUrl+grandsonInfo['uri']+'"><i class="fa fa-'+grandsonInfo['icon']+'"></i> '+grandsonInfo['name']+'</a></li>'
-									    +'</ul>'
-									    +'</li>';// 闭合二级菜单标签
-									$("#tree_child_"+childInfo['id']).append(html);
-								}
-							}
-						}
+						unlockScreen();
+						showModalTips("系统错误！<br>请联系技术支持并提供错误码【USIF"+ret.code+"】");
+						return false;
 					}
 				}
-
-				unlockScreen();
-				return true;
-			}else if(ret.code==403){
-				unlockScreen();
-				showModalTips("用户菜单获取失败！");
-				return false;
-			}else{
-				unlockScreen();
-				showModalTips("系统错误！<br>请联系技术支持并提供错误码【MN"+ret.code+"】");
-				return false;
-			}
-		}
-	});
-}
-
-
-function getNavbarNotice(){
-	$.ajax({
-		url:"<?=API_PATH;?>notice/get.php",
-		data:{"type":"navbar"},
-		dataType:"json",
-		error:function(e){
-			showModalTips("服务器错误！"+e.status);
-			console.log(e);
-			return false;
+			});
 		},
-		success:function(ret){
-			if(ret.code==200){
-				list=ret.data['list'];
-				count=list.length;
+		getMenuTree:function(){
+			lockScreen();
 
-				if(count>0) $("#navbarNoticeNum").html(count);
-				else $("#navbarNoticeNum").remove();
-
-				for(info in list){
-					id=list[info]['id'];
-					title=list[info]['title'];
-					html='<li><a href="<?=ROOT_PATH;?>notice/detail.php?id='+id+'"><i class="fa fa-bullhorn"></i> '+title+'</a></li>';
-					$("#navbarNoticeList").append(html);
+			$.ajax({
+				url:"<?=API_PATH;?>user/getUserMenu.php",
+				dataType:"json",
+				error:function(e){
+					unlockScreen();
+					showModalTips("服务器错误！"+e.status);
+					console.log(e);
+					return false;
+				},
+				success:function(ret){
+					if(ret.code==200){
+						treeData=ret.data['treeData'];
+						headerVm.treeData=treeData;
+						unlockScreen();
+						return true;
+					}else if(ret.code==403){
+						unlockScreen();
+						showModalTips("用户菜单获取失败！");
+						return false;
+					}else{
+						unlockScreen();
+						showModalTips("系统错误！<br>请联系技术支持并提供错误码【MN"+ret.code+"】");
+						return false;
+					}
 				}
-				
-				if(list==""){
-					html="<li>"
-					    +"<a><font color='blue'><b>暂无公告！</b></font></a>"
-					    +"</li>";
-					$("#navbarNoticeList").append(html);
+			});
+		},
+		getNavbarNotice:function(){
+			$.ajax({
+				url:"<?=API_PATH;?>notice/get.php",
+				data:{"type":"navbar"},
+				dataType:"json",
+				error:function(e){
+					showModalTips("服务器错误！"+e.status);
+					console.log(e);
+					return false;
+				},
+				success:function(ret){
+					if(ret.code==200){
+						list=ret.data['list'];
+						headerVm.navNoticeList=list;
+						headerVm.navNoticeTotal=list.length;
+						return false;
+					}
 				}
-
-			}
+			});
 		}
-	});
-}
+	}
+});
+
+headerVm.getUserInfo();
+headerVm.getMenuTree();
+headerVm.getNavbarNotice();
 </script>

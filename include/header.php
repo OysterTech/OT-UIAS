@@ -15,6 +15,8 @@
 <link rel="stylesheet" href="https://cdn.bootcss.com/datatables/1.10.19/css/dataTables.bootstrap.min.css">
 
 <script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="<?=JS_PATH;?>jquery-ui.min.js"></script>
 <script>
 	$.widget.bridge('uibutton', $.ui.button);
