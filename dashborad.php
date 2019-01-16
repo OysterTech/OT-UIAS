@@ -1,20 +1,20 @@
 <?php
 /**
- * @name 生蚝科技统一身份认证平台-首页
+ * @name 生蚝科技用户中心-首页
  * @author Jerry Cheung <master@smhgzs.com>
  * @since 2018-12-31
- * @version 2019-01-06
+ * @version 2019-01-12
  */
 
 require_once 'include/public.func.php';
 
-checkLogin();
+checkAuth();
 
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-	<title>首页 / 生蚝科技统一身份认证平台</title>
+	<title>首页 / 生蚝科技用户中心</title>
 	<?php include 'include/header.php'; ?>
 </head>
 <body class="hold-transition skin-green sidebar-mini">
@@ -26,7 +26,7 @@ checkLogin();
 <div id="app" class="content-wrapper">
 	<!-- 头部(显示页面名称和路径) -->
 	<section class="content-header">
-		<h1>生蚝科技统一身份认证平台<small>首页</small></h1>
+		<h1>生蚝科技用户中心<small>首页</small></h1>
 		<ol class="breadcrumb">
 			<li><a href="<?=ROOT_PATH;?>dashborad.php"><i class="fa fa-dashboard"></i> 生蚝科技用户中心</a></li>
 			<li class="active">首页</li>
@@ -52,7 +52,7 @@ checkLogin();
 					<!-- /.box-header -->
 					<div class="box-body">
 						<ul class="todo-list">
-							<li v-if="noticeList==={}"><font color='blue'><b>暂无公告！</b></font></li>
+							<li v-if="Object.keys(noticeList).length===0"><font color='blue'><b>暂无公告！</b></font></li>
 							<li v-else v-for="noticeInfo in noticeList">
 								<span class="handle"><i class="fa fa-bullhorn"></i></span>
 								<a v-bind:href="['<?=ROOT_PATH;?>notice/detail.php?id='+noticeInfo['id']]"><span class="text">{{noticeInfo['title']}}</span></a>

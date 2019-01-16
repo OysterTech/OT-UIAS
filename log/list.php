@@ -3,12 +3,12 @@
  * @name 生蚝科技统一身份认证平台-登录记录
  * @author Jerry Cheung <master@smhgzs.com>
  * @since 2018-12-31
- * @version 2018-12-31
+ * @version 2019-01-07
  */
 
 require_once '../include/public.func.php';
 
-checkLogin();
+checkAuth();
 
 // 查询登录记录
 $logQuery=PDOQuery($dbcon,"SELECT * FROM log WHERE user_id=? AND content LIKE '登录-%'",[getSess("user_id")],[PDO::PARAM_INT]);
@@ -18,7 +18,7 @@ $logInfos=$logQuery[0];
 <html>
 <head>
 	<?php include '../include/header.php'; ?>
-	<title>登录记录 / 生蚝科技统一身份认证平台</title>
+	<title>登录记录 / 生蚝科技用户中心</title>
 </head>
 <body class="hold-transition skin-green sidebar-mini">
 <div class="wrapper">

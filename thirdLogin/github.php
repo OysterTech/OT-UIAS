@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-第三方登录-Github
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-12-30
- * @version 2019-01-05
+ * @version 2019-01-12
  */
 require_once '../include/public.func.php';
 
@@ -17,16 +17,16 @@ $accessToken=substr($data[0],13);
 
 $userInfo=http_post("https://api.github.com/user?access_token=".$accessToken);
 $userInfo=json_decode($userInfo,TRUE);
-$unionId=$userInfo['id'];
+$thirdId=$userInfo['id'];
 
-$unionInfo=PDOQuery($dbcon,"SELECT * FROM union_user WHERE method='github' AND union_id=?",[$unionId],[PDO::PARAM_STR]);
+$unionInfo=PDOQuery($dbcon,"SELECT * FROM third_user WHERE method='github' AND third_id=?",[$thirdId],[PDO::PARAM_STR]);
 
 if($unionInfo[1]!=1){
 	setSess("third_name","github");
-	setSess("third_unionId",$unionId);
+	setSess("third_thirdId",$thirdId);
 	header("location:bindUser.php");
 }else{
-	PDOQuery($dbcon,"UPDATE union_user SET last_login=? WHERE method='github' AND union_id=?",[date("Y-m-d H:i:s"),$unionId],[PDO::PARAM_STR,PDO::PARAM_STR]);
+	PDOQuery($dbcon,"UPDATE third_user SET last_login=? WHERE method='github' AND third_id=?",[date("Y-m-d H:i:s"),$thirdId],[PDO::PARAM_STR,PDO::PARAM_STR]);
 
 	$appId=getSess("appId");
 	$userId=$unionInfo[0][0]['user_id'];
@@ -37,7 +37,7 @@ if($unionInfo[1]!=1){
 	}else{
 		$userInfo=$userQuery[0][0];
 		$token=sha1(md5($appId).time());
-		setSess(['isLogin'=>1,'token'=>$token,'userName'=>$userInfo['user_name'],'nickName'=>$userInfo['nick_name'],'role'=>$userInfo['role'],'user_id'=>$userId,'unionId'=>$userInfo['union_id']]);
+		setSess(['isLogin'=>1,'token'=>$token,'userName'=>$userInfo['user_name'],'nickName'=>$userInfo['nick_name'],'role'=>$userInfo['role_id'],'user_id'=>$userId,'unionId'=>$userInfo['union_id']]);
 
 		// 校验是否有权限
 		$appPermission=explode(",",$userInfo['app_permission']);

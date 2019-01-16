@@ -7,7 +7,7 @@ CREATE TABLE `app` (
   `name` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
   `main_page` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL,
   `return_url` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` int(1) NOT NULL DEFAULT '1',
+  `status` int(1) NOT NULL DEFAULT '1' COMMENT '0废弃1开放2内部3审核中',
   `is_show` int(1) NOT NULL DEFAULT '1',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -81,8 +81,11 @@ CREATE TABLE `role` (
   `remark` text COLLATE utf8_unicode_ci COMMENT '备注',
   `is_default` int(1) NOT NULL DEFAULT '0' COMMENT '是否为默认角色',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` varchar(19) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0000-00-00 00:00:00'
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='角色表';
+
+INSERT INTO `role` (`id`, `name`, `remark`, `is_default`, `create_time`, `update_time`) VALUES
+(1, '超级管理员', NULL, 0, '2019-01-05 13:01:11', '2019-01-05 13:01:11');
 
 CREATE TABLE `role_permission` (
   `id` int(11) NOT NULL,
@@ -111,11 +114,20 @@ INSERT INTO `role_permission` (`id`, `role_id`, `menu_id`) VALUES
 (23, 1, 23),
 (24, 1, 24);
 
-CREATE TABLE `union_user` (
+CREATE TABLE `setting` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `chinese_name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `value` text COLLATE utf8_unicode_ci NOT NULL,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` varchar(19) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `third_user` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL COMMENT '对应user表的id',
   `method` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '第三方英文名称小写（可选github/workwechat）',
-  `union_id` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '第三方用户ID',
+  `third_id` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '第三方用户ID',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `last_login` varchar(19) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0000-00-00 00:00:00'
@@ -123,7 +135,7 @@ CREATE TABLE `union_user` (
 
 CREATE TABLE `user` (
   `id` int(11) NOT NULL,
-  `union_id` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `union_id` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_name` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `nick_name` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -133,6 +145,7 @@ CREATE TABLE `user` (
   `status` int(1) NOT NULL DEFAULT '2',
   `phone` varchar(11) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `extra_param` varchar(16184) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '{}' COMMENT '扩展字段，用JSON储存',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -162,7 +175,11 @@ ALTER TABLE `role`
 ALTER TABLE `role_permission`
   ADD PRIMARY KEY (`id`);
 
-ALTER TABLE `union_user`
+ALTER TABLE `setting`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+ALTER TABLE `third_user`
   ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `user`
@@ -179,14 +196,16 @@ ALTER TABLE `log`
 ALTER TABLE `login_token`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `menu`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `notice`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `role`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `role_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
-ALTER TABLE `union_user`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `setting`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `third_user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;

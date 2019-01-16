@@ -15,7 +15,7 @@ else die(returnAjaxData(403,"failed To Auth"));
 
 function getFatherMenuByRole($dbcon,$roleID)
 {
-	$sql='SELECT a.*,b.* FROM role_permission a,menu b WHERE a.role_id=? AND a.menu_id=b.id AND b.father_id="0"';
+	$sql='SELECT a.menu_id,b.* FROM role_permission a,menu b WHERE a.role_id=? AND a.menu_id=b.id AND b.father_id="0"';
 	$query=PDOQuery($dbcon,$sql,[$roleID],[PDO::PARAM_INT]);
 	$list=$query[0];
 
@@ -25,7 +25,7 @@ function getFatherMenuByRole($dbcon,$roleID)
 
 function getChildMenuByRole($dbcon,$roleID,$fatherID)
 {
-	$sql="SELECT a.*,b.* FROM role_permission a,menu b WHERE a.role_id=? AND a.menu_id=b.id AND b.father_id=?";
+	$sql="SELECT a.menu_id,b.* FROM role_permission a,menu b WHERE a.role_id=? AND a.menu_id=b.id AND b.father_id=?";
 	$query=PDOQuery($dbcon,$sql,[$roleID,$fatherID],[PDO::PARAM_INT,PDO::PARAM_INT]);
 	$list=$query[0];
 
@@ -78,5 +78,3 @@ function getAllMenuByRole($dbcon,$roleID)
 
 	return $allMenu;
 }
-
-?>

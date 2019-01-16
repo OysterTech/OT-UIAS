@@ -3,12 +3,12 @@
  * @name 生蚝科技统一身份认证平台-我的应用列表
  * @author Jerry Cheung <master@smhgzs.com>
  * @since 2018-12-31
- * @version 2019-01-04
+ * @version 2019-01-12
  */
 
 require_once '../include/public.func.php';
 
-checkLogin();
+checkAuth();
 
 // 获取用户权限的应用信息
 $appPermission=PDOQuery($dbcon,"SELECT app_permission FROM user WHERE union_id=?",[getSess("unionId")],[PDO::PARAM_STR]);
@@ -25,7 +25,7 @@ $appInfos=$appInfoQuery[0];
 <!DOCTYPE html>
 <html>
 <head>
-	<title>我的应用列表 / 生蚝科技统一身份认证平台</title>
+	<title>我的应用列表 / 生蚝科技用户中心</title>
 	<?php include '../include/header.php'; ?>
 </head>
 <body class="hold-transition skin-green sidebar-mini">
@@ -82,7 +82,11 @@ $appInfos=$appInfoQuery[0];
 <script>
 window.onload=function(){ 
 	$('#table').DataTable({
-		responsive: true
+		responsive: true,
+		"columnDefs":[{
+			"targets":[1,2],
+			"orderable": false
+		}]
 	});
 };
 </script>

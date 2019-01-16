@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-API-获取通知
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-12-31
- * @version 2019-01-05
+ * @version 2019-01-07
  */
 
 require_once '../../include/public.func.php';
@@ -22,11 +22,13 @@ switch($type){
 		break;
 	case "list":
 		break;
+	case "detail":
+		$id=isset($_GET['id'])&&$_GET['id']!=""?$_GET['id']:die(returnAjaxData(0,"Lack Param"));
+	 $sql.="AND a.id=".$id;
+	 break;
 	default:
 		die(returnAjaxData(1,"Invaild Type"));
 }
 
 $query=PDOQuery($dbcon,$sql);
 die(returnAjaxData(200,"success",['list'=>$query[0]]));
-
-?>

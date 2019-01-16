@@ -106,3 +106,13 @@ function delCookie(name){
 	var cval=getCookie(name);
 	if(cval!=null) document.cookie= name + "="+cval+";expires="+exp.toGMTString();
 }
+
+
+function arrayToObject(array){
+	b={};
+	array.map(function(e,i){
+		b[i]=e;
+	});
+
+	return b;
+}

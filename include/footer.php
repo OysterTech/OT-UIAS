@@ -2,7 +2,7 @@
 	<div class="pull-right hidden-xs">
 		<b>Version</b> 1.0.0
 	</div>
-	<strong>Copyright &copy; 2014-<?=date("Y");?> <a href="https://www.itrclub.com">生蚝科技</a>.</strong> All rights
+	<strong>Copyright &copy; 2014-<?=date("Y");?> <a href="https://www.xshgzs.com">生蚝科技</a>.</strong> All rights
 	reserved.
 </footer>
 

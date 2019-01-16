@@ -3,10 +3,10 @@
  * @name 生蚝科技统一身份认证平台-处理修改资料
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-12-28
- * @version 2018-12-28
+ * @version 2019-01-15
  */
 
-require_once '../include/public.func.php';
+require_once '../../include/public.func.php';
 
 $userId=getSess("user_id");
 $userName=isset($_POST['userName'])&&$_POST['userName']!=""?$_POST['userName']:die(returnAjaxData(0,"lackParam"));
@@ -26,10 +26,6 @@ if($query2[1]!=0){
 $query3=PDOQuery($dbcon,"SELECT id FROM user WHERE phone=? AND id!=?",[$phone,$userId],[PDO::PARAM_STR,PDO::PARAM_INT]);
 if($query3[1]!=0){
 	die(returnAjaxData(3,"have Phone"));
-}
-$query4=PDOQuery($dbcon,"SELECT id FROM user WHERE email=? AND id!=?",[$email,$userId],[PDO::PARAM_STR,PDO::PARAM_INT]);
-if($query4[1]!=0){
-	die(returnAjaxData(4,"have Email"));
 }
 
 // 修改资料

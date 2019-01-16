@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-公用函数库
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-11-30
- * @version 2019-01-03
+ * @version 2019-01-07
  */
 
 session_start();
@@ -177,7 +177,7 @@ function logout()
 /**
  * checkLogin 检查是否已登录
  */
-function checkLogin()
+function checkAuth()
 {
 	if(getSess("isLogin")!=1){
 		logout();

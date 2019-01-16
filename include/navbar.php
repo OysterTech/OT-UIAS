@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-导航栏
  * @author Jerry Cheung <master@smhgzs.com>
  * @since 2018-12-31
- * @version 2019-01-06
+ * @version 2019-01-15
  */
 ?>
 
@@ -11,7 +11,7 @@
 
 <div id="header">
 <header class="main-header">
-	<a href="<?=ROOT_PATH;?>dashborad.php" class="logo">
+	<a v-bind:href="[rootUrl+'dashborad.php']" class="logo">
 		<span class="logo-mini"><img src="https://www.itrclub.com/resource/index/img/logo.png" style="width:85%"></span>
 		<span class="logo-lg"><img src="https://www.itrclub.com/resource/index/img/logo.png" style="width:20%"> <b>ITRClub</b></span>
 	</a>
@@ -52,7 +52,7 @@
 						<!-- Menu Footer-->
 						<li class="user-footer">
 							<div class="pull-left">
-								<a v-bind:href="[rootUrl+'profile/my.php']" class="btn btn-default btn-flat">个人中心</a>
+								<a v-bind:href="[rootUrl+'profile/index.php']" class="btn btn-default btn-flat">个人中心</a>
 								<a data-toggle="modal" data-target="#changePasswordModal" class="btn btn-default btn-flat">修改密码</a>
 							</div>
 							<div class="pull-right">
@@ -113,7 +113,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-outline pull-left" data-dismiss="modal">&lt; 取消</button>
-				<a href="<?=ROOT_PATH;?>logout.php" class="btn btn-outline">确认登出 &gt;</a>
+				<a v-bind:href="[rootUrl+'logout.php']" class="btn btn-outline">确认登出 &gt;</a>
 			</div>
 		</div>
 		<!-- /.modal-content -->
@@ -137,7 +137,7 @@
 		<!-- 菜单树 -->
 		<!-- 父菜单 -->
 		<ul class="sidebar-menu" data-widget="tree">
-			<li v-for="fatherInfo in treeData" v-if="fatherInfo['hasChild']!=1"><a v-bind:href="[rootUrl+fatherInfo['name']]"><i v-bind:class="['fa fa-'+fatherInfo['icon']]"></i> {{fatherInfo['name']}}</a></li>
+			<li v-for="fatherInfo in treeData" v-if="fatherInfo['hasChild']!=1"><a v-bind:href="[rootUrl+fatherInfo['uri']]"><i v-bind:class="['fa fa-'+fatherInfo['icon']]"></i> {{fatherInfo['name']}}</a></li>
 			<!-- 二级菜单 -->
 			<li v-else class="treeview">
 				<a href="#">
@@ -145,7 +145,7 @@
 					<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
 				</a>
 				<ul class="treeview-menu">
-					<li v-for="childInfo in fatherInfo['child']" v-if="childInfo['hasChild']!=1"><a v-bind:href="[rootUrl+childInfo['name']]"><i v-bind:class="['fa fa-'+childInfo['icon']]"></i> {{childInfo['name']}}</a></li>
+					<li v-for="childInfo in fatherInfo['child']" v-if="childInfo['hasChild']!=1"><a v-bind:href="[rootUrl+childInfo['uri']]"><i v-bind:class="['fa fa-'+childInfo['icon']]"></i> {{childInfo['name']}}</a></li>
 					<!-- 三级菜单 -->
 					<li v-else class="treeview">
 						<a href="#">
@@ -153,7 +153,7 @@
 							<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
 						</a>
 						<ul class="treeview-menu">
-							<li v-for="grandsonInfo in childInfo['child']"><a v-bind:href="[rootUrl+grandsonInfo['name']]"><i v-bind:class="['fa fa-'+grandsonInfo['icon']]"></i> {{grandsonInfo['name']}}</a></li>
+							<li v-for="grandsonInfo in childInfo['child']"><a v-bind:href="[rootUrl+grandsonInfo['uri']]"><i v-bind:class="['fa fa-'+grandsonInfo['icon']]"></i> {{grandsonInfo['name']}}</a></li>
 						</ul>
 					</li>
 					<!-- ./三级菜单 -->
@@ -290,6 +290,9 @@ var headerVm = new Vue({
 					if(ret.code==200){
 						treeData=ret.data['treeData'];
 						headerVm.treeData=treeData;
+						if(treeData==""){
+							showModalTips("用户菜单获取失败 或 用户暂无权限！");
+						}
 						unlockScreen();
 						return true;
 					}else if(ret.code==403){

@@ -42,7 +42,7 @@ if($userQuery[1]!=1){
 			}
 			
 			$tokenQuery=addLoginToken($dbcon,$token,$userInfo['id']);
-			$addLog=PDOQuery($dbcon,"INSERT INTO log(user_id,app_id,method,content,ip) VALUES (?,?,'登录','登录-".$appInfo[0][0]['name']."',?)",[$userInfo['id'],$appInfo[0][0]['id'],getIP()],[PDO::PARAM_INT,PDO::PARAM_INT,PDO::PARAM_STR]);
+			$addLog=PDOQuery($dbcon,"INSERT INTO log(user_id,app_id,method,content,ip) VALUES (?,?,'常规登录','登录-".$appInfo[0][0]['name']."',?)",[$userInfo['id'],$appInfo[0][0]['id'],getIP()],[PDO::PARAM_INT,PDO::PARAM_INT,PDO::PARAM_STR]);
 			
 			if($tokenQuery===TRUE) die(returnAjaxData(200,"success",['returnUrl'=>getSess("returnUrl")."?token=".$token]));
 			else die(returnAjaxData(1,"database Error"));

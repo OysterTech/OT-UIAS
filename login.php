@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-登录页
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-11-30
- * @version 2019-01-05
+ * @version 2019-01-15
  */
 
 require_once 'include/public.func.php';
@@ -18,7 +18,7 @@ if($query[1]!=1){
 	if($appId!="" && $returnUrl!=ROOT_PATH."dashborad.php"){
 		gotoUrl(ROOT_PATH."noAccess.php?mod=appInfo");
 	}else{
-		$appName="用户中心";
+		$appName="生蚝科技用户中心";
 	}
 }else{
 	$appName=$query[0][0]['name'];
@@ -97,15 +97,15 @@ if(getSess("isLogin")==1){
 		</div>
 
 		<div id="loginForm" class="form-signin">
-			<input type="hidden" id="OTSSO_appId" value="<?=$appId;?>">
-			<input type="text" id="OTSSO_userName" class="fadeIn second" maxlength="20" placeholder="键入您的统一身份认证账号" onkeyup='if(event.keyCode==13)$("#OTSSO_password").focus();'>
-			<input type="password" id="OTSSO_password" class="fadeIn third" maxlength="30" placeholder="键入您账号对应的密码" onkeyup='if(event.keyCode==13)toLogin();'>
-			<input type="button" class="fadeIn fourth" style="font-size:18px;" value="登 录" onclick="toLogin()">
+			<input type="hidden" id="<?=SESSION_PREFIX;?>appId" value="<?=$appId;?>">
+			<input type="text" id="<?=SESSION_PREFIX;?>userName" class="fadeIn second" maxlength="20" placeholder="键入您的通行证账号" onkeyup='if(event.keyCode==13)$("#<?=SESSION_PREFIX;?>password").focus();'>
+			<input type="password" id="<?=SESSION_PREFIX;?>password" class="fadeIn third" maxlength="30" placeholder="键入您账号对应的密码" onkeyup='if(event.keyCode==13)toLogin();'>
+			<button class="fadeIn fourth" style="font-size:18px;background-color:#56baed;border:none;color:#fff;padding:15px 39px;text-align:center;text-decoration:none;display:inline-block;text-transform:uppercase;-webkit-box-shadow:0 10px 30px 0 rgba(95,186,233,.4);box-shadow:0 10px 30px 0 rgba(95,186,233,.4);-webkit-border-radius:5px 5px 5px 5px;border-radius:5px 5px 5px 5px;margin:5px 20px 40px 20px;-webkit-transition:all .3s ease-in-out;-moz-transition:all .3s ease-in-out;-ms-transition:all .3s ease-in-out;-o-transition:all .3s ease-in-out;transition:all .3s ease-in-out" value="登 录" onclick="toReg()">注 册</button><button class="fadeIn fourth" style="font-size:18px;background-color:#9ccc65;border:none;color:#fff;padding:15px 39px;text-align:center;text-decoration:none;display:inline-block;text-transform:uppercase;-webkit-box-shadow:0 10px 30px 0 rgba(95,186,233,.4);box-shadow:0 10px 30px 0 rgba(95,186,233,.4);-webkit-border-radius:5px 5px 5px 5px;border-radius:5px 5px 5px 5px;margin:5px 20px 40px 20px;-webkit-transition:all .3s ease-in-out;-moz-transition:all .3s ease-in-out;-ms-transition:all .3s ease-in-out;-o-transition:all .3s ease-in-out;transition:all .3s ease-in-out" onclick="toLogin()">登 录</button>
 			<br>
 			<p style="text-align:left;padding-left:25px;font-size:17px;">
 				第三方登录：
 				<a href="https://github.com/login/oauth/authorize?client_id=&scope=user"><i class="fa fa-2x fa-github" aria-hidden="true"></i></a>&nbsp;&nbsp;
-				<a onclick="alert('目前仅支持生蚝科技内部企业微信！\n请直接点击右上角扫码登录！\n\n普通用户暂不支持，敬请期待！');"><i class="fa fa-2x fa-weixin" aria-hidden="true"></i></a>&nbsp;&nbsp;
+				<a onclick="alert('目前仅支持生蚝科技内部企业微信！\n请直接点击右上角扫码登录！\n\n普通用户暂不支持，敬请期待！');"><i class="fa fa-2x fa-weixin" aria-hidden="true"></i></a>&nbsp;&nbsp;>
 			</p>
 			<p style="line-height:6px;">&nbsp;</p>
 		</div>
@@ -115,7 +115,7 @@ if(getSess("isLogin")==1){
 		<!-- ▲ 企业微信登录二维码 ▲ -->
 
 		<div id="formFooter">
-			<span style="color: #56baed;line-height:28px;">本系统已整合统一身份认证<br>单点登录服务由 生蚝科技 提供</span>
+			<span style="color: #56baed;line-height:28px;">本系统已整合统一身份认证<br>单点登录服务由 <a href="https://www.xshgzs.com?from=sso" target="_blank">生蚝科技</a> 提供</span>
 		</div>
 	</div>
 </div>
@@ -126,6 +126,7 @@ if(getSess("isLogin")==1){
 <script src="https://rescdn.qqmail.com/node/ww/wwopenmng/js/sso/wwLogin-1.0.0.js"></script>
 
 <script>
+
 const CORP_ID="";
 const AGENT_ID="";
 const REDIRECT_URI=encodeURI("");
@@ -163,10 +164,28 @@ function loadWxLoginQrCode(){
 }
 
 
+function toReg(){
+	window.open("register_step1.php");
+}
+
+
 function toLogin(){
-	appId=$("#OTSSO_appId").val();
-	userName=$("#OTSSO_userName").val();
-	password=$("#OTSSO_password").val();
+	lockScreen();
+	
+	appId=$("#<?=SESSION_PREFIX;?>appId").val();
+	userName=$("#<?=SESSION_PREFIX;?>userName").val();
+	password=$("#<?=SESSION_PREFIX;?>password").val();
+	
+	if(userName.length<5 || userName.length>20){
+		unlockScreen();
+		showModalTips("请正确输入用户名！");
+		return false;
+	}
+	if(password.length<6 || password.length>20){
+		unlockScreen();
+		showModalTips("请正确输入密码！");
+		return false;
+	}
 	
 	$.ajax({
 		url:"toLogin.php",
@@ -174,6 +193,7 @@ function toLogin(){
 		data:{"appId":appId,"userName":userName,"password":password},
 		dataType:"json",
 		error:function(e){
+			unlockScreen();
 			showModalTips("服务器错误！"+e.status);
 			console.log(e);
 			return false;
@@ -189,16 +209,20 @@ function toLogin(){
 				window.location.href=url;
 				return true;
 			}else if(ret.code==4031){
+				unlockScreen();
 				showModalTips("用户名或密码错误！");
 				return false;
 			}else if(ret.code==4032){
+				unlockScreen();
 				alert("登录成功~\n当前用户暂无访问此应用权限！\n即将跳转至平台用户中心！");
 				window.location.href="<?=ROOT_PATH;?>dashborad.php";
 				return false;
 			}else if(ret.code==0){
+				unlockScreen();
 				showModalTips("参数缺失！请联系技术支持！");
 				return false;
 			}else{
+				unlockScreen();
 				showModalTips("未知错误！请提交错误码["+ret.code+"]并联系技术支持");
 				return false;
 			}
