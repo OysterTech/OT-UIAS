@@ -108,6 +108,34 @@ function delCookie(name){
 }
 
 
+function getTransTypeCNName(type){
+	cnName="";
+	
+	switch(type){
+		case "0":
+			cnName="收入";
+			break;
+		case "1":
+			cnName="支出";
+			break;
+		case "2":
+			cnName="冻结";
+			break;
+		case "3":
+			cnName="解冻";
+			break;
+		case "4":
+			cnName="赊欠";
+			break;
+		case "5":
+			cnName="还款";
+			break;
+	}
+	
+	return cnName;
+}
+
+
 function arrayToObject(array){
 	b={};
 	array.map(function(e,i){
