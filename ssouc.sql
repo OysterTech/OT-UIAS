@@ -13,7 +13,7 @@ CREATE TABLE `app` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `log` (
+CREATE TABLE `login_log` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `app_id` int(11) NOT NULL,
@@ -39,29 +39,27 @@ CREATE TABLE `menu` (
   `icon` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT '图标名（FA）',
   `uri` text COLLATE utf8_unicode_ci COMMENT '链接URL',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` varchar(19) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0000-00-00 00:00:00'
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `menu` (`id`, `father_id`, `name`, `icon`, `uri`, `create_time`, `update_time`) VALUES
-(1, 0, '通知 Notice', 'bullhorn', NULL, '2019-01-05 11:31:36', '0000-00-00 00:00:00'),
-(2, 1, '通知列表', 'list-ul', 'notice/list.php', '2019-01-05 11:32:18', '0000-00-00 00:00:00'),
-(3, 1, '通知管理', 'gears', NULL, '2019-01-05 11:32:51', '0000-00-00 00:00:00'),
-(4, 3, '通知列表管理', 'list-alt', 'notice/adminList.php', '2019-01-05 11:33:15', '0000-00-00 00:00:00'),
-(5, 3, '发布新通知', 'plus-circle', 'notice/publish.php', '2019-01-05 11:33:43', '0000-00-00 00:00:00'),
-(6, 0, '应用 App', 'unlock', NULL, '2019-01-05 11:34:05', '0000-00-00 00:00:00'),
-(7, 6, '应用列表', 'window-restore', 'app/list.php', '2019-01-05 11:34:28', '0000-00-00 00:00:00'),
-(8, 6, '登录记录', 'list', 'log/list.php', '2019-01-05 11:34:44', '0000-00-00 00:00:00'),
-(9, 6, '应用管理', 'gears', NULL, '2019-01-05 11:35:24', '0000-00-00 00:00:00'),
-(10, 9, '应用列表管理', 'list-alt', 'app/adminList.php', '2019-01-05 11:36:28', '0000-00-00 00:00:00'),
-(11, 9, '申请新增应用', 'plus-circle', 'app/apply.php', '2019-01-05 11:38:22', '0000-00-00 00:00:00'),
-(12, 9, '审核应用申请', 'check-square-o', 'app/examineList.php', '2019-01-05 11:40:44', '0000-00-00 00:00:00'),
-(18, 0, '系统管理 System', 'wrench', NULL, '2019-01-05 11:43:57', '0000-00-00 00:00:00'),
-(19, 18, '用户管理', 'user', NULL, '2019-01-05 11:44:11', '0000-00-00 00:00:00'),
-(20, 19, '用户列表', 'users', 'admin/user/list.php', '2019-01-05 11:44:48', '0000-00-00 00:00:00'),
-(21, 19, '用户配权（角色分配）', 'users', 'admin/user/userRole.php', '2019-01-05 11:45:35', '0000-00-00 00:00:00'),
-(22, 18, '角色管理', 'users', 'admin/role/list.php', '2019-01-05 11:45:59', '0000-00-00 00:00:00'),
-(23, 18, '菜单管理', 'bars', 'admin/menu/list.php', '2019-01-05 11:46:18', '0000-00-00 00:00:00'),
-(24, 18, '系统配置', 'gears', 'admin/systemSetting.php', '2019-01-05 11:46:40', '0000-00-00 00:00:00');
+(1, 0, '通知 Notice', 'bullhorn', NULL, '2019-01-05 11:31:36', '2019-01-05 11:31:36'),
+(2, 1, '通知列表', 'list-ul', 'notice/list', '2019-01-05 11:32:18', '2019-01-19 08:17:10'),
+(3, 1, '通知管理', 'gears', NULL, '2019-01-05 11:32:51', '2019-01-05 11:32:51'),
+(4, 3, '通知列表管理', 'list-alt', 'admin/notice/list', '2019-01-05 11:33:15', '2019-01-19 08:17:19'),
+(5, 3, '发布新通知', 'plus-circle', 'admin/notice/publish', '2019-01-05 11:33:43', '2019-01-19 08:17:58'),
+(6, 0, '应用 App', 'unlock', NULL, '2019-01-05 11:34:05', '2019-01-05 11:34:05'),
+(7, 6, '应用列表', 'window-restore', 'app/list', '2019-01-05 11:34:28', '2019-01-19 08:18:24'),
+(8, 6, '登录记录（内部）', 'ban', '#', '2019-01-05 11:34:44', '2019-01-19 13:46:31'),
+(9, 6, '应用管理', 'gears', NULL, '2019-01-05 11:35:24', '2019-01-05 11:35:24'),
+(10, 9, '应用列表管理', 'list-alt', 'php', '2019-01-05 11:36:28', '2019-01-19 08:16:13'),
+(11, 9, '申请新增应用', 'plus-circle', 'php', '2019-01-05 11:38:22', '2019-01-19 08:16:13'),
+(12, 9, '审核应用申请', 'check-square-o', 'php', '2019-01-05 11:40:44', '2019-01-19 08:16:13'),
+(18, 0, '系统管理 System', 'wrench', NULL, '2019-01-05 11:43:57', '2019-01-05 11:43:57'),
+(20, 18, '用户列表', 'user-circle-o', 'admin/user/list', '2019-01-05 11:44:48', '2019-01-19 08:19:33'),
+(22, 18, '角色管理', 'users', 'admin/role/list', '2019-01-05 11:45:59', '2019-01-19 08:19:38'),
+(23, 18, '菜单管理', 'bars', 'admin/menu/list', '2019-01-05 11:46:18', '2019-01-19 08:19:52'),
+(24, 18, '系统配置', 'gears', 'admin/setting/list', '2019-01-05 11:46:40', '2019-01-19 08:20:01');
 
 CREATE TABLE `notice` (
   `id` int(11) NOT NULL,
@@ -84,35 +82,12 @@ CREATE TABLE `role` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='角色表';
 
-INSERT INTO `role` (`id`, `name`, `remark`, `is_default`, `create_time`, `update_time`) VALUES
-(1, '超级管理员', NULL, 0, '2019-01-05 13:01:11', '2019-01-05 13:01:11');
-
 CREATE TABLE `role_permission` (
   `id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL COMMENT '角色ID',
-  `menu_id` int(11) NOT NULL COMMENT '菜单ID'
+  `menu_id` int(11) NOT NULL COMMENT '菜单ID',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-INSERT INTO `role_permission` (`id`, `role_id`, `menu_id`) VALUES
-(1, 1, 1),
-(2, 1, 2),
-(3, 1, 3),
-(4, 1, 4),
-(5, 1, 5),
-(6, 1, 6),
-(7, 1, 7),
-(8, 1, 8),
-(9, 1, 9),
-(10, 1, 10),
-(11, 1, 11),
-(12, 1, 12),
-(18, 1, 18),
-(19, 1, 19),
-(20, 1, 20),
-(21, 1, 21),
-(22, 1, 22),
-(23, 1, 23),
-(24, 1, 24);
 
 CREATE TABLE `setting` (
   `id` int(11) NOT NULL,
@@ -120,8 +95,14 @@ CREATE TABLE `setting` (
   `chinese_name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `value` text COLLATE utf8_unicode_ci NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` varchar(19) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0000-00-00 00:00:00'
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `setting` (`id`, `name`, `chinese_name`, `value`, `create_time`, `update_time`) VALUES
+(1, 'openReg', '是否开放注册（0关闭1开放）', '0', '2018-07-18 13:09:35', '2018-07-20 11:14:37'),
+(2, 'sessionPrefix', 'SESSION前缀', 'OTSSO_', '2019-01-19 01:26:12', '2019-01-19 01:26:12'),
+(3, 'apiPath', 'API接口网址', 'https://ssouc.xshgzs.com/api/', '2019-01-19 05:40:31', '2019-01-19 13:24:01'),
+(4, 'systemName', '系统名称', '生蚝科技用户中心', '2019-01-19 08:33:54', '2019-01-19 08:33:54');
 
 CREATE TABLE `third_user` (
   `id` int(11) NOT NULL,
@@ -145,7 +126,7 @@ CREATE TABLE `user` (
   `status` int(1) NOT NULL DEFAULT '2',
   `phone` varchar(11) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `extra_param` varchar(16184) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '{}' COMMENT '扩展字段，用JSON储存',
+  `extra_param` varchar(16183) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '{}' COMMENT '扩展字段，用JSON储存',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -155,7 +136,7 @@ ALTER TABLE `app`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `app_id` (`app_id`);
 
-ALTER TABLE `log`
+ALTER TABLE `login_log`
   ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `login_token`
@@ -191,7 +172,7 @@ ALTER TABLE `user`
 
 ALTER TABLE `app`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-ALTER TABLE `log`
+ALTER TABLE `login_log`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `login_token`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
