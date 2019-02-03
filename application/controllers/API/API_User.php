@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-C-API-用户
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-19
- * @version 2019-01-20
+ * @version 2019-01-22
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');

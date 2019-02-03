@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-V-首页
  * @author Jerry Cheung <master@smhgzs.com>
  * @since 2018-12-31
- * @version 2019-01-19
+ * @version 2019-01-22
  */
 ?>
 <!DOCTYPE html>
@@ -33,7 +33,7 @@
 		<!-- Main row -->
 		<div class="row">
 			<!-- 左侧 -->
-			<section class="col-lg-6 connectedSortable">
+			<section class="connectedSortable">
 				<!-- 通知列表 -->
 				<div class="box box-primary">
 					<div class="box-header">
@@ -75,9 +75,7 @@
 var vm = new Vue({
 	el:'#app',
 	data:{
-		noticeList:{},
-		integralData:{},
-		transactionLog:{}
+		noticeList:{}
 	},
 	methods:{
 		getDashBroadNotice:function(){

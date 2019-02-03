@@ -46,3 +46,14 @@ th{
 	vertical-align:middle;
 }
 </style>
+
+<!-- Baidu tongji-->
+<!--script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?57f935b2ea561c6b84f8ea26dd96fe5a";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script-->

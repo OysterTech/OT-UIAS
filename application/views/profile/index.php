@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-我的资料
  * @author Jerry Cheung <master@smhgzs.com>
  * @since 2019-01-05
- * @version 2019-01-08
+ * @version 2019-01-20
  */
 ?>
 <!DOCTYPE html>
@@ -111,13 +111,12 @@ var vm = new Vue({
 			history.go(-1);
 		},
 		getUserInfo:function(){
-			unionId=$("#<?=$this->sessPrefix;?>unionId").val();
 			lockScreen();
 
 			$.ajax({
 				url:headerVm.apiPath+"user/getUserInfo",
 				type:"post",
-				data:{"method":"unionId","unionId":unionId},
+				data:{"method":"unionId","unionId":headerVm.unionId},
 				dataType:"json",
 				error:function(e){
 					unlockScreen();

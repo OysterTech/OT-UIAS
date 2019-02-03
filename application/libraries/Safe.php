@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-L-安全类
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-19
- * @version 2019-01-19
+ * @version 2019-01-23
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -68,7 +68,11 @@ class Safe {
 			if(in_array($menuId,$menuPermission)){
 				return true;
 			}else{
-				return false;
+				if($method!='api'){
+					logout();
+				}else{
+					return false;
+				}
 			}
 		}
 	}

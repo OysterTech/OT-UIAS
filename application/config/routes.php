@@ -1,9 +1,17 @@
 <?php
+/**
+ * @name 生蚝科技统一身份认证平台-路由设置
+ * @author Jerry Cheung <master@smhgzs.com>
+ * @since 2019-01-19
+ * @version 2019-01-26
+ */
+
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 $route['default_controller'] = 'Main/index';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
 
 /******* API-用户 *******/
 $route['api/user/resetPassword']['POST']='API/API_User/resetPassword';
@@ -25,10 +33,6 @@ $route['api/role/getRoleMenuForZtree/(:num)']='API/API_Role/getRoleMenuForZtree/
 $route['api/notice/get']='API/API_Notice/get';
 
 
-/******* API-积分 *******/
-$route['api/integral/getInfo/(:any)']='API/API_Integral/getInfo/$1';
-
-
 /******* 基础页面 *******/
 $route['error/(:any)']='Main/error/$1';
 $route['dashborad']='Main/dashborad';
@@ -40,6 +44,14 @@ $route['login/(:any)/(:any)']='Login/login/$1/$2';// 有AppId的登录
 $route['logout']='Login/logout';
 $route['logout/(:any)']='Login/logout/$1';
 $route['logout/(:any)/(:any)/(:any)']='Login/logout/$1/$2/$3';
+
+
+$route['thirdLogin/wxMPQr/getQrCode/(:any)']='ThirdLogin/wxMP_getQrCode/$1';
+$route['thirdLogin/wxMPQr/getQrCode/(:any)/(:num)']='ThirdLogin/wxMP_getQrCode/$1/$2';
+$route['thirdLogin/wxMPQr/checkStatus']='ThirdLogin/wxMP_checkStatus';
+$route['thirdLogin/wxMPQr/getOpenId']='ThirdLogin/wxMP_getOpenId';
+$route['thirdLogin/wxMPQr/handler']['POST']='ThirdLogin/wxMP_handler';
+
 
 
 /******* 注册 *******/

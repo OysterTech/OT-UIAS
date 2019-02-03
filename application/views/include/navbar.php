@@ -240,6 +240,7 @@ var headerVm = new Vue({
 	data:{
 		rootUrl:"<?=base_url();?>",
 		apiPath:"<?=$this->API_PATH;?>",
+		unionId:$("#<?=$this->sessPrefix;?>unionId").val(),
 		userInfo:{},
 		treeData:{},
 		navNoticeList:{},
@@ -248,12 +249,11 @@ var headerVm = new Vue({
 	methods:{
 		getUserInfo:function(){
 			lockScreen();
-			unionId=$("#<?=$this->sessPrefix;?>unionId").val();
 
 			$.ajax({
 				url:headerVm.apiPath+"user/getUserInfo",
 				type:"post",
-				data:{"method":"unionId","unionId":unionId},
+				data:{"method":"unionId","unionId":headerVm.unionId},
 				dataType:"json",
 				error:function(e){
 					unlockScreen();

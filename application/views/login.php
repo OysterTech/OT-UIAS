@@ -17,7 +17,20 @@
 	<meta name="author" content="ITRClub">
 	<link rel="shortcut icon" href="<?=base_url('resource/image/favicon.ico');?>">
 	<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="https://res.wx.qq.com/open/libs/weui/0.4.1/weui.css">
 	<link href="<?=base_url('resource/css/login.css');?>" rel="stylesheet">
+
+	<!-- Baidu tongji-->
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+			var hm = document.createElement("script");
+			hm.src = "https://hm.baidu.com/hm.js?57f935b2ea561c6b84f8ea26dd96fe5a";
+			var s = document.getElementsByTagName("script")[0]; 
+			s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
 </head>
 <body>
 <div class="wrapper fadeInDown">
@@ -87,7 +100,16 @@
 		</div>
 
 		<!-- ▼ 企业微信登录二维码 ▼ -->
-		<div id="loginQrcode" style="display:none;"></div>
+		<div id="loginQrcode" style="display:none;">
+			<iframe id="qrCodeImg" style='width:90%;height:100%;' scrolling="no" frameborder="0"></iframe>
+			请使用微信扫描此小程序码 <a onclick="stopCheckStatus();loadWxLoginQrCode();"><i class="fa fa-refresh" aria-hidden="true"></i> 刷新</a>
+			<div class="weui_msg">
+				<div class="weui_icon_area"><i class="weui_icon_success weui_icon_msg"></i></div>
+				<div class="weui_text_area">
+					<h4 class="weui_msg_title"></h4>
+				</div>
+			</div>
+		</div>
 		<!-- ▲ 企业微信登录二维码 ▲ -->
 
 		<div id="formFooter">
@@ -102,13 +124,13 @@
 <!--script src="https://rescdn.qqmail.com/node/ww/wwopenmng/js/sso/wwLogin-1.0.0.js"></script-->
 
 <script>
-/**
-const CORP_ID="";
+/*const CORP_ID="";
 const AGENT_ID="";
-const REDIRECT_URI=encodeURI("");
+const REDIRECT_URI=encodeURI("");*/
 var nowLoginMethod="password";
 var pwdMethodBtnStyle="background-position:0 -57;";
 var qrMethodBtnStyle="background-position:0 0;";
+var checkQrStatus;
 
 function changeLoginMethod(){
 	if(nowLoginMethod=="password"){
@@ -117,10 +139,10 @@ function changeLoginMethod(){
 		$("#changeLoginMethodBtn").attr("style",qrMethodBtnStyle);
 		$("#userIcon").attr("style","display:none");
 		$("#loginForm").attr("style","display:none");
-		$("#loginQrcode").attr("style","height:40%");
+		$("#loginQrcode").attr("style","font-size:17px;");
 	}else if(nowLoginMethod=="qr"){
 		nowLoginMethod="password";
-		loadWxLoginQrCode();
+		stopCheckStatus();
 		$("#changeLoginMethodBtn").attr("style",pwdMethodBtnStyle);
 		$("#userIcon").attr("style","");
 		$("#loginForm").attr("style","");
@@ -128,22 +150,79 @@ function changeLoginMethod(){
 	}
 }
 
+
 function loadWxLoginQrCode(){
-	window.WwLogin({
+	width=$("#loginForm").width();
+	qrWidth=width-100;
+	/*window.WwLogin({
 		"id" : "loginQrcode",
 		"appid" : CORP_ID,
 		"agentid" : AGENT_ID,
 		"redirect_uri" :REDIRECT_URI,
 		"state" : "",
 		"href" : "<?=base_url('resource/css/workWechatQR.css');?>"
-	});
-}*/
+	});*/
+	$("#qrCodeImg").attr('src','https://ssouc.itrclub.com/thirdLogin/wxMPQr/getQrCode/<?=$appId;?>/'+qrWidth);
+	$("#qrCodeImg").attr('style','width:'+width+'px;height:'+width+'px;');
+	startCheckStatus();
+}
+
+
+function startCheckStatus(){
+	checkQrStatus = window.setInterval(function() {
+		$.ajax({
+			url:"thirdLogin/wxMPQr/checkStatus",
+			dataType:"json",
+			success:function(ret){
+				console.log(ret);
+				if(ret.code==200){
+					status=ret.data['status'];
+					
+					switch(status){
+						case -1:
+							// 用户主动取消
+							
+							break;
+						case 0:
+							// 过期
+							window.clearInterval(checkQrStatus);
+							break;
+						case 1:
+							// 正常
+							break;
+						case 2:
+							// 已经被扫
+							break;
+						case 3:
+							// 已授权
+							break;
+						default:
+							break;
+					}
+				}else if(ret.code==403){
+					showModalTips("暂未生成小程序码！<br>请点击“刷新”生成！");
+					stopCheckStatus();
+					return false;
+				}else if(ret.code==404){
+					showModalTips("小程序码信息不存在！<br>请点击“刷新”生成！");
+					stopCheckStatus();
+					return false;
+				}
+			}
+		})
+	}, 2000);
+}
+
+
+function stopCheckStatus(){
+	window.clearInterval(checkQrStatus);
+	$("#qrCodeImg").attr('src','');
+}
 
 
 function toReg(){
-	window.open("register_step1");
+	window.open("/register_step1");
 }
-
 
 function toLogin(){
 	lockScreen();

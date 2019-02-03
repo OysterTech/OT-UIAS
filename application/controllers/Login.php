@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-C-登录
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-19
- * @version 2019-01-19
+ * @version 2019-01-22
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -29,6 +29,7 @@ class Login extends CI_Controller {
 			if($appId!="" && $returnUrl!=base_url('dashborad')){
 				gotoUrl(base_url('error/appInfo'));
 			}else{
+				$appId=$this->setting->get('SSOUCAppId');
 				$appName='ITRClub用户中心';
 			}
 		}else{
@@ -66,6 +67,9 @@ class Login extends CI_Controller {
 			if($checkPwd!==true){
 				$this->ajax->returnData(4031,"failed To Auth");
 			}else{
+				$this->db->where('user_name',$userName);
+				$this->db->update('user',['last_login'=>date('Y-m-d H:i:s')]);
+				
 				$token=sha1(md5($appId).time());
 				$sessionData=array(
 					$this->sessPrefix.'isLogin'=>1,
@@ -113,7 +117,7 @@ class Login extends CI_Controller {
 	}
 
 
-	public function register_step1()
+	/*public function register_step1()
 	{
 		include 'application/libraries/Geetestlib.php';
 		$GtSdk = new GeetestLib($this->CAPTCHA_ID,$this->PRIVATE_KEY);
@@ -173,19 +177,30 @@ class Login extends CI_Controller {
 		if($accountType=="person"){
 			$school=isset($_POST['school'])&&$_POST['school']!=""?$_POST['school']:$this->ajax->returnData(0,"lack Param");
 			$extraParam="{}";
+			$originIntegral=$this->setting->get('originIntegral_User');
+			$originSpecialIntegral=$this->setting->get('originSpecialIntegral_User');
 		}elseif($accountType=="organization"){
 			$phone2=isset($_POST['phone2'])&&$_POST['phone2']!=""?$_POST['phone2']:$this->ajax->returnData(0,"lack Param");
 			$school=isset($_POST['organization'])&&$_POST['organization']!=""?$_POST['organization']:$this->ajax->returnData(0,"lack Param");
 			$extraParam=json_encode(['phone2'=>$phone2]);
+			$originIntegral=$this->setting->get('originIntegral_Org');
+			$originSpecialIntegral=$this->setting->get('originSpecialIntegral_Org');
 		}
 
-		// 再次校验用户名手机号是否已存在
+
+		// 扣除积分池余额
+		$integralPoolBalance=$this->setting->get('integralPoolBalance');
+		$integralPoolBalance=$integralPoolBalance-$originIntegral-$originSpecialIntegral;
+		$this->setting->save('integralPoolBalance',$integralPoolBalance);
+
+		// 再次校验用户名是否已存在
 		$this->db->select('id');
 		$query1=$this->db->get_where('user',array('user_name',$userName));
 		if($query1->num_rows()>=1){
 			$this->ajax->returnData(1,"have UserName");
 		}
 
+		// 再次校验手机号是否已存在
 		$this->db->select('id');
 		$query2=$this->db->get_where('user',array('phone',$this->session->userdata($this->sessPrefix.'reg_phone')));
 		if($query2->num_rows()>=1){
@@ -195,25 +210,15 @@ class Login extends CI_Controller {
 		// 获取默认角色资料
 		$this->db->select('id');
 		$this->db->where('is_default=',1);
-		if($accountType=="organization") $this->db->where('is_group=',1);
-		else $this->db->where('is_group=',0);
+		if($accountType=="organization") $this->db->where('is_org=',1);
+		else $this->db->where('is_org=',0);
 		$roleInfoQuery=$this->db->get('role');
 		if($roleInfoQuery->num_rows()!=1){
 			$this->ajax->returnData(3,"no Role Info");
 		}else{
 			$roleInfo=$roleInfoQuery->result_array();
 			$roleId=$roleInfo[0]['id'];
-		}
-
-		// 获取初始积分
-		$this->db->select('value');
-		$originIntegralQuery=$this->db->get_where('setting',array('name'=>'originIntegral'));
-		if($originIntegralQuery->num_rows()!=1){
-			$this->ajax->returnData(4,"no Origin Integral");
-		}else{
-			$integralInfo=$originIntegralQuery->result_array();
-			$integral=$integralInfo[0]['value'];
-		}
+		}			
 
 		// 获取初始应用权限
 		$appPermission=array();
@@ -236,7 +241,8 @@ class Login extends CI_Controller {
 			'salt'=>$salt,
 			'app_permission'=>$appPermissionStr,
 			'role_id'=>$roleId,
-			'integral'=>$integral,
+			'integral'=>$originIntegral,
+			'special_integral'=>$originSpecialIntegral,
 			'phone'=>$this->session->userdata($this->sessPrefix.'reg_phone'),
 			'email'=>$email,
 			'school'=>$school,
@@ -303,9 +309,8 @@ class Login extends CI_Controller {
 		$postData['content'] = $MessageContent;
 		$postData['mobile'] = $phone;
 		$postData['sendtime'] = '';
-		$action="send";
 
-		$url='http://119.23.126.199:8888/sms.aspx?action='.$action;
+		$url='http://119.23.126.199:8888/sms.aspx?action=send';
 		$o='';
 
 		foreach ($postData as $k=>$v)
@@ -338,6 +343,5 @@ class Login extends CI_Controller {
 		}else{
 			$this->ajax->returnData(400,"bad Request",[$result]);
 		}
-
-	}
+	}*/
 }
