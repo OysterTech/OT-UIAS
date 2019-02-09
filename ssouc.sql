@@ -14,7 +14,7 @@ CREATE TABLE `app` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `app` (`id`, `app_id`, `name`, `main_page`, `return_url`, `status`, `is_show`, `create_time`, `update_time`) VALUES
-(1, 'otsso_0e4d2dbq0ak9fbu6dc6', '用户中心', 'https://ssouc.xshgzs.com', 'https://ssouc.xshgzs.com/ci/dashborad.php', 1, 1, '2018-12-18 05:18:24', '2019-02-03 01:43:45');
+(1, 'otsso_0e4d2dbq0ak9fbu6dc6', '用户中心', 'https://ssouc.xshgzs.com', 'https://ssouc.xshgzs.com/dashborad', 1, 1, '2018-12-18 05:18:24', '2019-02-09 12:57:20');
 
 CREATE TABLE `login_token` (
   `id` int(11) NOT NULL,
@@ -96,31 +96,23 @@ CREATE TABLE `role_permission` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `role_permission` (`id`, `role_id`, `menu_id`, `create_time`) VALUES
-(136, 1, 1, '2019-01-23 13:44:08'),
-(137, 1, 2, '2019-01-23 13:44:08'),
-(138, 1, 3, '2019-01-23 13:44:08'),
-(139, 1, 4, '2019-01-23 13:44:08'),
-(140, 1, 5, '2019-01-23 13:44:08'),
-(141, 1, 6, '2019-01-23 13:44:08'),
-(142, 1, 7, '2019-01-23 13:44:08'),
-(143, 1, 8, '2019-01-23 13:44:08'),
-(144, 1, 9, '2019-01-23 13:44:08'),
-(145, 1, 10, '2019-01-23 13:44:08'),
-(146, 1, 11, '2019-01-23 13:44:08'),
-(147, 1, 12, '2019-01-23 13:44:08'),
-(148, 1, 13, '2019-01-23 13:44:08'),
-(149, 1, 14, '2019-01-23 13:44:08'),
-(150, 1, 15, '2019-01-23 13:44:08'),
-(151, 1, 16, '2019-01-23 13:44:08'),
-(152, 1, 26, '2019-01-23 13:44:08'),
-(153, 1, 27, '2019-01-23 13:44:08'),
-(154, 1, 28, '2019-01-23 13:44:08'),
-(155, 1, 29, '2019-01-23 13:44:08'),
-(156, 1, 18, '2019-01-23 13:44:08'),
-(157, 1, 20, '2019-01-23 13:44:08'),
-(158, 1, 22, '2019-01-23 13:44:08'),
-(159, 1, 23, '2019-01-23 13:44:08'),
-(160, 1, 24, '2019-01-23 13:44:08');
+(1, 1, 1, '2019-01-23 13:44:08'),
+(2, 1, 2, '2019-01-23 13:44:08'),
+(3, 1, 3, '2019-01-23 13:44:08'),
+(4, 1, 4, '2019-01-23 13:44:08'),
+(5, 1, 5, '2019-01-23 13:44:08'),
+(6, 1, 6, '2019-01-23 13:44:08'),
+(7, 1, 7, '2019-01-23 13:44:08'),
+(8, 1, 8, '2019-01-23 13:44:08'),
+(9, 1, 9, '2019-01-23 13:44:08'),
+(10, 1, 10, '2019-01-23 13:44:08'),
+(11, 1, 11, '2019-01-23 13:44:08'),
+(12, 1, 12, '2019-01-23 13:44:08'),
+(13, 1, 18, '2019-01-23 13:44:08'),
+(14, 1, 20, '2019-01-23 13:44:08'),
+(15, 1, 22, '2019-01-23 13:44:08'),
+(16, 1, 23, '2019-01-23 13:44:08'),
+(17, 1, 24, '2019-01-23 13:44:08');
 
 CREATE TABLE `setting` (
   `id` int(11) NOT NULL,
@@ -132,17 +124,17 @@ CREATE TABLE `setting` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `setting` (`id`, `name`, `chinese_name`, `value`, `create_time`, `update_time`) VALUES
-(3, 'openReg', '是否开放注册（0关闭1开放）', '0', '2018-07-18 13:09:35', '2018-07-20 11:14:37'),
-(5, 'sessionPrefix', 'SESSION前缀', 'OTSSO_', '2019-01-19 01:26:12', '2019-02-03 01:43:09'),
-(6, 'apiPath', 'API接口目录', 'https://ssouc.xshgzs.com/api/', '2019-01-19 05:40:31', '2019-02-03 01:44:09'),
-(7, 'systemName', '系统名称', 'ITRClub用户中心', '2019-01-19 08:33:54', '2019-01-19 08:33:54'),
-(13, 'SSOUCAppId', 'SSO用户中心AppId', 'otsso_0e4d2dbq0ak9fbu6dc6', '2019-01-26 02:39:45', '2019-02-03 01:44:00');
+(1, 'openReg', '是否开放注册（0关闭1开放）', '0', '2018-07-18 13:09:35', '2018-07-20 11:14:37'),
+(2, 'sessionPrefix', 'SESSION前缀', 'OTSSO_', '2019-01-19 01:26:12', '2019-02-03 01:43:09'),
+(3, 'apiPath', 'API接口目录', 'https://ssouc.xshgzs.com/api/', '2019-01-19 05:40:31', '2019-02-03 01:44:09'),
+(4, 'systemName', '系统名称', 'ITRClub用户中心', '2019-01-19 08:33:54', '2019-01-19 08:33:54'),
+(5, 'SSOUCAppId', 'SSO用户中心AppId', 'otsso_0e4d2dbq0ak9fbu6dc6', '2019-01-26 02:39:45', '2019-02-03 01:44:00');
 
 CREATE TABLE `third_user` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL COMMENT '对应user表的id',
   `method` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '第三方英文名称小写（可选github/workwechat）',
-  `third_id` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '第三方用户ID',
+  `third_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '第三方用户ID',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `last_login` varchar(19) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0000-00-00 00:00:00'
@@ -151,7 +143,7 @@ CREATE TABLE `third_user` (
 CREATE TABLE `user` (
   `id` int(11) NOT NULL,
   `union_id` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `wx_open_id` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '微信openId',
+  `wx_open_id` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '微信小程序openId',
   `user_name` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `nick_name` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -166,6 +158,9 @@ CREATE TABLE `user` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `last_login` varchar(19) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0000-00-00 00:00:00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `user` (`id`, `union_id`, `wx_open_id`, `user_name`, `nick_name`, `password`, `salt`, `app_permission`, `role_id`, `status`, `phone`, `email`, `extra_param`, `create_time`, `update_time`, `last_login`) VALUES
+(1, 'G18KECAD', 'oYsjr0LDatAHWpV3bvRgPqquwhy0', 'super', '小生蚝', 'f8fa3a41c7ddb501bee7a6711f9c42188de71f4a', 'YGcyHECs', '1,2,3,4', 1, 2, '1', '571339406@qq.com', '{}', '2018-12-20 05:47:20', '2019-02-03 06:37:23', '2019-02-03 14:37:23');
 
 
 ALTER TABLE `app`
@@ -209,22 +204,22 @@ ALTER TABLE `user`
 
 
 ALTER TABLE `app`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `login_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=323;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `menu`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `notice`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `qr_login_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `role`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `role_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `setting`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `third_user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
