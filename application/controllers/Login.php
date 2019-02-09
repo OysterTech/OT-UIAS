@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-C-登录
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-19
- * @version 2019-01-22
+ * @version 2019-02-09
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -11,6 +11,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Login extends CI_Controller {
 
 	public $sessPrefix;
+	public $API_PATH;
 	public $CAPTCHA_ID="a3b962b474e6b1d40ae2c19bc621088a";
 	public $PRIVATE_KEY="0a45afb6d67750f8d8d6570686c68f9f";
 
@@ -18,6 +19,7 @@ class Login extends CI_Controller {
 	{
 		parent::__construct();
 		$this->sessPrefix=$this->safe->getSessionPrefix();
+		$this->API_PATH=$this->setting->get('apiPath');
 	}
 
 	public function login($appId='',$returnUrl='')
@@ -30,7 +32,7 @@ class Login extends CI_Controller {
 				gotoUrl(base_url('error/appInfo'));
 			}else{
 				$appId=$this->setting->get('SSOUCAppId');
-				$appName='ITRClub用户中心';
+				$appName='生蚝科技用户中心';
 			}
 		}else{
 			$appName=$appInfo['name'];
@@ -47,7 +49,7 @@ class Login extends CI_Controller {
 			if($tokenQuery===true) gotoUrl($returnUrl.'?token='.$token);
 		}
 
-		$this->load->view('login',['appId'=>$appId,'appName'=>$appName]);
+		$this->load->view('login',['appId'=>$appId,'appName'=>$appName,'returnUrl'=>$returnUrl]);
 	}
 
 

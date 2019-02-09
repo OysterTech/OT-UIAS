@@ -1,18 +1,18 @@
 <?php
 /**
- * @name 生蚝科技统一身份认证平台-C-第三方登录
+ * @name 生蚝科技统一身份认证平台-C-小程序API
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-25
- * @version 2019-01-26
+ * @version 2019-02-08
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class ThirdLogin extends CI_Controller {
+class API_WXMP extends CI_Controller {
 
 	public $sessPrefix;
-	const WXMP_APP_ID="";
-	const WXMP_APP_SECRET="";
+	const APP_ID="";
+	const APP_SECRET="";
 
 	public function __construct()
 	{
@@ -21,7 +21,7 @@ class ThirdLogin extends CI_Controller {
 	}
 
 
-	public function wxMP_getQrCode($appId="",$width=0)
+	public function getQrCode($appId="",$width=0)
 	{
 		$ticket=md5(mt_rand(1234,9876).time().mt_rand(1234,9876));
 
@@ -29,15 +29,15 @@ class ThirdLogin extends CI_Controller {
 			$appId=$this->setting->get("SSOUCAppId");
 		}
 
-		if($this->session->userdata($this->sessPrefix.'wxMP_accessToken')!=null && time()<=$this->session->userdata($this->sessPrefix.'wxMP_accessTokenExpireTime')){
-			$accessToken=$this->session->userdata($this->sessPrefix.'wxMP_accessToken');
+		if($this->session->userdata($this->sessPrefix.'wxmp_accessToken')!=null && time()<=$this->session->userdata($this->sessPrefix.'wxmp_accessTokenExpireTime')){
+			$accessToken=$this->session->userdata($this->sessPrefix.'wxmp_accessToken');
 		}else{
-			$getAccessTokenUrl='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.self::WXMP_APP_ID.'&secret='.self::WXMP_APP_SECRET;
+			$getAccessTokenUrl='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.self::APP_ID.'&secret='.self::APP_SECRET;
 			$getAccessToken=curl($getAccessTokenUrl);
 			$accessToken=json_decode($getAccessToken,true);
 			$accessToken=$accessToken['access_token'];
-			$this->session->set_userdata($this->sessPrefix.'wxMP_accessToken',$accessToken);
-			$this->session->set_userdata($this->sessPrefix.'wxMP_accessTokenExpireTime',time()+7200);
+			$this->session->set_userdata($this->sessPrefix.'wxmp_accessToken',$accessToken);
+			$this->session->set_userdata($this->sessPrefix.'wxmp_accessTokenExpireTime',time()+7200);
 		}
 
 		$getCodeUrl='https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token='.$accessToken;
@@ -52,10 +52,10 @@ class ThirdLogin extends CI_Controller {
 			$this->db->where('expire_time<',time());
 			$this->db->delete('qr_login_token');
 
-			$query=$this->db->insert('qr_login_token',['ticket'=>$ticket,'app_id'=>$appId,'ip'=>getIP(),'expire_time'=>time()+5]);
+			$query=$this->db->insert('qr_login_token',['ticket'=>$ticket,'app_id'=>$appId,'ip'=>getIP(),'expire_time'=>time()+120]);
 
 			if($query==true){
-				$this->session->set_userdata($this->sessPrefix.'wxMP_qrTicket',$ticket);
+				$this->session->set_userdata($this->sessPrefix.'wxmp_qrTicket',$ticket);
 				header('content-type:image/jpeg');
 				echo $getCode;
 			}else{
@@ -69,11 +69,11 @@ class ThirdLogin extends CI_Controller {
 	}
 
 
-	public function wxMP_getOpenId()
+	public function getOpenId()
 	{
 		$code=isset($_GET['code'])&&strlen($_GET['code'])>=1?$_GET['code']:$this->ajax->returnData(0,'lack Param');
 
-		$url='https://api.weixin.qq.com/sns/jscode2session?grant_type=authorization_code&appid='.self::WXMP_APP_ID.'&secret='.self::WXMP_APP_SECRET.'&js_code='.$code;
+		$url='https://api.weixin.qq.com/sns/jscode2session?grant_type=authorization_code&appid='.self::APP_ID.'&secret='.self::APP_SECRET.'&js_code='.$code;
 		$rtn=curl($url);
 
 		$rtn=json_decode($rtn,true);
@@ -83,8 +83,8 @@ class ThirdLogin extends CI_Controller {
 	}
 
 
-	public function wxMP_checkStatus(){
-		$ticket=$this->session->userdata($this->sessPrefix.'wxMP_qrTicket')!=null?$this->session->userdata($this->sessPrefix.'wxMP_qrTicket'):$this->ajax->returnData(403,'no Ticket');
+	public function checkStatus(){
+		$ticket=$this->session->userdata($this->sessPrefix.'wxmp_qrTicket')!=null?$this->session->userdata($this->sessPrefix.'wxmp_qrTicket'):$this->ajax->returnData(403,'no Ticket');
 
 		$this->db->where('ticket', $ticket);
 		$qrInfoQuery=$this->db->get('qr_login_token');
@@ -106,14 +106,12 @@ class ThirdLogin extends CI_Controller {
 	}
 
 
-	public function wxMP_handler()
+	public function handler()
 	{
 		$mod=isset($_POST['mod'])&&$_POST['mod']!=""?$_POST['mod']:$this->ajax->returnData(0,'lack Param');
 		$ticket=isset($_POST['ticket'])&&strlen($_POST['ticket'])==32?$_POST['ticket']:$this->ajax->returnData(0,'lack Param');
 
 		$this->db->where('ticket', $ticket);
-		$this->db->where('status!=', 0);
-		//if($mod=='scan') $this->db->where('status', 1);
 		$qrInfoQuery=$this->db->get('qr_login_token');
 		$qrInfo=$qrInfoQuery->result_array();
 
@@ -145,9 +143,14 @@ class ThirdLogin extends CI_Controller {
 				break;
 			case 'login':
 				$openId=isset($_POST['openId'])&&strlen($_POST['openId'])>=1?$_POST['openId']:$this->ajax->returnData(0,'lack Param');
-				$userInfo=$this->user->getInfo(['wx_open_id'=>$openId]);
+
+				$this->db->where('third_id', $openId);
+				$userInfo=$this->db->get('third_user');
+				$userInfo=$userInfo->result_array();
 
 				if(count($userInfo)>=1){
+					$userId=$userInfo[0]['user_id'];
+					$userInfo=$this->user->getInfo(['id'=>$userId]);
 					$token=sha1(md5($appId).time());
 					$sessionData=array(
 						$this->sessPrefix.'isLogin'=>1,
@@ -201,6 +204,41 @@ class ThirdLogin extends CI_Controller {
 			default:
 				$this->ajax->returnData(2,'invaild Mod');
 				break;
+		}
+	}
+
+	public function bindUser()
+	{
+		$openId=isset($_POST['openId'])&&$_POST['openId']!=""?$_POST['openId']:$this->ajax->returnData(0,'lack Param');
+		$userName=isset($_POST['userName'])&&strlen($_POST['userName'])>=5?$_POST['userName']:$this->ajax->returnData(0,'lack Param');
+		$password=isset($_POST['password'])&&strlen($_POST['password'])>=5?$_POST['password']:$this->ajax->returnData(0,'lack Param');
+
+		$userInfo=$this->user->getInfoByUserName($userName);
+
+		if($userInfo==array()){
+			$this->ajax->returnData(404,'no User');
+		}else{
+			$checkPassword=$this->safe->checkPassword($password,$userInfo['password'],$userInfo['salt']);
+
+			if($checkPassword===true){
+				$userId=$userInfo['id'];
+
+				$this->db->where('user_id', $userId);
+				$this->db->where('method', 'wxmp');
+				$query=$this->db->get('third_user');
+
+				if($query->num_rows()>=1){
+					$this->db->where('user_id', $userId);
+					$this->db->where('method', 'wxmp');
+					$this->db->update('third_user',['third_id'=>$openId]);
+					$this->ajax->returnData(200,'success',['unionId'=>$userInfo['union_id'],'nickName'=>$userInfo['nick_name']]);
+				}else{
+					$this->db->insert('third_user',['user_id'=>$userId,'method'=>'wxmp','third_id'=>$openId]);
+					$this->ajax->returnData(200,'success',['unionId'=>$userInfo['union_id'],'nickName'=>$userInfo['nick_name'],$query,$query->num_rows()]);
+				}
+			}else{
+				$this->ajax->returnData(403,'invaild Password');
+			}
 		}
 	}
 }

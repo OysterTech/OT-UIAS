@@ -3,22 +3,22 @@
  * @name 生蚝科技统一身份认证平台-登录页
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-11-30
- * @version 2019-01-20
+ * @version 2019-02-09
  */
 ?>
 <html>
 <head>
-	<title>登录 / ITRClub统一身份认证平台</title>
+	<title>登录 / 生蚝科技统一身份认证平台</title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="keywords" content="">
-	<meta name="description" content="">
-	<meta name="author" content="ITRClub">
+	<meta name="keywords" content="生蚝科技,生蚝科技统一身份认证平台,生蚝科技用户中心">
+	<meta name="description" content="生蚝科技统一身份认证平台">
+	<meta name="author" content="生蚝科技 Oyster Tech">
 	<link rel="shortcut icon" href="<?=base_url('resource/image/favicon.ico');?>">
 	<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css">
-	<link rel="stylesheet" type="text/css" href="https://res.wx.qq.com/open/libs/weui/0.4.1/weui.css">
+	<link href="https://cdn.bootcss.com/weui/1.1.3/style/weui.min.css" rel="stylesheet">
 	<link href="<?=base_url('resource/css/login.css');?>" rel="stylesheet">
 
 	<!-- Baidu tongji-->
@@ -31,13 +31,36 @@
 			s.parentNode.insertBefore(hm, s);
 		})();
 	</script>
+	<style>
+	.qrCodeFilter {
+		position: absolute;
+		left:0;
+		right:0;
+		top:0;
+		bottom: 0;
+		background: white;
+		opacity: 0.9;
+		filter:alpha(opacity=90)
+	}
+	.info{
+		color:#222;
+		display: inline-block;
+		position: absolute;
+		height: 110px;
+		top:50%;
+		margin-top: -50px;
+		width: 115px;
+		left:50%;
+		margin-left:-57px;
+	}
+	</style>
 </head>
 <body>
 <div class="wrapper fadeInDown">
 	<div id="formContent">
-		<!--a id="changeLoginMethodBtn" class="loginMethodButton" style="background-position:0 0;" onclick="changeLoginMethod();"></a-->
+		<a id="changeLoginMethodBtn" class="loginMethodButton" style="background-position:0 0;" onclick="changeLoginMethod();"></a>
 
-		<h2 class="active" style="line-height:32px;">欢迎登录 ITRClub统一身份认证平台<br>正在通过统一认证平台快速登录：<?=$appName;?> </h2>
+		<h2 class="active" style="line-height:32px;">欢迎登录 生蚝科技统一身份认证平台<br>正在通过统一认证平台快速登录：<?=$appName;?> </h2>
 
 		<div id="userIcon" class="fadeIn first">
 			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px"
@@ -90,30 +113,33 @@
 			<input type="text" id="<?=$this->sessPrefix;?>userName" class="fadeIn second" maxlength="20" placeholder="键入您的通行证账号" onkeyup='if(event.keyCode==13)$("#<?=$this->sessPrefix;?>password").focus();'>
 			<input type="password" id="<?=$this->sessPrefix;?>password" class="fadeIn third" maxlength="30" placeholder="键入您账号对应的密码" onkeyup='if(event.keyCode==13)toLogin();'>
 			<button class="fadeIn fourth" style="font-size:18px;background-color:#56baed;border:none;color:#fff;padding:15px 39px;text-align:center;text-decoration:none;display:inline-block;text-transform:uppercase;-webkit-box-shadow:0 10px 30px 0 rgba(95,186,233,.4);box-shadow:0 10px 30px 0 rgba(95,186,233,.4);-webkit-border-radius:5px 5px 5px 5px;border-radius:5px 5px 5px 5px;margin:5px 20px 40px 20px;-webkit-transition:all .3s ease-in-out;-moz-transition:all .3s ease-in-out;-ms-transition:all .3s ease-in-out;-o-transition:all .3s ease-in-out;transition:all .3s ease-in-out" value="登 录" onclick="toReg()">注 册</button><button class="fadeIn fourth" style="font-size:18px;background-color:#9ccc65;border:none;color:#fff;padding:15px 39px;text-align:center;text-decoration:none;display:inline-block;text-transform:uppercase;-webkit-box-shadow:0 10px 30px 0 rgba(95,186,233,.4);box-shadow:0 10px 30px 0 rgba(95,186,233,.4);-webkit-border-radius:5px 5px 5px 5px;border-radius:5px 5px 5px 5px;margin:5px 20px 40px 20px;-webkit-transition:all .3s ease-in-out;-moz-transition:all .3s ease-in-out;-ms-transition:all .3s ease-in-out;-o-transition:all .3s ease-in-out;transition:all .3s ease-in-out" onclick="toLogin()">登 录</button>
-			<!--br>
+			<br>
 			<p style="text-align:left;padding-left:25px;font-size:17px;">
 				第三方登录：
-				<a href="https://github.com/login/oauth/authorize?client_id=&scope=user"><i class="fa fa-2x fa-github" aria-hidden="true"></i></a>&nbsp;&nbsp;
-				<a onclick="alert('目前仅支持生蚝科技内部企业微信！\n请直接点击右上角扫码登录！\n\n普通用户暂不支持，敬请期待！');"><i class="fa fa-2x fa-weixin" aria-hidden="true"></i></a>&nbsp;&nbsp;>
+				<!--a href="https://github.com/login/oauth/authorize?client_id=&scope=user"><i class="fa fa-2x fa-github" aria-hidden="true"></i></a>&nbsp;&nbsp;-->
+				<a onclick="changeLoginMethod();"><i class="fa fa-2x fa-weixin" aria-hidden="true"></i></a>&nbsp;&nbsp;
 			</p>
-			<p style="line-height:6px;">&nbsp;</p-->
+			<p style="line-height:6px;">&nbsp;</p>
 		</div>
 
-		<!-- ▼ 企业微信登录二维码 ▼ -->
+		<!-- ▼ 微信小程序扫码登录 ▼ -->
 		<div id="loginQrcode" style="display:none;">
-			<iframe id="qrCodeImg" style='width:90%;height:100%;' scrolling="no" frameborder="0"></iframe>
+			<center>
+			<iframe id="qrCodeImg" style='width:100%;height:100%;' scrolling="no" frameborder="0"></iframe>
+			<br>
 			请使用微信扫描此小程序码 <a onclick="stopCheckStatus();loadWxLoginQrCode();"><i class="fa fa-refresh" aria-hidden="true"></i> 刷新</a>
-			<div class="weui_msg">
-				<div class="weui_icon_area"><i class="weui_icon_success weui_icon_msg"></i></div>
+			</center>
+			<div class="weui_msg" id="wxCodeStatusDiv" style="display:none;">
+				<div class="weui_icon_area"><i id="wxCodeStatusIcon" class="weui_icon_warn weui_icon_msg"></i></div>
 				<div class="weui_text_area">
-					<h4 class="weui_msg_title"></h4>
+					<h4 id="wxCodeStatusContent" class="weui_msg_title"></h4>
 				</div>
 			</div>
 		</div>
-		<!-- ▲ 企业微信登录二维码 ▲ -->
+		<!-- ▲ 微信小程序扫码登录 ▲ -->
 
 		<div id="formFooter">
-			<span style="color: #56baed;line-height:28px;">本系统已整合统一身份认证<br>单点登录服务由 <a href="https://www.itrclub.com" target="_blank">ITRClub</a>&<a href="https://www.xshgzs.com?from=itrsso" target="_blank">生蚝科技</a> 提供</span>
+			<span style="color: #56baed;line-height:28px;">本系统已整合统一身份认证<br>单点登录服务由 <a href="https://www.xshgzs.com?from=sso" target="_blank">生蚝科技</a> 提供</span>
 		</div>
 	</div>
 </div>
@@ -121,12 +147,8 @@
 <script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="<?=base_url('resource/js/utils.js');?>"></script>
-<!--script src="https://rescdn.qqmail.com/node/ww/wwopenmng/js/sso/wwLogin-1.0.0.js"></script-->
 
 <script>
-/*const CORP_ID="";
-const AGENT_ID="";
-const REDIRECT_URI=encodeURI("");*/
 var nowLoginMethod="password";
 var pwdMethodBtnStyle="background-position:0 -57;";
 var qrMethodBtnStyle="background-position:0 0;";
@@ -136,14 +158,14 @@ function changeLoginMethod(){
 	if(nowLoginMethod=="password"){
 		nowLoginMethod="qr";
 		loadWxLoginQrCode();
-		$("#changeLoginMethodBtn").attr("style",qrMethodBtnStyle);
+		$("#changeLoginMethodBtn").attr("style",pwdMethodBtnStyle);
 		$("#userIcon").attr("style","display:none");
 		$("#loginForm").attr("style","display:none");
 		$("#loginQrcode").attr("style","font-size:17px;");
 	}else if(nowLoginMethod=="qr"){
 		nowLoginMethod="password";
 		stopCheckStatus();
-		$("#changeLoginMethodBtn").attr("style",pwdMethodBtnStyle);
+		$("#changeLoginMethodBtn").attr("style",qrMethodBtnStyle);
 		$("#userIcon").attr("style","");
 		$("#loginForm").attr("style","");
 		$("#loginQrcode").attr("style","display:none");
@@ -153,17 +175,11 @@ function changeLoginMethod(){
 
 function loadWxLoginQrCode(){
 	width=$("#loginForm").width();
-	qrWidth=width-100;
-	/*window.WwLogin({
-		"id" : "loginQrcode",
-		"appid" : CORP_ID,
-		"agentid" : AGENT_ID,
-		"redirect_uri" :REDIRECT_URI,
-		"state" : "",
-		"href" : "<?=base_url('resource/css/workWechatQR.css');?>"
-	});*/
-	$("#qrCodeImg").attr('src','https://ssouc.itrclub.com/thirdLogin/wxMPQr/getQrCode/<?=$appId;?>/'+qrWidth);
+	width-=80;
+	if(width<280) width=280;
+	$("#qrCodeImg").attr('src','<?=$this->API_PATH;?>/wxmp/getQrCode/<?=$appId;?>/'+width);
 	$("#qrCodeImg").attr('style','width:'+width+'px;height:'+width+'px;');
+	$("#wxCodeStatusDiv").attr('style','display:none');
 	startCheckStatus();
 }
 
@@ -171,30 +187,51 @@ function loadWxLoginQrCode(){
 function startCheckStatus(){
 	checkQrStatus = window.setInterval(function() {
 		$.ajax({
-			url:"thirdLogin/wxMPQr/checkStatus",
+			url:"<?=$this->API_PATH;?>wxmp/checkStatus",
 			dataType:"json",
 			success:function(ret){
 				console.log(ret);
 				if(ret.code==200){
 					status=ret.data['status'];
-					
+
 					switch(status){
-						case -1:
+						case "-1":
 							// 用户主动取消
-							
+							window.clearInterval(checkQrStatus);
+							$("#qrCodeImg").attr('src','');
+							$("#qrCodeImg").attr('style','width:100%;height:0px');
+							$("#wxCodeStatusDiv").attr('style','');
+							$("#wxCodeStatusIcon").attr('class','weui-icon-warn weui-icon_msg-primary');
+							$("#wxCodeStatusContent").html('用户已取消登录<br>请点击“刷新”重新扫码');
 							break;
-						case 0:
+						case "0":
 							// 过期
 							window.clearInterval(checkQrStatus);
+							$("#qrCodeImg").attr('src','');
+							$("#qrCodeImg").attr('style','width:100%;height:0px');
+							$("#wxCodeStatusDiv").attr('style','');
+							$("#wxCodeStatusIcon").attr('class','weui-icon-warn weui-icon_msg');
+							$("#wxCodeStatusContent").html('小程序码已超时失效<br>请点击“刷新”重新扫码');
 							break;
-						case 1:
+						case "1":
 							// 正常
 							break;
-						case 2:
+						case "2":
 							// 已经被扫
+							$("#wxCodeStatusDiv").attr('style','');
+							$("#wxCodeStatusIcon").attr('class','weui-icon-info weui-icon_msg');
+							$("#wxCodeStatusContent").html('已成功扫码<br>请在微信小程序授权登录');
 							break;
-						case 3:
+						case "3":
 							// 已授权
+							window.clearInterval(checkQrStatus);
+							$("#qrCodeImg").attr('src','');
+							$("#qrCodeImg").attr('style','width:100%;height:0px');
+							$("#wxCodeStatusDiv").attr('style','');
+							$("#wxCodeStatusIcon").attr('class','weui-icon-success weui-icon_msg');
+							$("#wxCodeStatusContent").html('正在跳转，请稍候！');
+							sleep(2000);
+							window.location.href="<?=$returnUrl;?>";
 							break;
 						default:
 							break;
