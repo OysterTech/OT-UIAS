@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-C-小程序API
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-25
- * @version 2019-02-08
+ * @version 2019-02-09
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -13,6 +13,7 @@ class API_WXMP extends CI_Controller {
 	public $sessPrefix;
 	const APP_ID="";
 	const APP_SECRET="";
+
 
 	public function __construct()
 	{
@@ -80,6 +81,21 @@ class API_WXMP extends CI_Controller {
 
 		if(isset($rtn['openid'])) $this->ajax->returnData(200,'success',['openId'=>$rtn['openid']]);
 		else $this->ajax->returnData(500,'failed to Request Wechat Server');
+	}
+
+
+	public function checkHasBindUser()
+	{
+		$openId=isset($_GET['openId'])&&strlen($_GET['openId'])>=1?$_GET['openId']:$this->ajax->returnData(0,'lack Param');
+
+		$infoQuery=$this->db->query('SELECT a.union_id,a.nick_name FROM user a,third_user b WHERE a.id=b.user_id AND b.third_id=?',[$openId]);
+		$info=$infoQuery->result_array();
+
+		if(count($info)==1){
+			$this->ajax->returnData(200,'success',['unionId'=>$info[0]['union_id'],'nickName'=>$info[0]['nick_name']]);
+		}else{
+			$this->ajax->returnData(403,'no User');
+		}
 	}
 
 
@@ -239,6 +255,21 @@ class API_WXMP extends CI_Controller {
 			}else{
 				$this->ajax->returnData(403,'invaild Password');
 			}
+		}
+	}
+
+
+	public function cancelBindUser()
+	{
+		$openId=isset($_POST['openId'])&&$_POST['openId']!=""?$_POST['openId']:$this->ajax->returnData(0,'lack Param');
+
+		$this->db->where('third_id', $openId);
+		$query=$this->db->delete('third_user');
+
+		if($this->db->affected_rows()==1){
+			$this->ajax->returnData(200,'success');
+		}else{
+			$this->ajax->returnData(500,'database Error');
 		}
 	}
 }
