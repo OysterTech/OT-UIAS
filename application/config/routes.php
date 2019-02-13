@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-路由设置
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-19
- * @version 2019-02-09
+ * @version 2019-02-13
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -43,10 +43,13 @@ $route['api/wxmp/getQrCode/(:any)']='API/API_WXMP/getQrCode/$1';
 $route['api/wxmp/getQrCode/(:any)/(:any)']='API/API_WXMP/getQrCode/$1/$2';
 $route['api/wxmp/checkStatus']='API/API_WXMP/checkStatus';
 $route['api/wxmp/getOpenId']='API/API_WXMP/getOpenId';
-$route['api/wxmp/checkHasBindUser']='API/API_WXMP/checkHasBindUser';
+$route['api/wxmp/getAccessToken/(:any)']='API/API_WXMP/getAccessToken/$1';
+$route['api/wxmp/getUserInfo']='API/API_WXMP/getUserInfo';
+$route['api/wxmp/updateUserInfo']['POST']='API/API_WXMP/updateUserInfo';
 $route['api/wxmp/handler']['POST']='API/API_WXMP/handler';
 $route['api/wxmp/bindUser']['POST']='API/API_WXMP/bindUser';
 $route['api/wxmp/cancelBindUser']['POST']='API/API_WXMP/cancelBindUser';
+$route['api/wxmp/toSendTemplate']['POST']='API/API_WXMP/toSendTemplate';
 
 
 /******* 登录登出 *******/

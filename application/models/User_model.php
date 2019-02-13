@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-M-用户
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-19
- * @version 2019-01-26
+ * @version 2019-02-13
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -14,7 +14,7 @@ class User_model extends CI_Model {
 
 	public function __construct() {
 		parent::__construct();
-		$this->userInfoFields=['id','union_id','wx_open_id','user_name','nick_name','app_permission','role_id','phone','email','school'];
+		$this->userInfoFields=['id','union_id','user_name','nick_name','app_permission','role_id','phone','email'];
 	}
 
 

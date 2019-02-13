@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-C-小程序API
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-25
- * @version 2019-02-09
+ * @version 2019-02-13
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -22,6 +22,34 @@ class API_WXMP extends CI_Controller {
 	}
 
 
+	public function getAccessToken($method='')
+	{
+		if($method=='api'){
+			$getAccessTokenUrl='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.self::APP_ID.'&secret='.self::APP_SECRET;
+			$getAccessToken=curl($getAccessTokenUrl);
+			$accessToken=json_decode($getAccessToken,true);
+			echo $accessToken=$accessToken['access_token'];
+			return;
+		}elseif($method=='server'){
+			if($this->session->userdata($this->sessPrefix.'wxmp_accessToken')!=null && time()<=$this->session->userdata($this->sessPrefix.'wxmp_accessTokenExpireTime')){
+				$accessToken=$this->session->userdata($this->sessPrefix.'wxmp_accessToken');
+			}else{
+				$getAccessTokenUrl='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.self::APP_ID.'&secret='.self::APP_SECRET;
+				$getAccessToken=curl($getAccessTokenUrl);
+				$accessToken=json_decode($getAccessToken,true);
+				$accessToken=$accessToken['access_token'];
+				$this->session->set_userdata($this->sessPrefix.'wxmp_accessToken',$accessToken);
+				$this->session->set_userdata($this->sessPrefix.'wxmp_accessTokenExpireTime',time()+7200);
+			}
+
+			return $accessToken;
+		}else{
+			show_404();
+			return;
+		}
+	}
+
+
 	public function getQrCode($appId="",$width=0)
 	{
 		$ticket=md5(mt_rand(1234,9876).time().mt_rand(1234,9876));
@@ -30,16 +58,7 @@ class API_WXMP extends CI_Controller {
 			$appId=$this->setting->get("SSOUCAppId");
 		}
 
-		if($this->session->userdata($this->sessPrefix.'wxmp_accessToken')!=null && time()<=$this->session->userdata($this->sessPrefix.'wxmp_accessTokenExpireTime')){
-			$accessToken=$this->session->userdata($this->sessPrefix.'wxmp_accessToken');
-		}else{
-			$getAccessTokenUrl='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.self::APP_ID.'&secret='.self::APP_SECRET;
-			$getAccessToken=curl($getAccessTokenUrl);
-			$accessToken=json_decode($getAccessToken,true);
-			$accessToken=$accessToken['access_token'];
-			$this->session->set_userdata($this->sessPrefix.'wxmp_accessToken',$accessToken);
-			$this->session->set_userdata($this->sessPrefix.'wxmp_accessTokenExpireTime',time()+7200);
-		}
+		$accessToken=self::getAccessToken('server');
 
 		$getCodeUrl='https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token='.$accessToken;
 		$getCodeData=array(
@@ -63,6 +82,7 @@ class API_WXMP extends CI_Controller {
 				echo "新增记录失败！";
 			}
 		}else{
+			var_dump($_SESSION);
 			$getCode=json_decode($getCode,true);
 			echo "生成小程序码失败";
 		}
@@ -72,51 +92,112 @@ class API_WXMP extends CI_Controller {
 
 	public function getOpenId()
 	{
-		$code=isset($_GET['code'])&&strlen($_GET['code'])>=1?$_GET['code']:$this->ajax->returnData(0,'lack Param');
+		$code=inputGet('code',0,1);
 
 		$url='https://api.weixin.qq.com/sns/jscode2session?grant_type=authorization_code&appid='.self::APP_ID.'&secret='.self::APP_SECRET.'&js_code='.$code;
 		$rtn=curl($url);
 
 		$rtn=json_decode($rtn,true);
 
-		if(isset($rtn['openid'])) $this->ajax->returnData(200,'success',['openId'=>$rtn['openid']]);
-		else $this->ajax->returnData(500,'failed to Request Wechat Server');
+		if(isset($rtn['openid'])) returnAjaxData(200,'success',['openId'=>$rtn['openid']]);
+		else returnAjaxData(500,'failed to Request Wechat Server');
 	}
 
 
-	public function checkHasBindUser()
+	public function getUserInfo()
 	{
-		$openId=isset($_GET['openId'])&&strlen($_GET['openId'])>=1?$_GET['openId']:$this->ajax->returnData(0,'lack Param');
+		$openId=inputGet('openId',0,1);
 
-		$infoQuery=$this->db->query('SELECT a.union_id,a.nick_name FROM user a,third_user b WHERE a.id=b.user_id AND b.third_id=?',[$openId]);
+		$infoQuery=$this->db->query('SELECT a.union_id AS unionId,a.user_name AS userName,a.nick_name AS nickName,a.phone,a.email,a.extra_param AS extraParam,a.create_time AS createTime,a.last_login AS lastLogin FROM user a,third_user b WHERE a.id=b.user_id AND b.third_id=?',[$openId]);
 		$info=$infoQuery->result_array();
 
 		if(count($info)==1){
-			$this->ajax->returnData(200,'success',['unionId'=>$info[0]['union_id'],'nickName'=>$info[0]['nick_name']]);
+			returnAjaxData(200,'success',['userInfo'=>$info[0]]);
 		}else{
-			$this->ajax->returnData(403,'no User');
+			returnAjaxData(403,'no User');
 		}
+	}
+	
+	
+	public function updateUserInfo()
+	{
+		$unionId=inputPost('unionId',0,1);
+		$postData=inputPost('postData',0,1);
+		$postData=json_decode($postData,true);
+		$updateData=array();
+
+		if(isset($postData['userName'])){
+			$this->db->where('union_id!=', $unionId);
+			$this->db->where('user_name', $postData['userName']);
+			$query=$this->db->get('user');
+			if($query->num_rows()!=0){
+				returnAjaxData(1,'have UserName');
+			}
+		}
+		if(isset($postData['nickName'])){
+			$this->db->where('union_id!=', $unionId);
+			$this->db->where('nick_name', $postData['nickName']);
+			$query=$this->db->get('user');
+			if($query->num_rows()!=0){
+				returnAjaxData(2,'have NickName');
+			}
+		}
+		if(isset($postData['phone'])){
+			$this->db->where('union_id!=', $unionId);
+			$this->db->where('phone', $postData['phone']);
+			$query=$this->db->get('user');
+			if($query->num_rows()!=0){
+				returnAjaxData(3,'have Phone');
+			}
+		}
+
+		$userInfo=$this->user->getInfo(['union_id'=>$unionId]);
+
+		if(isset($postData['oldPassword']) && isset($postData['newPassword'])){
+			$checkPassword=$this->safe->checkPassword($postData['oldPassword'],$userInfo['password'],$userInfo['salt']);
+
+			if($checkPassword===true){
+				$salt=getRanSTR(8);
+				$hash=sha1(md5($postData['newPassword']).$salt);
+
+				$updateData['password']=$hash;
+				$updateData['salt']=$salt;
+			}else{
+				returnAjaxData(403,'invaild Old Password');
+			}
+		}
+
+		if(isset($postData['userName'])) $updateData['user_name']=$postData['userName'];
+		if(isset($postData['nickName'])) $updateData['nick_name']=$postData['nickName'];
+		if(isset($postData['phone'])) $updateData['phone']=$postData['phone'];
+		if(isset($postData['email'])) $updateData['email']=$postData['email'];
+
+		$this->db->where('union_id', $unionId);
+		$this->db->update('user', $updateData);
+
+		if($this->db->affected_rows()==1) returnAjaxData(200,'success');
+		else returnAjaxData(500,'database Error');
 	}
 
 
 	public function checkStatus(){
-		$ticket=$this->session->userdata($this->sessPrefix.'wxmp_qrTicket')!=null?$this->session->userdata($this->sessPrefix.'wxmp_qrTicket'):$this->ajax->returnData(403,'no Ticket');
+		$ticket=$this->session->userdata($this->sessPrefix.'wxmp_qrTicket')!=null?$this->session->userdata($this->sessPrefix.'wxmp_qrTicket'):returnAjaxData(403,'no Ticket');
 
 		$this->db->where('ticket', $ticket);
 		$qrInfoQuery=$this->db->get('qr_login_token');
 		$qrInfo=$qrInfoQuery->result_array();
 
 		if(count($qrInfo)!=1){
-			$this->ajax->returnData(404,'ticket Not Found');
+			returnAjaxData(404,'ticket Not Found');
 		}else{
 			$qrInfo=$qrInfo[0];
 
 			if(time()>$qrInfo['expire_time']){
 				$this->db->where('ticket', $ticket);
 				$this->db->update('qr_login_token',['status'=>0]);
-				$this->ajax->returnData(200,'success',['status'=>0]);
+				returnAjaxData(200,'success',['status'=>0]);
 			}else{
-				$this->ajax->returnData(200,'success',['status'=>$qrInfo['status']]);
+				returnAjaxData(200,'success',['status'=>$qrInfo['status']]);
 			}
 		}
 	}
@@ -124,20 +205,20 @@ class API_WXMP extends CI_Controller {
 
 	public function handler()
 	{
-		$mod=isset($_POST['mod'])&&$_POST['mod']!=""?$_POST['mod']:$this->ajax->returnData(0,'lack Param');
-		$ticket=isset($_POST['ticket'])&&strlen($_POST['ticket'])==32?$_POST['ticket']:$this->ajax->returnData(0,'lack Param');
+		$mod=inputPost('mod',0,1);
+		$ticket=inputPost('ticket',0,1);
 
 		$this->db->where('ticket', $ticket);
 		$qrInfoQuery=$this->db->get('qr_login_token');
 		$qrInfo=$qrInfoQuery->result_array();
 
 		if(count($qrInfo)!=1){
-			$this->ajax->returnData(404,'ticket Not Found');
+			returnAjaxData(404,'ticket Not Found');
 		}else{
 			$qrInfo=$qrInfo[0];
 
 			if(time()>$qrInfo['expire_time']){
-				$this->ajax->returnData(1,'ticket Expired');
+				returnAjaxData(1,'ticket Expired');
 			}else{
 				$appId=$qrInfo['app_id'];
 				$appInfo=$this->app->get($appId);
@@ -151,14 +232,14 @@ class API_WXMP extends CI_Controller {
 				$this->db->update('qr_login_token',['status'=>2]);
 
 				if($this->db->affected_rows()===1){
-					$this->ajax->returnData(200,'success',['appName'=>$appName]);
+					returnAjaxData(200,'success',['appName'=>$appName]);
 				}else{
-					$this->ajax->returnData(500,'database Error');
+					returnAjaxData(500,'database Error');
 				}
 
 				break;
 			case 'login':
-				$openId=isset($_POST['openId'])&&strlen($_POST['openId'])>=1?$_POST['openId']:$this->ajax->returnData(0,'lack Param');
+				$openId=inputPost('openId',0,1);
 
 				$this->db->where('third_id', $openId);
 				$userInfo=$this->db->get('third_user');
@@ -179,7 +260,7 @@ class API_WXMP extends CI_Controller {
 					);
 					$this->session->set_userdata($sessionData);
 				}else{
-					$this->ajax->returnData(4031,'user Not Found');
+					returnAjaxData(4031,'user Not Found');
 				}
 
 				$appPermission=explode(",",$userInfo['app_permission']);
@@ -189,21 +270,25 @@ class API_WXMP extends CI_Controller {
 					// 没有此应用
 					$this->db->where('ticket',$ticket);
 					$this->db->update('qr_login_token',['status'=>4]);
-					$this->ajax->returnData(4032,"permission Denied");
+					returnAjaxData(4032,"permission Denied");
 				}elseif($appId!="" && in_array($appInfo['id'],$appPermission)!=true){
 					// 没有权限访问
 					$this->db->where('ticket',$ticket);
 					$this->db->update('qr_login_token',['status'=>4]);
-					$this->ajax->returnData(4032,"permission Denied");
+					returnAjaxData(4032,"permission Denied");
 				}else{
 					// 有权限，跳转回应用登录页
 					$tokenQuery=$this->user->addLoginToken($token,$userInfo['id']);
 					if($tokenQuery===true){
+						$this->db->where('user_id',$userId);
+						$this->db->where('method','wxmp');
+						$this->db->update('third_user',['last_login'=>date('Y-m-d H:i:s')]);
+						
 						$this->db->where('ticket',$ticket);
 						$this->db->update('qr_login_token',['status'=>3]);
-						$this->ajax->returnData(200,"success");
+						returnAjaxData(200,"success");
 					}else{
-						$this->ajax->returnData(500,"database Error");
+						returnAjaxData(500,"database Error");
 					}
 				}
 			case 'cancel':
@@ -211,33 +296,47 @@ class API_WXMP extends CI_Controller {
 				$this->db->update('qr_login_token',['status'=>-1]);
 
 				if($this->db->affected_rows()==1){
-					$this->ajax->returnData(200,'success');
+					returnAjaxData(200,'success');
 				}else{
-					$this->ajax->returnData(500,'database Error');
+					returnAjaxData(500,'database Error');
 				}
 
 				break;
 			default:
-				$this->ajax->returnData(2,'invaild Mod');
+				returnAjaxData(2,'invaild Mod');
 				break;
 		}
 	}
 
+
 	public function bindUser()
 	{
-		$openId=isset($_POST['openId'])&&$_POST['openId']!=""?$_POST['openId']:$this->ajax->returnData(0,'lack Param');
-		$userName=isset($_POST['userName'])&&strlen($_POST['userName'])>=5?$_POST['userName']:$this->ajax->returnData(0,'lack Param');
-		$password=isset($_POST['password'])&&strlen($_POST['password'])>=5?$_POST['password']:$this->ajax->returnData(0,'lack Param');
+		$openId=inputPost('openId',0,1);
+		$userName=inputPost('userName',0,1);
+		$password=inputPost('password',0,1);
 
 		$userInfo=$this->user->getInfoByUserName($userName);
 
 		if($userInfo==array()){
-			$this->ajax->returnData(404,'no User');
+			returnAjaxData(404,'no User');
 		}else{
 			$checkPassword=$this->safe->checkPassword($password,$userInfo['password'],$userInfo['salt']);
 
 			if($checkPassword===true){
 				$userId=$userInfo['id'];
+				$extraParam=$userInfo['extra_param'];
+				$extraParam=json_decode($extraParam,true);
+
+				$ret = array(
+					'unionId'=>$userInfo['union_id'],
+					'userName'=>$userInfo['user_name'],
+					'nickName'=>$userInfo['nick_name'],
+					'phone'=>$userInfo['phone'],
+					'email'=>$userInfo['email'],
+					'extraParam'=>$extraParam,
+					'createTime'=>$userInfo['create_time'],
+					'lastLogin'=>$userInfo['last_login'],
+				);
 
 				$this->db->where('user_id', $userId);
 				$this->db->where('method', 'wxmp');
@@ -247,13 +346,13 @@ class API_WXMP extends CI_Controller {
 					$this->db->where('user_id', $userId);
 					$this->db->where('method', 'wxmp');
 					$this->db->update('third_user',['third_id'=>$openId]);
-					$this->ajax->returnData(200,'success',['unionId'=>$userInfo['union_id'],'nickName'=>$userInfo['nick_name']]);
+					returnAjaxData(200,'success',['userInfo'=>$ret]);
 				}else{
 					$this->db->insert('third_user',['user_id'=>$userId,'method'=>'wxmp','third_id'=>$openId]);
-					$this->ajax->returnData(200,'success',['unionId'=>$userInfo['union_id'],'nickName'=>$userInfo['nick_name'],$query,$query->num_rows()]);
+					returnAjaxData(200,'success',['userInfo'=>$ret]);
 				}
 			}else{
-				$this->ajax->returnData(403,'invaild Password');
+				returnAjaxData(403,'invaild Password');
 			}
 		}
 	}
@@ -261,15 +360,38 @@ class API_WXMP extends CI_Controller {
 
 	public function cancelBindUser()
 	{
-		$openId=isset($_POST['openId'])&&$_POST['openId']!=""?$_POST['openId']:$this->ajax->returnData(0,'lack Param');
+		$openId=inputPost('openId',0,1);
 
 		$this->db->where('third_id', $openId);
 		$query=$this->db->delete('third_user');
 
 		if($this->db->affected_rows()==1){
-			$this->ajax->returnData(200,'success');
+			returnAjaxData(200,'success');
 		}else{
-			$this->ajax->returnData(500,'database Error');
+			returnAjaxData(500,'database Error');
 		}
+	}
+
+
+	public function toSendTemplate()
+	{
+		$accessToken=inputPost('accessToken',0,1);
+		$templateId=inputPost('templateId',0,1);
+		$openId=inputPost('openId',0,1);
+		$formId=inputPost('formId',0,1);
+		$data=inputPost('data',0,1);
+		$page=inputPost('page',1,1);
+		$emphasisKeyword=inputPost('emphasisKeyword',1,1);
+
+		$data=json_decode($data,TRUE);
+		$postData=array('touser'=>$openId,'template_id'=>$templateId,'page'=>$page,'form_id'=>$formId,'data'=>$data);
+		$postData=json_encode($postData,JSON_UNESCAPED_UNICODE);
+
+		$url='https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token='.$accessToken;
+		$query=curl($url,'post',$postData);
+		$query=json_decode($query,true);
+		
+		if($query['errcode']==0) returnAjaxData(200,'success');
+		else returnAjaxData(500,'system Error',[$query]);
 	}
 }
