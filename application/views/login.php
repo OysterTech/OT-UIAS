@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-登录页
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-11-30
- * @version 2019-02-09
+ * @version 2019-02-14
  */
 ?>
 <html>
@@ -125,7 +125,7 @@
 		<!-- ▼ 微信小程序扫码登录 ▼ -->
 		<div id="loginQrcode" style="display:none;">
 			<center>
-			<iframe id="qrCodeImg" style='width:100%;height:100%;' scrolling="no" frameborder="0"></iframe>
+			<img id="qrCodeImg" style='width:100%;height:100%;'></img>
 			<br>
 			请使用微信扫描此小程序码 <a onclick="stopCheckStatus();loadWxLoginQrCode();"><i class="fa fa-refresh" aria-hidden="true"></i> 刷新</a>
 			</center>
@@ -177,7 +177,7 @@ function loadWxLoginQrCode(){
 	width=$("#loginForm").width();
 	width-=80;
 	if(width<280) width=280;
-	$("#qrCodeImg").attr('src','<?=$this->API_PATH;?>/wxmp/getQrCode/<?=$appId;?>/'+width);
+	$("#qrCodeImg").attr('src','<?=$this->API_PATH;?>wxmp/getQrCode/<?=session_id();?>/<?=$appId;?>/'+width);
 	$("#qrCodeImg").attr('style','width:'+width+'px;height:'+width+'px;');
 	$("#wxCodeStatusDiv").attr('style','display:none');
 	startCheckStatus();
@@ -230,7 +230,6 @@ function startCheckStatus(){
 							$("#wxCodeStatusDiv").attr('style','');
 							$("#wxCodeStatusIcon").attr('class','weui-icon-success weui-icon_msg');
 							$("#wxCodeStatusContent").html('正在跳转，请稍候！');
-							sleep(2000);
 							window.location.href="<?=$returnUrl;?>";
 							break;
 						default:

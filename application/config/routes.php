@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-路由设置
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-19
- * @version 2019-02-13
+ * @version 2019-02-14
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -39,8 +39,8 @@ $route['api/notice/get']='API/API_Notice/get';
 
 
 /******* API-小程序 *******/
-$route['api/wxmp/getQrCode/(:any)']='API/API_WXMP/getQrCode/$1';
 $route['api/wxmp/getQrCode/(:any)/(:any)']='API/API_WXMP/getQrCode/$1/$2';
+$route['api/wxmp/getQrCode/(:any)/(:any)/(:any)']='API/API_WXMP/getQrCode/$1/$2/$3';
 $route['api/wxmp/checkStatus']='API/API_WXMP/checkStatus';
 $route['api/wxmp/getOpenId']='API/API_WXMP/getOpenId';
 $route['api/wxmp/getAccessToken/(:any)']='API/API_WXMP/getAccessToken/$1';

@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-C-小程序API
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-25
- * @version 2019-02-13
+ * @version 2019-02-14
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -50,8 +50,9 @@ class API_WXMP extends CI_Controller {
 	}
 
 
-	public function getQrCode($appId="",$width=0)
+	public function getQrCode($sessionId='',$appId="",$width=0)
 	{
+		session_id($sessionId);
 		$ticket=md5(mt_rand(1234,9876).time().mt_rand(1234,9876));
 
 		if($appId==""){
@@ -72,7 +73,7 @@ class API_WXMP extends CI_Controller {
 			$this->db->where('expire_time<',time());
 			$this->db->delete('qr_login_token');
 
-			$query=$this->db->insert('qr_login_token',['ticket'=>$ticket,'app_id'=>$appId,'ip'=>getIP(),'expire_time'=>time()+120]);
+			$query=$this->db->insert('qr_login_token',['ticket'=>$ticket,'app_id'=>$appId,'session_id'=>$sessionId,'ip'=>getIP(),'expire_time'=>time()+120]);
 
 			if($query==true){
 				$this->session->set_userdata($this->sessPrefix.'wxmp_qrTicket',$ticket);
@@ -217,6 +218,11 @@ class API_WXMP extends CI_Controller {
 		}else{
 			$qrInfo=$qrInfo[0];
 
+			// 切换回浏览器的session
+			session_destroy();
+			session_id($qrInfo['session_id']);
+			session_start();
+
 			if(time()>$qrInfo['expire_time']){
 				returnAjaxData(1,'ticket Expired');
 			}else{
@@ -285,7 +291,7 @@ class API_WXMP extends CI_Controller {
 						$this->db->update('third_user',['last_login'=>date('Y-m-d H:i:s')]);
 						
 						$this->db->where('ticket',$ticket);
-						$this->db->update('qr_login_token',['status'=>3]);
+						$this->db->update('qr_login_token',['status'=>3,'session_id'=>session_id()]);
 						returnAjaxData(200,"success");
 					}else{
 						returnAjaxData(500,"database Error");
@@ -392,6 +398,6 @@ class API_WXMP extends CI_Controller {
 		$query=json_decode($query,true);
 		
 		if($query['errcode']==0) returnAjaxData(200,'success');
-		else returnAjaxData(500,'system Error',[$query]);
+		else returnAjaxData(500,'system Error',['wxServerError'=>$query]);
 	}
 }

@@ -13,7 +13,7 @@
 <header class="main-header">
 	<a v-bind:href="[rootUrl+'dashborad']" class="logo">
 		<span class="logo-mini"><img src="https://www.itrclub.com/resource/index/img/logo.png" style="width:85%"></span>
-		<span class="logo-lg"><img src="https://www.itrclub.com/resource/index/img/logo.png" style="width:20%"> <b>ITRClub</b></span>
+		<span class="logo-lg"><img src="https://www.itrclub.com/resource/index/img/logo.png" style="width:20%"> <b>生蚝科技</b></span>
 	</a>
 	<nav class="navbar navbar-static-top">
 		<a class="sidebar-toggle" data-toggle="push-menu" role="button"><span class="sr-only">Toggle navigation</span></a>
