@@ -34,6 +34,7 @@ class API_Role extends CI_Controller {
 	public function getUserMenu()
 	{
 		$roleId=$this->session->userdata($this->sessPrefix."role_id");
+		
 		if($roleId>=1) $this->ajax->returnData(200,"success",['treeData'=>$this->getAllMenuByRole($roleId)]);
 		else $this->ajax->returnData(403,"failed To Auth");
 	}

@@ -24,7 +24,7 @@ class API_User extends CI_Controller {
 		$auth=$this->safe->checkAuth('api',substr($this->input->server('HTTP_REFERER'),strpos($this->input->server('HTTP_REFERER'),base_url())+strlen(base_url())));
 		if($auth!=true) $this->ajax->returnData(403,"no Permission");
 
-		$userId=isset($_POST['userId'])&&$_POST['userId']!=""?$_POST['userId']:$this->ajax->returnData(0,"lack Param");
+		$userId=inputPost('userId',0,1);
 		if($userId==$this->session->userdata($this->sessPrefix.'user_id')) $this->ajax->returnData(400,"cannot Operate own");
 
 		$password=mt_rand(12345678,98765432);
@@ -32,6 +32,7 @@ class API_User extends CI_Controller {
 		$hash=sha1(md5($password).$salt);
 
 		$query=$this->db->update('user',array('password'=>$hash,'salt'=>$salt),array('id'=>$userId));
+		
 		if($query==true) $this->ajax->returnData(200,"success",['password'=>$password]);
 		else $this->ajax->returnData(500,"database Error");
 	}
@@ -42,7 +43,7 @@ class API_User extends CI_Controller {
 		$auth=$this->safe->checkAuth('api',substr($this->input->server('HTTP_REFERER'),strpos($this->input->server('HTTP_REFERER'),base_url())+strlen(base_url())));
 		if($auth!=true) $this->ajax->returnData(403,"no Permission");
 
-		$userId=isset($_POST['userId'])&&$_POST['userId']!=""?$_POST['userId']:$this->ajax->returnData(0,"lack Param");
+		$userId=inputPost('userId',0,1);
 		if($userId==$this->session->userdata($this->sessPrefix.'user_id')) $this->ajax->returnData(400,"cannot Operate own");
 
 		$query=$this->db->delete('user',array('id'=>$userId));
@@ -73,9 +74,9 @@ class API_User extends CI_Controller {
 		$query=$this->db->get('user');
 
 		if($query->num_rows()!=1){
-			$this->ajax->returnData(200,"no User");
+			returnAjaxData(200,"no User");
 		}else{
-			$this->ajax->returnData(403,"have User");
+			returnAjaxData(403,"have User");
 		}
 	}
 
@@ -94,21 +95,21 @@ class API_User extends CI_Controller {
 		$this->db->where('id!=',$userId);
 		$query1=$this->db->get('user');
 		if($query1->num_rows()!=0){
-			$this->ajax->returnData(1,"have UserName");
+			returnAjaxData(1,"have UserName");
 		}
 
 		$this->db->where('nick_name',$nickName);
 		$this->db->where('id!=',$userId);
 		$query2=$this->db->get('user');
 		if($query2->num_rows()!=0){
-			$this->ajax->returnData(2,"have nickName");
+			returnAjaxData(2,"have nickName");
 		}
 
 		$this->db->where('phone',$phone);
 		$this->db->where('id!=',$userId);
 		$query3=$this->db->get('user');
 		if($query3->num_rows()!=0){
-			$this->ajax->returnData(3,"have Phone");
+			returnAjaxData(3,"have Phone");
 		}
 
 		// 修改资料

@@ -83,7 +83,6 @@ class API_WXMP extends CI_Controller {
 				echo "新增记录失败！";
 			}
 		}else{
-			var_dump($_SESSION);
 			$getCode=json_decode($getCode,true);
 			echo "生成小程序码失败";
 		}

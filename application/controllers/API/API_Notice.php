@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-C-API-通知
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-19
- * @version 2019-01-19
+ * @version 2019-02-14
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -21,7 +21,7 @@ class API_Notice extends CI_Controller {
 
 	public function get()
 	{
-		$type=isset($_GET['type'])&&$_GET['type']!=""?$_GET['type']:$this->ajax->returnData(0,"lack Param");
+		$type=inputGet('type',0,1);
 		$userId=$this->session->userdata($this->sessPrefix.'user_id')!=null?$this->session->userdata($this->sessPrefix.'user_id'):$this->ajax->returnData(403,"Not Login");
 		$sql="SELECT a.*,b.nick_name AS publisher FROM notice a,user b WHERE a.publisher_id=b.id AND (receiver='0' OR receiver LIKE '%".$userId."%') ";
 
@@ -36,7 +36,7 @@ class API_Notice extends CI_Controller {
 			case "list":
 				break;
 			case "detail":
-				$id=isset($_GET['id'])&&$_GET['id']!=""?$_GET['id']:$this->ajax->returnData(0,"lack Param");
+				$id=inputGet('id',0,1);
 				$sql.="AND a.id=".$id;
 				break;
 			default:

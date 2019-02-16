@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-C-登录
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-19
- * @version 2019-02-09
+ * @version 2019-02-16
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -55,19 +55,20 @@ class Login extends CI_Controller {
 
 	public function toLogin()
 	{
-		$appId=isset($_POST['appId'])?$_POST['appId']:$this->ajax->returnData(0,"lack Param");
-		$userName=isset($_POST['userName'])&&$_POST['userName']!=""?$_POST['userName']:$this->ajax->returnData(0,"lack Param");
-		$password=isset($_POST['password'])&&$_POST['password']!=""?$_POST['password']:$this->ajax->returnData(0,"lack Param");
+		$appId=inputPost('appId',0,1);
+		$userName=inputPost('userName',0,1);
+		$password=inputPost('password',0,1);
+
 		$userInfo=$this->user->getInfoByUserName($userName);
 		
 		if($userInfo==array()){
-			$this->ajax->returnData(4031,"failed To Auth");
+			returnAjaxData(4031,"failed To Auth");
 		}else{
 			$checkPwd=$this->safe->checkPassword($password,$userInfo['password'],$userInfo['salt']);
 			
 			// 判断密码有效性
 			if($checkPwd!==true){
-				$this->ajax->returnData(4031,"failed To Auth");
+				returnAjaxData(4031,"failed To Auth");
 			}else{
 				$this->db->where('user_name',$userName);
 				$this->db->update('user',['last_login'=>date('Y-m-d H:i:s')]);
@@ -89,15 +90,15 @@ class Login extends CI_Controller {
 
 				if($appId!="" && $appInfo==array()){
 					// 没有此应用
-					$this->ajax->returnData(4032,"permission Denied");
+					returnAjaxData(4032,"permission Denied");
 				}elseif($appId!="" && in_array($appInfo['id'],$appPermission)!=true){
 					// 没有权限访问
-					$this->ajax->returnData(4032,"permission Denied");
+					returnAjaxData(4032,"permission Denied");
 				}else{
 					// 有权限，跳转回应用登录页
 					$tokenQuery=$this->user->addLoginToken($token,$userInfo['id']);
-					if($tokenQuery===true) $this->ajax->returnData(200,"success",['returnUrl'=>$this->session->userdata($this->sessPrefix.'returnUrl')."?token=".$token]);
-					else $this->ajax->returnData(500,"database Error");
+					if($tokenQuery===true) returnAjaxData(200,"success",['returnUrl'=>$this->session->userdata($this->sessPrefix.'returnUrl')."?token=".$token]);
+					else returnAjaxData(500,"database Error");
 				}
 			}
 		}
@@ -138,8 +139,8 @@ class Login extends CI_Controller {
 
 
 	public function toRegister_step1(){
-		$phone=isset($_POST['phone'])&&strlen($_POST['phone'])==11?$_POST['phone']:$this->ajax->returnData(0,"lack Param");
-		$messageCode=isset($_POST['messageCode'])&&$_POST['messageCode']!=""?$_POST['messageCode']:$this->ajax->returnData(0,"lack Param");
+		$phone=isset($_POST['phone'])&&strlen($_POST['phone'])==11?$_POST['phone']:returnAjaxData(0,"lack Param");
+		$messageCode=isset($_POST['messageCode'])&&$_POST['messageCode']!=""?$_POST['messageCode']:returnAjaxData(0,"lack Param");
 
 		if($phone==$this->session->userdata($this->sessPrefix.'reg_msgPhone') && $messageCode==$this->session->userdata($this->sessPrefix.'reg_msgCode') && time()<=$this->session->userdata($this->sessPrefix.'reg_msgExpireTime')){
 			$ticket=sha1($phone.time());
@@ -147,12 +148,12 @@ class Login extends CI_Controller {
 			$this->session->set_userdata($this->sessPrefix.'reg_phone',$phone);
 			$this->session->set_userdata($this->sessPrefix.'reg_ticket',$ticket);
 
-			$this->ajax->returnData(200,"success",['url'=>base_url('register_step2/'.$ticket)]);
+			returnAjaxData(200,"success",['url'=>base_url('register_step2/'.$ticket)]);
 		}else{
 			if($this->session->userdata($this->sessPrefix.'reg_msgExpireTime')!=NULL && time()>$this->session->userdata($this->sessPrefix.'reg_msgExpireTime')){
-				$this->ajax->returnData(1,"expire Time");
+				returnAjaxData(1,"expire Time");
 			}else{
-				$this->ajax->returnData(403,"invaild Code");
+				returnAjaxData(403,"invaild Code");
 			}
 		}
 	}
@@ -170,20 +171,20 @@ class Login extends CI_Controller {
 
 	public function toRegister_step2()
 	{
-		$accountType=isset($_POST['accountType'])&&$_POST['accountType']!=""?$_POST['accountType']:$this->ajax->returnData(0,"lack Param");
-		$userName=isset($_POST['userName'])&&$_POST['userName']!=""?$_POST['userName']:$this->ajax->returnData(0,"lack Param");
-		$password=isset($_POST['password'])&&$_POST['password']!=""?$_POST['password']:$this->ajax->returnData(0,"lack Param");
-		$nickName=isset($_POST['nickName'])&&$_POST['nickName']!=""?$_POST['nickName']:$this->ajax->returnData(0,"lack Param");
-		$email=isset($_POST['email'])&&$_POST['email']!=""?$_POST['email']:$this->ajax->returnData(0,"lack Param");
+		$accountType=isset($_POST['accountType'])&&$_POST['accountType']!=""?$_POST['accountType']:returnAjaxData(0,"lack Param");
+		$userName=isset($_POST['userName'])&&$_POST['userName']!=""?$_POST['userName']:returnAjaxData(0,"lack Param");
+		$password=isset($_POST['password'])&&$_POST['password']!=""?$_POST['password']:returnAjaxData(0,"lack Param");
+		$nickName=isset($_POST['nickName'])&&$_POST['nickName']!=""?$_POST['nickName']:returnAjaxData(0,"lack Param");
+		$email=isset($_POST['email'])&&$_POST['email']!=""?$_POST['email']:returnAjaxData(0,"lack Param");
 
 		if($accountType=="person"){
-			$school=isset($_POST['school'])&&$_POST['school']!=""?$_POST['school']:$this->ajax->returnData(0,"lack Param");
+			$school=isset($_POST['school'])&&$_POST['school']!=""?$_POST['school']:returnAjaxData(0,"lack Param");
 			$extraParam="{}";
 			$originIntegral=$this->setting->get('originIntegral_User');
 			$originSpecialIntegral=$this->setting->get('originSpecialIntegral_User');
 		}elseif($accountType=="organization"){
-			$phone2=isset($_POST['phone2'])&&$_POST['phone2']!=""?$_POST['phone2']:$this->ajax->returnData(0,"lack Param");
-			$school=isset($_POST['organization'])&&$_POST['organization']!=""?$_POST['organization']:$this->ajax->returnData(0,"lack Param");
+			$phone2=isset($_POST['phone2'])&&$_POST['phone2']!=""?$_POST['phone2']:returnAjaxData(0,"lack Param");
+			$school=isset($_POST['organization'])&&$_POST['organization']!=""?$_POST['organization']:returnAjaxData(0,"lack Param");
 			$extraParam=json_encode(['phone2'=>$phone2]);
 			$originIntegral=$this->setting->get('originIntegral_Org');
 			$originSpecialIntegral=$this->setting->get('originSpecialIntegral_Org');
@@ -199,14 +200,14 @@ class Login extends CI_Controller {
 		$this->db->select('id');
 		$query1=$this->db->get_where('user',array('user_name',$userName));
 		if($query1->num_rows()>=1){
-			$this->ajax->returnData(1,"have UserName");
+			returnAjaxData(1,"have UserName");
 		}
 
 		// 再次校验手机号是否已存在
 		$this->db->select('id');
 		$query2=$this->db->get_where('user',array('phone',$this->session->userdata($this->sessPrefix.'reg_phone')));
 		if($query2->num_rows()>=1){
-			$this->ajax->returnData(2,"have Phone");
+			returnAjaxData(2,"have Phone");
 		}
 
 		// 获取默认角色资料
@@ -216,7 +217,7 @@ class Login extends CI_Controller {
 		else $this->db->where('is_org=',0);
 		$roleInfoQuery=$this->db->get('role');
 		if($roleInfoQuery->num_rows()!=1){
-			$this->ajax->returnData(3,"no Role Info");
+			returnAjaxData(3,"no Role Info");
 		}else{
 			$roleInfo=$roleInfoQuery->result_array();
 			$roleId=$roleInfo[0]['id'];
@@ -253,8 +254,8 @@ class Login extends CI_Controller {
 
 		$query=$this->db->insert('user',$data);
 
-		if($query==true) $this->ajax->returnData(200,"success");
-		else $this->ajax->returnData(500,"database Error");
+		if($query==true) returnAjaxData(200,"success");
+		else returnAjaxData(500,"database Error");
 	}
 
 
@@ -287,16 +288,16 @@ class Login extends CI_Controller {
 
 	public function toSendMessageCode()
 	{
-		$phone=isset($_POST['phone'])&&strlen($_POST['phone'])==11?$_POST['phone']:$this->ajax->returnData(0,"lack Param");
+		$phone=isset($_POST['phone'])&&strlen($_POST['phone'])==11?$_POST['phone']:returnAjaxData(0,"lack Param");
 
 		if($this->session->userdata($this->sessPrefix.'reg_msgNextTime')>=time()){
-			$this->ajax->returnData(1,"send Frequently");
+			returnAjaxData(1,"send Frequently");
 		}
 
 		$this->db->select('id');
 		$query=$this->db->get_where('user',array('phone',$phone));
 		if($query->num_rows()>=1){
-			$this->ajax->returnData(2,"have Phone");
+			returnAjaxData(2,"have Phone");
 		}
 
 		$code=mt_rand(123456,987654);
@@ -341,9 +342,9 @@ class Login extends CI_Controller {
 		$this->session->set_userdata($sessionData);
 
 		if(stripos($result,"Success")==true){
-			$this->ajax->returnData(200,"success");
+			returnAjaxData(200,"success");
 		}else{
-			$this->ajax->returnData(400,"bad Request",[$result]);
+			returnAjaxData(400,"bad Request",[$result]);
 		}
 	}*/
 }
