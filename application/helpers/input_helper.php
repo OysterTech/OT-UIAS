@@ -8,26 +8,30 @@
 
 function inputGet($dataName="",$allowNull=0,$isAjax=0)
 {
-	if($allowNull!=1 && isset($_GET[$dataName])){
+	if(isset($_GET[$dataName])){
 		if($allowNull!=1 && $_GET[$dataName]==""){
 			return $isAjax==1?returnAjaxData(0,'lack Parameter'):false;
 		}else{
 			return $_GET[$dataName];
 		}
+	}elseif($allowNull==1){
+		return;
 	}else{
-		return $isAjax==1?returnAjaxData(0,'lack Parameter'):false;
+		return $isAjax==1?returnAjaxData(1,'lack Parameter'):false;
 	}
 }
 
 
 function inputPost($dataName="",$allowNull=0,$isAjax=0)
 {
-	if($allowNull!=1 && isset($_POST[$dataName])){
+	if(isset($_POST[$dataName])){
 		if($allowNull!=1 && $_POST[$dataName]==""){
 			return $isAjax==1?returnAjaxData(0,'lack Parameter'):false;
 		}else{
 			return $_POST[$dataName];
 		}
+	}elseif($allowNull==1){
+		return;
 	}else{
 		return $isAjax==1?returnAjaxData(0,'lack Parameter'):false;
 	}
@@ -45,4 +49,3 @@ function returnAjaxData($code,$msg,$data=""){
 	$ret=array('code'=>$code,'message'=>$msg,'data'=>$data,'requestTime'=>time());
 	die(json_encode($ret));
 }
-	
