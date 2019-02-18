@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-登录页
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2018-11-30
- * @version 2019-02-14
+ * @version 2019-02-18
  */
 ?>
 <html>
@@ -230,7 +230,9 @@ function startCheckStatus(){
 							$("#wxCodeStatusDiv").attr('style','');
 							$("#wxCodeStatusIcon").attr('class','weui-icon-success weui-icon_msg');
 							$("#wxCodeStatusContent").html('正在跳转，请稍候！');
-							window.location.href="<?=$returnUrl;?>";
+							setTimeout(function(){
+								window.location.href="<?=$returnUrl;?>";
+							},1500);
 							break;
 						default:
 							break;
