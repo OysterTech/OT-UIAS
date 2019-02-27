@@ -8,7 +8,7 @@
 
 ▲ 开发商：广州市生蚝科技有限公司（生蚝科技）
 
-▲ 代码版本信息：***Build 00521***
+▲ 代码版本信息：***Build 00522***
 
 ▲ 系统版本信息：***1.0.0***
 
@@ -28,7 +28,7 @@
 
 ① 在SSO中心数据库的app表添加你的app信息（appId尽量用同一套算法生成25位字符串！！）
 
-② 仿照testApp的ssoLogin.php，发送请求到SSO中心API获取用户信息
+② 修改[`ssoTest.php`](https://github.com/OysterTech/OT-SSO/blob/master/ssoTest.php)里的常量，访问此文件即可自动发送请求到SSO中心API，并显示获取用户信息
 
 ---
 
