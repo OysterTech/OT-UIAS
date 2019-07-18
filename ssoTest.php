@@ -2,7 +2,7 @@
 define('APP_ID','');// 应用ID
 define('REDIRECT_URL','');// 回调Url（需要协议头，最后必须带"/"）
 define('SSO_SERVER','');// SSO服务器域名（需要协议头，最后必须带"/"）
-define('SSO_LOGIN_URL',SSO_SERVER.'user/login?appId='.APP_ID.'&redirectUrl='.urlencode(REDIRECT_URL));
+define('SSO_LOGIN_URL',SSO_SERVER.'login?appId='.APP_ID.'&redirectUrl='.urlencode(REDIRECT_URL));
 define('SSO_API_URL',SSO_SERVER.'api/user/getUserInfo');
 
 $token=isset($_GET['token'])&&$_GET['token']!=""?$_GET['token']:die(header("location:".SSO_LOGIN_URL));

@@ -17,6 +17,7 @@ $route['translate_uri_dashes'] = FALSE;
 // Custom Routes
 $route['error/(:any)']='Main/error/$1';
 $route['dashborad'] = 'Main/index';
+$route['login'] = 'User/login';
 
 /*********** API-Role ************/
 $route['api/role/get']='API/API_Role/getRoleInfo';
