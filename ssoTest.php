@@ -1,12 +1,12 @@
 <?php
 define('APP_ID','');// 应用ID
-define('RETURN_URL','');// 回调Url
+define('REDIRECT_URL','');// 回调Url（需要协议头，最后必须带"/"）
 define('SSO_SERVER','');// SSO服务器域名（需要协议头，最后必须带"/"）
-define('SSO_LOGIN_URL',SSO_SERVER.'login/'.APP_ID.'/'.urlencode(RETURN_URL));
+define('SSO_LOGIN_URL',SSO_SERVER.'user/login?appId='.APP_ID.'&redirectUrl='.urlencode(REDIRECT_URL));
 define('SSO_API_URL',SSO_SERVER.'api/user/getUserInfo');
 
 $token=isset($_GET['token'])&&$_GET['token']!=""?$_GET['token']:die(header("location:".SSO_LOGIN_URL));
-$postData=array('method'=>'api','token'=>$token,'appId'=>APP_ID,'returnUrl'=>RETURN_URL);
+$postData=array('method'=>'api','token'=>$token,'appId'=>APP_ID,'redirectUrl'=>REDIRECT_URL);
 $output=curl(SSO_API_URL,'post',$postData);
 $data=json_decode($output,TRUE);
 

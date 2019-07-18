@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-C-API-用户
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-19
- * @version 2019-01-22
+ * @version 2019-07-18
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -22,10 +22,10 @@ class API_User extends CI_Controller {
 	public function resetPassword()
 	{
 		$auth=$this->safe->checkAuth('api',substr($this->input->server('HTTP_REFERER'),strpos($this->input->server('HTTP_REFERER'),base_url())+strlen(base_url())));
-		if($auth!=true) $this->ajax->returnData(403,"no Permission");
+		if($auth!=true) returnAjaxData(403,"no Permission");
 
 		$userId=inputPost('userId',0,1);
-		if($userId==$this->session->userdata($this->sessPrefix.'user_id')) $this->ajax->returnData(400,"cannot Operate own");
+		if($userId==$this->session->userdata($this->sessPrefix.'user_id')) returnAjaxData(400,"cannot Operate own");
 
 		$password=mt_rand(12345678,98765432);
 		$salt=getRanSTR(8);
@@ -33,42 +33,42 @@ class API_User extends CI_Controller {
 
 		$query=$this->db->update('user',array('password'=>$hash,'salt'=>$salt),array('id'=>$userId));
 		
-		if($query==true) $this->ajax->returnData(200,"success",['password'=>$password]);
-		else $this->ajax->returnData(500,"database Error");
+		if($query==true) returnAjaxData(200,"success",['password'=>$password]);
+		else returnAjaxData(500,"database Error");
 	}
 
 
 	public function delete()
 	{
 		$auth=$this->safe->checkAuth('api',substr($this->input->server('HTTP_REFERER'),strpos($this->input->server('HTTP_REFERER'),base_url())+strlen(base_url())));
-		if($auth!=true) $this->ajax->returnData(403,"no Permission");
+		if($auth!=true) returnAjaxData(403,"no Permission");
 
 		$userId=inputPost('userId',0,1);
-		if($userId==$this->session->userdata($this->sessPrefix.'user_id')) $this->ajax->returnData(400,"cannot Operate own");
+		if($userId==$this->session->userdata($this->sessPrefix.'user_id')) returnAjaxData(400,"cannot Operate own");
 
 		$query=$this->db->delete('user',array('id'=>$userId));
-		if($query==true) $this->ajax->returnData(200,"success");
-		else $this->ajax->returnData(500,"database Error");
+		if($query==true) returnAjaxData(200,"success");
+		else returnAjaxData(500,"database Error");
 	}
 
 
 	public function getAllUser()
 	{
-		$query=$this->db->query("SELECT a.id,a.union_id AS unionId,a.user_name AS userName,a.nick_name AS nickName,b.name AS roleName FROM user a,role b WHERE a.role_id=b.id");
-		$this->ajax->returnData(200,"success",['list'=>$query->result_array()]);
+		$query=$this->db->query('SELECT a.id,a.union_id AS unionId,a.user_name AS userName,a.nick_name AS nickName,b.name AS roleName FROM user a,role b WHERE a.role_id=b.id');
+		returnAjaxData(200,'success',['list'=>$query->result_array()]);
 	}
 
 
 	public function checkDuplicate($method='',$value='')
 	{
 		if($method=='' || $value==''){
-			$this->ajax->returnData(0,"lack Param");
+			returnAjaxData(0,"lack Parameter");
 		}else if($method=="userName"){
 			$this->db->where('user_name', $value);
 		}else if($method=="phone"){
 			$this->db->where('phone', $value);
 		}else{
-			$this->ajax->returnData(1,"Invaild Method");
+			returnAjaxData(1,"Invaild Method");
 		}
 
 		$query=$this->db->get('user');
@@ -84,10 +84,10 @@ class API_User extends CI_Controller {
 	public function updateUserInfo()
 	{
 		$userId=isset($_POST['userId'])&&$_POST['userId']!=""?$_POST['userId']:$this->session->userdata($this->sessPrefix.'user_id');
-		$userName=$this->input->post('userName');
-		$nickName=$this->input->post('nickName');
-		$phone=$this->input->post('phone');
-		$email=$this->input->post('email');
+		$userName=inputPost('userName',0,1);
+		$nickName=inputPost('nickName',0,1);
+		$phone=inputPost('phone',0,1);
+		$email=inputPost('email',0,1);
 		$roleId=isset($_POST['roleId'])&&$_POST['roleId']!=""?$_POST['roleId']:0;
 
 		// 检查是否有重复
@@ -120,50 +120,99 @@ class API_User extends CI_Controller {
 		}
 
 		if($query4==true){
-			$this->ajax->returnData(200,"success");
+			returnAjaxData(200,'success');
 		}else{
-			$this->ajax->returnData(5,"changeError");
+			returnAjaxData(5,'Failed to change');
 		}
 	}
 
 
 	public function getUserInfo()
 	{
-		$method=isset($_POST['method'])&&$_POST['method']!=""?$_POST['method']:$this->ajax->returnData(0,"lack Param");
+		$method=inputPost('method',0,1);
 
-		if($method=="unionId"){
-			$unionId=isset($_POST['unionId'])&&strlen($_POST['unionId'])==8?$_POST['unionId']:$this->ajax->returnData(0,"lack Param");
+		if($method=='admin'){
+			$id=inputPost('userId',0,1);
+			$query=$this->db->query('SELECT user_name AS userName,nick_name AS nickName,phone,email,role_id FROM user WHERE id=?',[$id]);
+
+			if($query->num_rows()!=1){
+				returnAjaxData(1,'User not found');
+			}else{
+				$userInfo=$query->first_row('array');
+				$roleIds=explode(',',$list[0]['role_id']);
+
+				foreach($roleIds as $roleId){
+					$this->db->or_where('id', $roleId);
+				}
+
+				unset($userInfo['role_id']);
+				$query2=$this->db->get('role');
+				$roleList=$query2->result_array();
+				$roleName='';
+
+				foreach($roleList as $roleInfo){
+					$roleName.=$roleInfo['name'].',';
+					$userInfo['roleName'][$roleInfo['id']]=$roleInfo['name'];
+				}
+
+				$userInfo['allRoleName']=substr($roleName,0,strlen($roleName)-1);
+
+				returnAjaxData(200,'success',['userInfo'=>$userInfo]);
+			}
+		}else if($method=='own'){
+			$query=$this->db->query('SELECT a.user_name AS userName,a.nick_name AS nickName,a.phone,a.email,b.name AS roleName FROM user a,role b WHERE a.id=? AND b.id=?',[$_SESSION[$this->sessPrefix.'userId'],$_SESSION[$this->sessPrefix.'roleId']]);
+
+			if($query->num_rows()!=1){
+				returnAjaxData(1,'User not found');
+			}else{
+				$info=$query->first_row('array');
+				$info['roleId']=$_SESSION[$this->sessPrefix.'roleId'];
+				returnAjaxData(200,'success',['userInfo'=>$info]);
+			}
+		}else if($method=='unionId'){
+			$unionId=inputPost('unionId',0,1);
 			$query=$this->db->query('SELECT a.user_name AS userName,a.nick_name AS nickName,a.phone,a.email,b.name AS roleName FROM user a,role b WHERE a.union_id=? AND a.role_id=b.id',[$unionId]);
 
 			if($query->num_rows()!=1){
-				$this->ajax->returnData(1,'no User');
+				returnAjaxData(1,'User not found');
 			}else{
 				$list=$query->result_array();
-				$this->ajax->returnData(200,'success',['userInfo'=>$list[0]]);
+				returnAjaxData(200,'success',['userInfo'=>$list[0]]);
 			}
-		}else if($method=="api"){
-			$token=isset($_POST['token'])&&$_POST['token']!=""?$_POST['token']:$this->ajax->returnData(0,"lack Param");
+		}else if($method=='api'){
+			$token=inputPost('token',0,1);
+			
 			$this->db->select('user_id');
 			$query=$this->db->get_where('login_token',array('token'=>$token));
 
 			if($query->num_rows()==1){
 				$list=$query->result_array();
 				$userId=$list[0]['user_id'];
-				$userInfoQuery=$this->db->query('SELECT a.union_id AS unionId,a.user_name AS userName,a.nick_name AS nickName,a.phone,a.email,b.name AS roleName FROM user a,role b WHERE a.id=? AND a.role_id=b.id',[$userId]);
+				$userInfoQuery=$this->db->query('SELECT union_id AS unionId,user_name AS userName,nick_name AS nickName,phone,email,role_id FROM user WHERE id=?',[$userId]);
 
 				if($userInfoQuery->num_rows()!=1){
-					$this->ajax->returnData(1,"no User");
+					returnAjaxData(1,'User not found');
 				}else{
-					$userInfoList=$userInfoQuery->result_array();
-					$this->db->where('token',$token);
-					$this->db->delete('login_token');
-					$this->ajax->returnData(200,"success",['userInfo'=>$userInfoList[0]]);
+					$userInfo=$userInfoQuery->first_row('array');
+					$roleIds=explode(',',$userInfo['role_id']);
+					unset($userInfo['role_id']);
+
+					$this->db->where_in('id',$roleIds);
+					$roleQuery=$this->db->get('role');
+
+					if($roleQuery->num_rows()<1) returnAjaxData(2,'No role info');
+					else $userInfo['roleInfo']=$roleQuery->result_array();
+
+					$this->db->where('token',$token)
+					         ->delete('login_token');
+
+					returnAjaxData(200,'success',['userInfo'=>$userInfo]);
 				}
 			}else{
-				$this->ajax->returnData(403,"failed To Auth");
+				returnAjaxData(403,'Failed to Auth');
 			}
 		}else{
-			$this->ajax->returnData(2,"Invaild Method");
+			returnAjaxData(2,'Invaild method');
 		}
 	}
 }

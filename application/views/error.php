@@ -13,7 +13,7 @@
 </head>
 <body style="font-family:Microsoft YaHei; background-color:#f9f9f9;margin-top: 20px;">
 <center>
-	<img src="<?=base_url('resource/image/error.png');?>" style="width:40%;">
+	<img src="<?=base_url('resource/images/error.png');?>" style="width:40%;">
 	<h1>
 		<?=$tipsContent;?><br>
 		请联系管理员！

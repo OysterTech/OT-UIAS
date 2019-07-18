@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-M-应用
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-01-19
- * @version 2019-01-19
+ * @version 2019-07-18
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -26,7 +26,7 @@ class App_model extends CI_Model {
 		$data=array('app_id'=>$appId);
 
 		if($returnUrl!=""){
-			$data['return_url']=$returnUrl;
+			$data['redirect_url']=$returnUrl;
 		}
 
 		$query=$this->db->get_where('app',$data);

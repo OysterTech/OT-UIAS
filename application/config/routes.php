@@ -1,24 +1,30 @@
 <?php
 /**
- * @name 生蚝科技统一身份认证平台-路由设置
- * @author Jerry Cheung <master@xshgzs.com>
- * @since 2019-01-19
- * @version 2019-02-14
+ * @name 生蚝科技统一身份认证平台-路由
+ * @author CodeIgniter,Jerry Cheung
+ * @since 2018-02-06
+ * @version 2019-07-18
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+// System Default Routes
 $route['default_controller'] = 'Main/index';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
 
-/******* 基础页面 *******/
+// Custom Routes
 $route['error/(:any)']='Main/error/$1';
-$route['dashborad']='Main/dashborad';
+$route['dashborad'] = 'Main/index';
+
+/*********** API-Role ************/
+$route['api/role/get']='API/API_Role/getRoleInfo';
+$route['api/role/getRoleMenuForZtree']='API/API_Role/getRoleMenuForZtree';
+$route['api/role/getUserMenu']='API/API_Role/getUserMenu';
 
 
-/******* API-用户 *******/
+/*********** API-User ************/
 $route['api/user/resetPassword']['POST']='API/API_User/resetPassword';
 $route['api/user/delete']['POST']='API/API_User/delete';
 $route['api/user/getAllUser']='API/API_User/getAllUser';
@@ -27,51 +33,50 @@ $route['api/user/getUserInfo']['POST']='API/API_User/getUserInfo';
 $route['api/user/updateUserInfo']['POST']='API/API_User/updateUserInfo';
 
 
-/******* API-角色 *******/
-$route['api/role/getRoleInfo']='API/API_Role/getRoleInfo';// 获取所有角色
-$route['api/role/getRoleInfo/(:num)']='API/API_Role/getRoleInfo/$1';// 获取某一角色
-$route['api/role/getUserMenu']='API/API_Role/getUserMenu';
-$route['api/role/getRoleMenuForZtree/(:num)']='API/API_Role/getRoleMenuForZtree/$1';
+/*********** RBAC-Admin-Role ************/
+$route['admin/role/list']='RbacAdmin/RbacAdmin_role/toList';
+$route['admin/role/get']='RbacAdmin/RbacAdmin_role/get';
+$route['admin/role/add']='RbacAdmin/RbacAdmin_role/add';
+$route['admin/role/toAdd']['POST']='RbacAdmin/RbacAdmin_role/toAdd';
+$route['admin/role/edit']='RbacAdmin/RbacAdmin_role/edit';
+$route['admin/role/toEdit']['POST']='RbacAdmin/RbacAdmin_role/toEdit';
+$route['admin/role/toDelete']['POST']='RbacAdmin/RbacAdmin_role/toDelete';
+$route['admin/role/setPermission']='RbacAdmin/RbacAdmin_role/setPermission';
+$route['admin/role/toSetPermission']['POST']='RbacAdmin/RbacAdmin_role/toSetPermission';
+$route['admin/role/toSetDefaultRole']['POST']='RbacAdmin/RbacAdmin_role/toSetDefaultRole';
 
 
-/******* API-通知 *******/
-$route['api/notice/get']='API/API_Notice/get';
+/*********** RBAC-Admin-User ************/
+$route['admin/user/list']='RbacAdmin/RbacAdmin_user/toList';
+$route['admin/user/get']='RbacAdmin/RbacAdmin_user/get';
+$route['admin/user/add']='RbacAdmin/RbacAdmin_user/add';
+$route['admin/user/toAdd']['POST']='RbacAdmin/RbacAdmin_user/toAdd';
+$route['admin/user/toDelete']['POST']='RbacAdmin/RbacAdmin_user/toDelete';
+$route['admin/user/edit']='RbacAdmin/RbacAdmin_user/edit';
+$route['admin/user/toEdit']['POST']='RbacAdmin/RbacAdmin_user/toEdit';
+$route['admin/user/toResetPwd']['POST']='RbacAdmin/RbacAdmin_user/toResetPwd';
+$route['admin/user/toUpdateStatus']['POST']='RbacAdmin/RbacAdmin_user/toUpdateStatus';
 
 
-/******* API-小程序 *******/
-$route['api/wxmp/getQrCode/(:any)/(:any)']='API/API_WXMP/getQrCode/$1/$2';
-$route['api/wxmp/getQrCode/(:any)/(:any)/(:any)']='API/API_WXMP/getQrCode/$1/$2/$3';
-$route['api/wxmp/checkStatus']='API/API_WXMP/checkStatus';
-$route['api/wxmp/getOpenId']='API/API_WXMP/getOpenId';
-$route['api/wxmp/getAccessToken/(:any)']='API/API_WXMP/getAccessToken/$1';
-$route['api/wxmp/getUserInfo']='API/API_WXMP/getUserInfo';
-$route['api/wxmp/updateUserInfo']['POST']='API/API_WXMP/updateUserInfo';
-$route['api/wxmp/handler']['POST']='API/API_WXMP/handler';
-$route['api/wxmp/bindUser']['POST']='API/API_WXMP/bindUser';
-$route['api/wxmp/cancelBindUser']['POST']='API/API_WXMP/cancelBindUser';
-$route['api/wxmp/toSendTemplate']['POST']='API/API_WXMP/toSendTemplate';
+/*********** RBAC-Admin-Menu ************/
+$route['admin/menu/list']='RbacAdmin/RbacAdmin_menu/toList';
+$route['admin/menu/toDelete']['POST']='RbacAdmin/RbacAdmin_menu/toDelete';
+$route['admin/menu/toOperate']['POST']='RbacAdmin/RbacAdmin_menu/toOperate';
 
 
-/******* 登录登出 *******/
-$route['login']='Login/login';
-$route['login/(:any)/(:any)']='Login/login/$1/$2';// 有AppId的登录
-$route['logout']='Login/logout';
-$route['logout/(:any)']='Login/logout/$1';
-$route['logout/(:any)/(:any)/(:any)']='Login/logout/$1/$2/$3';
+/************ Admin-Setting *************/
+$route['admin/sys/setting/list']='Setting/toList';
+$route['admin/sys/setting/toSave']['POST']='Setting/toSave';
 
 
-/******* 注册 *******/
-$route['register_step1']='Login/register_step1';
-$route['toRegister_step1']='Login/toRegister_step1';
-$route['register_step2/(:any)']='Login/register_step2/$1';
-$route['toRegister_step2']='Login/toRegister_step2';
+/************* Admin-Log **************/
+$route['admin/sys/log/list']='Log/toList';
+$route['admin/sys/log/toTruncate']['POST']='Log/toTruncate';
 
 
-/******* 后台-用户 *******/
-$route['admin/user/list']='Admin/Admin_User/list';
-
-
-/******* 后台-角色 *******/
-$route['admin/role/list']='Admin/Admin_Role/list';
-$route['admin/role/delete']['POST']='Admin/Admin_Role/delete';
-$route['admin/role/toSetRolePermission']['POST']='Admin/Admin_Role/toSetRolePermission';
+/************* RBAC-User **************/
+$route['user/toUpdateProfile']['POST']='User/toUpdateProfile';
+$route['user/toLogin']['POST']='User/toLogin';
+$route['user/forgetPassword/sendCode']['POST']='User/forgetPasswordSendCode';
+$route['user/forgetPassword/verify']['POST']='User/forgetPasswordVerifyCode';
+$route['user/toResetPwd']['POST']='User/toResetPassword';

@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-V-我的应用列表
  * @author Jerry Cheung <master@smhgzs.com>
  * @since 2018-12-31
- * @version 2019-01-19
+ * @version 2019-07-18
  */
 ?>
 <!DOCTYPE html>
@@ -46,7 +46,7 @@
 						<tr>
 							<td><?=$appInfo['name'];?></td>
 							<td><a href="<?=$appInfo['main_page'];?>" target="_blank" class="btn btn-primary">访问</a></td>
-							<td><a href="<?=$appInfo['return_url']."?token=".$this->session->userdata($this->sessPrefix.'token');?>" target="_blank" class="btn btn-success">进入</a></td>
+							<td><a href="<?=$appInfo['redirect_url']."?token=".$this->session->userdata($this->sessPrefix.'token');?>" target="_blank" class="btn btn-success">进入</a></td>
 						</tr>
 					<?php } ?>
 					</tbody>

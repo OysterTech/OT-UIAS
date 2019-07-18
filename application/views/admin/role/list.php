@@ -1,21 +1,19 @@
-<?php
+<?php 
 /**
- * @name 生蚝科技统一身份认证平台-角色列表
- * @author Jerry Cheung <master@smhgzs.com>
- * @since 2019-01-20
- * @version 2019-01-20
+ * @name 生蚝科技RBAC开发框架-V-角色列表
+ * @author Jerry Cheung <master@xshgzs.com>
+ * @since 2018-02-09
+ * @version 2019-07-17
  */
 ?>
 <!DOCTYPE html>
 <html>
+
 <head>
-	<title>角色列表 / <?=$this->setting->get('systemName');?></title>
 	<?php $this->load->view('include/header'); ?>
-	<link rel="stylesheet" href="https://cdn.bootcss.com/zTree.v3/3.5.28/css/zTreeStyle/zTreeStyle.min.css" type="text/css">
-	<script type="text/javascript" src="https://cdn.bootcss.com/zTree.v3/3.5.28/js/jquery.ztree.core.min.js"></script>
-	<script type="text/javascript" src="https://cdn.bootcss.com/zTree.v3/3.5.28/js/jquery.ztree.excheck.min.js"></script>
-	<script type="text/javascript" src="https://cdn.bootcss.com/zTree.v3/3.5.28/js/jquery.ztree.exedit.min.js"></script>
+	<title>角色列表 / <?=$this->setting->get('systemName');?></title>
 </head>
+
 <body class="hold-transition skin-cyan sidebar-mini">
 <div class="wrapper">
 
@@ -23,291 +21,182 @@
 
 <!-- 页面内容 -->
 <div id="app" class="content-wrapper">
-	<!-- 头部(显示页面名称和路径) -->
-	<section class="content-header">
-		<h1>角色列表</h1>
-		<ol class="breadcrumb">
-			<li><a href="<?=base_url('dashborad');?>"><i class="fa fa-dashboard"></i> 生蚝科技用户中心</a></li>
-			<li class="active">后台管理</li>
-			<li class="active">角色列表</li>
-		</ol>
-	</section>
+	<?php $this->load->view('include/pagePath',['name'=>'角色列表','path'=>[['角色列表','',1]]]); ?>
 
 	<!-- 页面主要内容 -->
 	<section class="content">
-		<div class="callout callout-info">
-			▲ 点击“名称”显示详细资料
-		</div>
-		<div class="box">
-			<div class="box-body">
-				<table id="table" class="table table-bordered table-hover table-striped">
+		<a href="<?=base_url('admin/role/add');?>" class="btn btn-primary btn-block">新 增 角 色</a>
+
+		<hr>
+
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<table id="table" class="table table-striped table-bordered table-hover" style="border-radius: 5px; border-collapse: separate;">
 					<thead>
 						<tr>
-							<th>名称</th>
+							<th>角色名称</th>
 							<th>操作</th>
 						</tr>
 					</thead>
-					<tbody>
-						<tr v-for="info in roleList">
-							<td><a v-bind:onclick="['vm.showRoleInfo(&quot;'+info['name']+'&quot;,&quot;'+info['remark']+'&quot;)']">{{info['name']}}</a></td>
-							<td><!--a v-bind:href="['edit.php?id='+info['id']]" class="btn btn-info">编辑</a--> <a v-bind:onclick="['vm.setRolePermission('+info['id']+',&quot;'+info['name']+'&quot;)']" class="btn btn-success">分配权限</a> <a v-bind:onclick="['vm.delete('+info['id']+',&quot;'+info['name']+'&quot;)']" class="btn btn-danger">删除</a></td>
-						</tr>
-					</tbody>
+					<tbody></tbody>
 				</table>
 			</div>
 		</div>
 	</section>
 	<!-- ./页面主要内容 -->
-
-	<div class="modal fade" id="roleInfoModal">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true"></span><span class="sr-only">Close</span></button>
-					<h3 class="modal-title">角色详情</h3>
-				</div>
-				<div class="modal-body">
-					<table class="table table-hover table-striped table-bordered" style="border-radius: 5px;border-collapse: separate;">
-						<tr>
-							<td style="width:75px;">角色名称</td>
-							<th style="text-align:left;">{{roleInfoName}}</th>
-						</tr>
-						<tr>
-							<td style="width:75px;">角色描述</td>
-							<th style="text-align:left;">{{roleInfoRemark}}</th>
-						</tr>
-					</table>
-				</div>
-				<div class="modal-footer">
-					<button class="btn btn-primary" data-dismiss="modal">关闭 &gt;</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="modal fade" id="deleteModal">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true"></span><span class="sr-only">Close</span></button>
-					<h3 class="modal-title">温馨提示</h3>
-				</div>
-				<div class="modal-body">
-					<center>
-						<font color="red" style="font-weight:bold;font-size:24px;text-align:center;">
-							确定要删除[<font color="blue">{{deleteRoleName}}</font>]角色吗？
-						</font>
-					</center>
-				</div>
-				<div class="modal-footer">
-					<button class="btn btn-success" v-on:click="cancelDelete">&lt; 取消操作</button> <button class="btn btn-danger" v-bind:onclick="['if(confirm(&quot;请再次确认要删除['+deleteRoleName+']角色吗？&quot;)){vm.toDelete();}else{vm.cancelDelete();}']">确认删除 &gt;</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="modal fade" id="setPermissionModal">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true"></span><span class="sr-only">Close</span></button>
-					<h3 class="modal-title">分配 [{{setPermissionRoleName}}] 的权限</h3>
-				</div>
-				<div class="modal-body">
-					<ul id="treeDemo" class="ztree"></ul>
-				</div>
-				<div class="modal-footer">
-					<button class="btn btn-primary" data-dismiss="modal">&lt; 取消操作</button> <button class="btn btn-success" v-on:click="toSetRolePermission">确认配权 &gt;</button>
-				</div>
-			</div>
-		</div>
-	</div>
 </div>
 <!-- ./页面内容 -->
 
 <?php $this->load->view('include/footer'); ?>
 
+<!-- ./Page Main Content -->
 </div>
-<!-- ./wrapper -->
+<!-- ./Page -->
+</div>
 
 <script>
-var ztreeSetting = {
-	view: {
-		selectedMulti: false
-	},
-	check: {
-		enable: true
-	},
-	data: {
-		simpleData: {
-			enable: true
-		}
-	}
-};
+let table;
 
 var vm = new Vue({
 	el:'#app',
 	data:{
-		roleList:{},
-		roleInfoName:"",
-		roleInfoRemark:"",
-		deleteRoleId:0,
-		deleteRoleName:"",
-		setPermissionRoleId:0,
-		setPermissionRoleName:""
+		deleteId:0
 	},
 	methods:{
-		delete:function(roleId,roleName){
-			vm.deleteRoleId=roleId;
-			vm.deleteRoleName=roleName;
-			$("#deleteModal").modal("show");
-		},
-		toDelete:function(){
-			lockScreen();
-			$("#deleteModal").modal("hide");
+		getList:()=>{
 			$.ajax({
-				url:"delete",
-				data:{"roleId":vm.deleteRoleId},
-				dataType:"json",
-				type:"post",
-				error:function(e){
-					unlockScreen();
-					showModalTips("服务器错误！"+e.status);
-					console.log(e);
-					return false;
-				},
-				success:function(ret){
-					unlockScreen();
+				url:headerVm.apiPath+"role/get",
+				dataType:'json',
+				success:ret=>{
 					if(ret.code==200){
-						alert("删除成功！");
-						location.reload();
-						return true;
-					}else if(ret.code==500){
-						vm.cancelDelete();
-						showModalTips("删除失败！");
-						return false;
-					}else{
-						showModalTips("系统错误！"+ret.code);
-						console.log(ret);
-						return false;
-					}
-				}
-			});
-		},
-		cancelDelete:function(){
-			vm.deleteRoleId=0;
-			vm.deleteRoleName="";
-			$("#deleteModal").modal("hide");
-		},
-		getAllRole:function(){
-			lockScreen();
-			$.ajax({
-				url:headerVm.apiPath+"role/getRoleInfo",
-				dataType:"json",
-				error:function(e){
-					unlockScreen();
-					showModalTips("服务器错误！"+e.status);
-					console.log(e);
-					return false;
-				},
-				success:function(ret){
-					unlockScreen();
-					if(ret.code==200){
-						list=ret.data['list'];
-						vm.roleList=list;
-					}else{
-						showModalTips("系统错误！"+ret.code);
-						console.log(ret);
-						return false;
-					}
-				}
-			});
-		},
-		showRoleInfo:function(name,remark){
-			vm.roleInfoName=name;
-			vm.roleInfoRemark=remark;
-			$("#roleInfoModal").modal('show');
-		},
-		setRolePermission:function(roleId,roleName){
-			$.ajax({
-				url:headerVm.apiPath+"role/getRoleMenuForZtree/"+roleId,
-				error:function(e){
-					unlockScreen();
-					showModalTips("服务器错误！"+e.status);
-					console.log(e);
-					return false;
-				},
-				success:function(ret){
-					vm.setPermissionRoleId=roleId;
-					vm.setPermissionRoleName=roleName;
-					$.fn.zTree.init($("#treeDemo"),ztreeSetting,JSON.parse(ret));
-					$("#setPermissionModal").modal("show");
-				}
-			});
-		},
-		toSetRolePermission:function(){
-			lockScreen();
-			$("#setPermissionModal").modal("hide");
+						let list=ret.data['list'];
 
-			ids="";
-			zTree=$.fn.zTree.getZTreeObj("treeDemo");
-			nodes=zTree.getCheckedNodes();
-			for(i=0,l=nodes.length;i<l;i++){
-				ids+=nodes[i].id+",";
-			}
-			ids=ids.substr(0,ids.length-1);
+						table=$('#table').DataTable({
+							responsive: true,
+							"columnDefs":[{
+								"targets":[1],
+								"orderable": false
+							}]
+						});
 
-			$.ajax({
-				url:"toSetRolePermission",
-				type:"post",
-				data:{'roleId':vm.setPermissionRoleId,'permissionId':ids},
-				dataType:"json",
-				error:function(e){
-					unlockScreen();
-					showModalTips("服务器错误！"+e.status);
-					console.log(JSON.stringify(e));
-					return false;
-				},
-				success:function(ret){
-					unlockScreen();
-					if(ret.code==200){
-						showModalTips("成功给【"+vm.setPermissionRoleName+"】分配权限！");
-						return true;
-					}else if(ret.code==1){
-						showModalTips("无此角色！");
-						return false;
-					}else if(ret.code==0){
-						showModalTips("参数缺失！");
-						return false;
-					}else if(ret.code==500){
-						showModalTips("系统错误！<br>请联系技术支持！");
-						return false;
-					}else{
-						showModalTips("系统错误！"+ret.code);
-						console.log(ret);
-						return false;
+						for(i in list){
+							let operateHtml=''
+							               +'<a href="'+headerVm.rootUrl+'admin/role/edit?id='+list[i]['id']+'&name='+list[i]['name']+'" class="btn btn-info">编辑</a> '
+							               +"<a onclick='vm.del_ready("+'"'+list[i]['id']+'","'+list[i]['name']+'"'+")' class='btn btn-danger'>删除</a> "
+							               +'<a href="'+headerVm.rootUrl+'admin/role/setPermission?id='+list[i]['id']+'&name='+list[i]['name']+'" class="btn btn-success">分配权限</a> ';
+
+							operateHtml=list[i]['is_default']!=0?operateHtml:operateHtml+"<a onclick='vm.setDefaultRole("+'"'+list[i]['id']+'"'+")' class='btn btn-primary'>设为默认角色</a> ";
+
+							table.row.add({
+								0: list[i]['name'],
+								1: operateHtml
+							}).draw();
+						}
 					}
 				}
 			})
+		},
+		del_ready:(id,name)=>{
+			vm.deleteId=id;
+			$("#delName_show").html(name);
+			$("#delModal").modal('show');
+		},
+		del_sure:()=>{
+			lockScreen();
+			$.ajax({
+				url:"./toDelete",
+				type:"post",
+				dataType:"json",
+				data:{"id":vm.deleteId},
+				error:function(e){
+					console.log(e);
+					unlockScreen();
+					$("#delModal").modal('hide');
+					showModalTips("服务器错误！<hr>请联系技术支持并提交以下错误码：<br><font color='blue'>"+e.status+"</font>");
+					return false;
+				},
+				success:function(ret){
+					unlockScreen();
+
+					if(ret.code==200){
+						$("#delModal").modal('hide');
+						alert("删除成功！");
+						location.reload();
+						return true;
+					}else if(ret.code==1){
+						$("#delModal").modal('hide');
+						showModalTips("删除失败！！！");
+						return false;
+					}else{
+						$("#delModal").modal('hide');
+						showModalTips("系统错误！<hr>请联系技术支持并提交以下错误码：<br><font color='blue'>"+ret.code+"</font>");
+						return false;
+					}
+				}
+			});
+		},
+		setDefaultRole:(id)=>{
+			lockScreen();
+
+			$.ajax({
+				url:"./toSetDefaultRole",
+				type:"post",
+				dataType:"json",
+				data:{"id":id},
+				error:function(e){
+					console.log(e);
+					unlockScreen();
+					$("#delModal").modal('hide');
+					showModalTips("服务器错误！<hr>请联系技术支持并提交以下错误码：<br><font color='blue'>"+e.status+"</font>");
+					return false;
+				},
+				success:function(ret){
+					unlockScreen();
+
+					if(ret.code==200){
+						alert("设置成功！");
+						location.reload();
+						return true;
+					}else if(ret.code==1){
+						showModalTips("设置失败！！！");
+						return false;
+					}else if(ret.code==0){
+						showModalTips("参数缺失！请联系技术支持！");
+						return false;
+					}else{
+						showModalTips("系统错误！<hr>请联系技术支持并提交以下错误码：<br><font color='blue'>"+ret.code+"</font>");
+						return false;
+					}
+				}
+			});
 		}
+	},
+	mounted:function(){
+		this.getList();
 	}
 });
-
-vm.getAllRole();
-
-window.onload=function(){ 	
-	$('#table').DataTable({
-		responsive: true,
-		"order":[[0,'asc']],
-		"columnDefs":[{
-			"targets":[1],
-			"orderable": false
-		}]
-	});
-};
 </script>
 
-
+<div class="modal fade" id="delModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+				<h3 class="modal-title" id="ModalTitle">温馨提示</h3>
+			</div>
+			<div class="modal-body">
+				<center>
+				<font color="red" style="font-weight:bolder;font-size:23px;">确定要删除下列角色吗？</font>
+				<br><br>
+				<font color="blue" style="font-weight:bolder;font-size:23px;"><p id="delName_show"></p></font>
+				</center>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-success" data-dismiss="modal">&lt; 返回</button> <button type="button" class="btn btn-danger" onclick="vm.del_sure();">确定 &gt;</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 </body>
 </html>

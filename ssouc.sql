@@ -6,15 +6,21 @@ CREATE TABLE `app` (
   `app_id` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
   `main_page` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `return_url` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `redirect_url` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` int(1) NOT NULL DEFAULT '1' COMMENT '0废弃1开放2内部3审核中',
   `is_show` int(1) NOT NULL DEFAULT '1',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `app` (`id`, `app_id`, `name`, `main_page`, `return_url`, `status`, `is_show`, `create_time`, `update_time`) VALUES
-(1, 'otsso_0e4d2dbq0ak9fbu6dc6', '用户中心', 'https://ssouc.xshgzs.com', 'https://ssouc.xshgzs.com/dashborad', 1, 1, '2018-12-18 05:18:24', '2019-02-09 12:57:20');
+CREATE TABLE `log` (
+  `id` int(11) NOT NULL,
+  `type` varchar(10) COLLATE utf8_unicode_ci NOT NULL COMMENT '类型',
+  `content` text COLLATE utf8_unicode_ci NOT NULL COMMENT '内容',
+  `user_name` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '记录用户名',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `create_ip` varchar(15) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0.0.0.0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `login_token` (
   `id` int(11) NOT NULL,
@@ -31,88 +37,100 @@ CREATE TABLE `menu` (
   `name` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT '名称',
   `icon` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT '图标名（FA）',
   `uri` text COLLATE utf8_unicode_ci COMMENT '链接URL',
+  `type` int(1) NOT NULL DEFAULT '1',
+  `is_show` int(1) NOT NULL DEFAULT '1',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `update_time` varchar(19) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0000-00-00 00:00:00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO `menu` (`id`, `father_id`, `name`, `icon`, `uri`, `create_time`, `update_time`) VALUES
-(1, 0, '通知 Notice', 'bullhorn', NULL, '2019-01-05 11:31:36', '2019-01-05 11:31:36'),
-(2, 1, '通知列表', 'list-ul', 'notice/list', '2019-01-05 11:32:18', '2019-01-19 08:17:10'),
-(3, 1, '通知管理', 'gears', NULL, '2019-01-05 11:32:51', '2019-01-05 11:32:51'),
-(4, 3, '通知列表管理', 'list-alt', 'notice/admin/list', '2019-01-05 11:33:15', '2019-01-23 14:01:40'),
-(5, 3, '发布新通知', 'plus-circle', 'notice/admin/publish', '2019-01-05 11:33:43', '2019-01-23 14:02:09'),
-(6, 0, '应用 App', 'unlock', NULL, '2019-01-05 11:34:05', '2019-01-05 11:34:05'),
-(7, 6, '应用列表', 'window-restore', 'app/list', '2019-01-05 11:34:28', '2019-01-19 08:18:24'),
-(8, 6, '登录记录（内部）', 'ban', '#', '2019-01-05 11:34:44', '2019-01-19 13:46:31'),
-(9, 6, '应用管理', 'gears', NULL, '2019-01-05 11:35:24', '2019-01-05 11:35:24'),
-(10, 9, '应用管理', 'list-alt', 'app/manageList', '2019-01-05 11:36:28', '2019-01-23 13:52:45'),
-(11, 9, '申请新增应用', 'plus-circle', 'app/applyNew', '2019-01-05 11:38:22', '2019-01-23 13:52:21'),
-(12, 9, '审核应用申请', 'check-square-o', 'app/audit', '2019-01-05 11:40:44', '2019-01-23 13:52:32'),
-(18, 0, '系统管理 System', 'wrench', NULL, '2019-01-05 11:43:57', '2019-01-05 11:43:57'),
-(20, 18, '用户列表', 'user-circle-o', 'admin/user/list', '2019-01-05 11:44:48', '2019-01-19 08:19:33'),
-(22, 18, '角色管理', 'users', 'admin/role/list', '2019-01-05 11:45:59', '2019-01-19 08:19:38'),
-(23, 18, '菜单管理', 'bars', 'admin/menu/list', '2019-01-05 11:46:18', '2019-01-19 08:19:52'),
-(24, 18, '系统配置', 'gears', 'admin/setting/list', '2019-01-05 11:46:40', '2019-01-19 08:20:01');
+INSERT INTO `menu` (`id`, `father_id`, `name`, `icon`, `uri`, `type`, `is_show`, `create_time`, `update_time`) VALUES
+(1, 0, '系统管理', 'gears', '', 1, 1, '2018-02-18 04:46:23', '2018-03-02 13:09:30'),
+(2, 1, '用户列表', 'user-circle-o', 'admin/user/list', 1, 1, '2018-02-18 04:46:23', ''),
+(3, 1, '角色列表', 'users', 'admin/role/list', 1, 1, '2018-02-18 04:46:23', ''),
+(4, 1, '菜单管理', 'bars', 'admin/menu/list', 1, 1, '2018-02-18 04:46:23', ''),
+(5, 1, '操作记录列表', 'list-alt', 'admin/sys/log/list', 1, 1, '2018-02-18 04:46:23', ''),
+(8, 1, '修改系统参数', 'gear', 'admin/sys/setting/list', 1, 1, '2018-03-01 21:16:51', '2019-03-17 22:30:14'),
+(10, 0, '示例页面', 'file', '', 1, 1, '2018-03-14 06:39:43', '2018-03-14 22:42:10'),
+(12, 10, '空白页', 'file-o', 'show/blank', 1, 1, '2018-03-14 06:41:59', '0000-00-00 00:00:00'),
+(17, 0, '常用链接', 'link', '', 1, 1, '2019-03-23 15:49:14', '0000-00-00 00:00:00'),
+(18, 17, '图标库', 'circle-o', 'show/jumpout/http%3A%2F%2Fwww.fontawesome.com.cn%2Ffaicons%2F', 1, 1, '2019-03-23 15:53:45', '0000-00-00 00:00:00'),
+(19, 17, '数据库管理', 'circle-o', 'show/jumpout/https%3A%2F%2Fwww.xshgzs.com%2FdbAdmin%2F', 1, 1, '2019-03-24 00:20:50', '0000-00-00 00:00:00'),
+(20, 17, 'SSO用户中心', 'circle-o', 'show/jumpout/https%3A%2F%2Fssouc.xshgzs.com', 1, 1, '2019-03-24 00:22:09', '0000-00-00 00:00:00'),
+(21, 17, 'Github仓库', 'circle-o', 'show/jumpout//https%3A%2F%2Fgithub.com%2FSmallOyster%2FRBAC-CodeIgniter', 1, 1, '2019-05-25 15:20:31', '2019-05-26 09:41:50'),
+(22, 0, '应用 App', 'unlock', '', 1, 1, '2019-01-05 03:34:05', '2019-01-05 11:34:05'),
+(23, 22, '应用列表', 'window-restore', 'app/list', 1, 1, '2019-01-05 03:34:28', '2019-01-19 08:18:24'),
+(24, 22, '登录记录（内部）', 'ban', '#', 1, 1, '2019-01-05 03:34:44', '2019-01-19 13:46:31'),
+(25, 22, '应用管理', 'gears', '', 1, 1, '2019-01-05 03:35:24', '2019-01-05 11:35:24'),
+(26, 25, '应用管理', 'list-alt', 'app/manageList', 1, 1, '2019-01-05 03:36:28', '2019-01-23 13:52:45'),
+(27, 25, '申请新增应用', 'plus-circle', 'app/applyNew', 1, 1, '2019-01-05 03:38:22', '2019-01-23 13:52:21'),
+(28, 25, '审核应用申请', 'check-square-o', 'app/audit', 1, 1, '2019-01-05 03:40:44', '2019-01-23 13:52:32');
 
 CREATE TABLE `notice` (
   `id` int(11) NOT NULL,
-  `title` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `receiver` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `content` text COLLATE utf8_unicode_ci NOT NULL,
+  `receiver` text COLLATE utf8_unicode_ci NOT NULL,
   `publisher_id` int(11) NOT NULL,
   `praise` int(11) NOT NULL DEFAULT '0',
   `read_count` int(11) NOT NULL DEFAULT '0',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `qr_login_token` (
   `id` int(11) NOT NULL,
   `ticket` char(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `app_id` char(25) COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` int(1) NOT NULL DEFAULT '1' COMMENT '-1取消0过期1正常2已被扫3成功4无权',
+  `session_id` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `ip` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0.0.0.0',
   `expire_time` bigint(20) NOT NULL COMMENT 'Unix时间戳'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `role` (
-  `id` int(11) NOT NULL,
+  `id` varchar(6) COLLATE utf8_unicode_ci NOT NULL,
   `name` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT '角色名称',
   `remark` text COLLATE utf8_unicode_ci COMMENT '备注',
   `is_default` int(1) NOT NULL DEFAULT '0' COMMENT '是否为默认角色',
-  `is_org` int(1) NOT NULL DEFAULT '0',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `update_time` varchar(19) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0000-00-00 00:00:00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='角色表';
 
-INSERT INTO `role` (`id`, `name`, `remark`, `is_default`, `is_org`, `create_time`, `update_time`) VALUES
-(1, '系统管理员', '拥有所有最高权限', 0, 0, '2019-01-05 13:01:11', '2019-01-18 02:10:04');
+INSERT INTO `role` (`id`, `name`, `remark`, `is_default`, `create_time`, `update_time`) VALUES
+('g3sa86', '普通用户', '', 1, '2019-05-17 14:02:49', '2019-07-18 10:41:40'),
+('1p2wx4', '超级管理员', '拥有全部权限', 0, '2018-02-18 01:33:20', '2019-03-17 22:06:08');
 
 CREATE TABLE `role_permission` (
   `id` int(11) NOT NULL,
-  `role_id` int(11) NOT NULL COMMENT '角色ID',
-  `menu_id` int(11) NOT NULL COMMENT '菜单ID',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `role_id` varchar(6) COLLATE utf8_unicode_ci NOT NULL COMMENT '角色ID',
+  `menu_id` int(11) NOT NULL COMMENT '菜单ID'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO `role_permission` (`id`, `role_id`, `menu_id`, `create_time`) VALUES
-(1, 1, 1, '2019-01-23 13:44:08'),
-(2, 1, 2, '2019-01-23 13:44:08'),
-(3, 1, 3, '2019-01-23 13:44:08'),
-(4, 1, 4, '2019-01-23 13:44:08'),
-(5, 1, 5, '2019-01-23 13:44:08'),
-(6, 1, 6, '2019-01-23 13:44:08'),
-(7, 1, 7, '2019-01-23 13:44:08'),
-(8, 1, 8, '2019-01-23 13:44:08'),
-(9, 1, 9, '2019-01-23 13:44:08'),
-(10, 1, 10, '2019-01-23 13:44:08'),
-(11, 1, 11, '2019-01-23 13:44:08'),
-(12, 1, 12, '2019-01-23 13:44:08'),
-(13, 1, 18, '2019-01-23 13:44:08'),
-(14, 1, 20, '2019-01-23 13:44:08'),
-(15, 1, 22, '2019-01-23 13:44:08'),
-(16, 1, 23, '2019-01-23 13:44:08'),
-(17, 1, 24, '2019-01-23 13:44:08');
+INSERT INTO `role_permission` (`id`, `role_id`, `menu_id`) VALUES
+(157, '1p2wx4', 1),
+(158, '1p2wx4', 2),
+(159, '1p2wx4', 3),
+(160, '1p2wx4', 4),
+(161, '1p2wx4', 5),
+(162, '1p2wx4', 8),
+(163, '1p2wx4', 10),
+(164, '1p2wx4', 12),
+(165, '1p2wx4', 17),
+(166, '1p2wx4', 18),
+(167, '1p2wx4', 19),
+(168, '1p2wx4', 20),
+(169, '1p2wx4', 21),
+(170, '1p2wx4', 22),
+(171, '1p2wx4', 23),
+(172, '1p2wx4', 24),
+(173, '1p2wx4', 25),
+(174, '1p2wx4', 26),
+(175, '1p2wx4', 27),
+(176, '1p2wx4', 28),
+(177, 'g3sa86', 10),
+(178, 'g3sa86', 12),
+(179, 'g3sa86', 22),
+(180, 'g3sa86', 23);
 
 CREATE TABLE `setting` (
   `id` int(11) NOT NULL,
@@ -120,15 +138,14 @@ CREATE TABLE `setting` (
   `chinese_name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `value` text COLLATE utf8_unicode_ci NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `update_time` varchar(19) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0000-00-00 00:00:00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `setting` (`id`, `name`, `chinese_name`, `value`, `create_time`, `update_time`) VALUES
-(1, 'openReg', '是否开放注册（0关闭1开放）', '0', '2018-07-18 13:09:35', '2018-07-20 11:14:37'),
-(2, 'sessionPrefix', 'SESSION前缀', 'OTSSO_', '2019-01-19 01:26:12', '2019-02-03 01:43:09'),
-(3, 'apiPath', 'API接口目录', 'https://ssouc.xshgzs.com/api/', '2019-01-19 05:40:31', '2019-02-03 01:44:09'),
-(4, 'systemName', '系统名称', 'ITRClub用户中心', '2019-01-19 08:33:54', '2019-01-19 08:33:54'),
-(5, 'SSOUCAppId', 'SSO用户中心AppId', 'otsso_0e4d2dbq0ak9fbu6dc6', '2019-01-26 02:39:45', '2019-02-03 01:44:00');
+(1, 'sessionPrefix', 'Session名称前缀', 'OTSSOV2_', '2018-03-05 03:55:19', '2019-07-18 10:38:45'),
+(2, 'systemName', '系统名称', '生蚝科技统一身份认证平台V2.0', '2018-03-05 03:55:19', '2019-07-18 10:38:55'),
+(3, 'apiPath', 'API接口目录', 'https://ssouc.xshgzs.com/api/', '2019-02-23 09:29:55', '2019-07-18 10:39:00'),
+(8, 'SSOUCAppId', 'SSO用户中心AppId', 'otsso_0e4d2dbq0ak9fbu6dc6', '2019-01-25 18:39:45', '2019-02-03 01:44:00');
 
 CREATE TABLE `third_user` (
   `id` int(11) NOT NULL,
@@ -143,13 +160,12 @@ CREATE TABLE `third_user` (
 CREATE TABLE `user` (
   `id` int(11) NOT NULL,
   `union_id` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `wx_open_id` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '微信小程序openId',
   `user_name` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `nick_name` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
   `salt` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
   `app_permission` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `role_id` int(11) NOT NULL DEFAULT '0' COMMENT '角色ID',
+  `role_id` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '角色ID',
   `status` int(1) NOT NULL DEFAULT '2',
   `phone` varchar(11) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -159,13 +175,13 @@ CREATE TABLE `user` (
   `last_login` varchar(19) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0000-00-00 00:00:00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `user` (`id`, `union_id`, `wx_open_id`, `user_name`, `nick_name`, `password`, `salt`, `app_permission`, `role_id`, `status`, `phone`, `email`, `extra_param`, `create_time`, `update_time`, `last_login`) VALUES
-(1, 'G18KECAD', 'oYsjr0LDatAHWpV3bvRgPqquwhy0', 'super', '小生蚝', 'f8fa3a41c7ddb501bee7a6711f9c42188de71f4a', 'YGcyHECs', '1,2,3,4', 1, 2, '1', '571339406@qq.com', '{}', '2018-12-20 05:47:20', '2019-02-03 06:37:23', '2019-02-03 14:37:23');
-
 
 ALTER TABLE `app`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `app_id` (`app_id`);
+
+ALTER TABLE `log`
+  ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `login_token`
   ADD PRIMARY KEY (`id`),
@@ -182,8 +198,8 @@ ALTER TABLE `qr_login_token`
   ADD UNIQUE KEY `ticket` (`ticket`);
 
 ALTER TABLE `role`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
+  ADD UNIQUE KEY `name` (`name`),
+  ADD UNIQUE KEY `id` (`id`);
 
 ALTER TABLE `role_permission`
   ADD PRIMARY KEY (`id`);
@@ -199,27 +215,26 @@ ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `union_id` (`union_id`),
   ADD UNIQUE KEY `user_name` (`user_name`),
-  ADD UNIQUE KEY `phone` (`phone`),
-  ADD UNIQUE KEY `wx_open_id` (`wx_open_id`);
+  ADD UNIQUE KEY `phone` (`phone`);
 
 
 ALTER TABLE `app`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `log`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `login_token`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `menu`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 ALTER TABLE `notice`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `qr_login_token`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-ALTER TABLE `role`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `role_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=181;
 ALTER TABLE `setting`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 ALTER TABLE `third_user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;

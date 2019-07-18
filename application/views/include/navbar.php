@@ -1,58 +1,39 @@
 <?php
 /**
- * @name 生蚝科技统一身份认证平台-导航栏
+ * @name 生蚝科技RBAC开发框架-导航栏
  * @author Jerry Cheung <master@smhgzs.com>
  * @since 2018-12-31
- * @version 2019-01-20
+ * @version 2019-06-11
  */
 ?>
 
-<input type="hidden" id="<?=$this->sessPrefix;?>unionId" name="<?=$this->sessPrefix;?>unionId" value="<?=$this->session->userdata($this->sessPrefix.'unionId');?>">
+<!--input type="hidden" id="<?=$this->sessPrefix;?>userId" name="<?=$this->sessPrefix;?>userId" value="<?=$this->session->userdata($this->sessPrefix.'userId');?>"-->
 
 <div id="header">
 <header class="main-header">
 	<a v-bind:href="[rootUrl+'dashborad']" class="logo">
-		<span class="logo-mini"><img src="https://www.itrclub.com/resource/index/img/logo.png" style="width:85%"></span>
-		<span class="logo-lg"><img src="https://www.itrclub.com/resource/index/img/logo.png" style="width:20%"> <b>生蚝科技</b></span>
+		<span class="logo-mini"><img src="https://www.xshgzs.com/resource/index/images/logo2.png" style="width:85%"></span>
+		<span class="logo-lg"><img src="https://www.xshgzs.com/resource/index/images/logo2.png" style="width:20%"> <b>生蚝科技</b></span>
 	</a>
 	<nav class="navbar navbar-static-top">
 		<a class="sidebar-toggle" data-toggle="push-menu" role="button"><span class="sr-only">Toggle navigation</span></a>
 
 		<div class="navbar-custom-menu">
 			<ul class="nav navbar-nav">
-				<!-- 导航栏通知列表 -->
-				<li class="dropdown notifications-menu">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						<i class="fa fa-bell-o"></i>
-						<span v-if="navNoticeTotal>0" class="label label-warning">{{navNoticeTotal}}</span>
-					</a>
-					<ul class="dropdown-menu">
-						<li class="header">最近一个月的通知公告</li>
-						<li>
-							<ul class="menu">
-								<li v-if="navNoticeList!={}" v-for="navNoticeInfo in navNoticeList"><a v-bind:href="[rootUrl+'notice/detail/?id='+navNoticeInfo['id']]"><i class="fa fa-bullhorn"></i> {{navNoticeInfo['title']}}</a></li>
-								<li v-else><a><font color='blue'><b>暂无公告！</b></font></a></li>
-							</ul>
-						</li>
-						<li class="footer"><a v-bind:href="[rootUrl+'notice/list']">查看所有通知 &gt;</a></li>
-					</ul>
-				</li>
-				<!-- ./导航栏通知列表 -->
-
 				<li class="dropdown user user-menu">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						<img src="<?=base_url('resource/image/user.png');?>" class="user-image">
+						<img v-bind:src="[rootUrl+'resource/images/user.png']" class="user-image">
 						<span class="hidden-xs">{{userInfo['nickName']}}</span>
 					</a>
 					<ul class="dropdown-menu">
 						<li class="user-header">
-							<img src="<?=base_url('resource/image/user.png');?>" class="img-circle">
+							<img v-bind:src="[rootUrl+'resource/images/user.png']" class="img-circle">
 							<p>{{userInfo['userName']}} - {{userInfo['nickName']}}<!--small>Member since ?</small--></p>
 						</li>
 						<!-- Menu Footer-->
 						<li class="user-footer">
 							<div class="pull-left">
-								<a v-bind:href="[rootUrl+'profile/index']" class="btn btn-default btn-flat">个人中心</a>
+								<a v-bind:href="[rootUrl+'user/updateProfile']" class="btn btn-default btn-flat">修改资料</a>
 								<a data-toggle="modal" data-target="#changePasswordModal" class="btn btn-default btn-flat">修改密码</a>
 							</div>
 							<div class="pull-right">
@@ -109,11 +90,11 @@
 				<h4 class="modal-title">登出提示</h4>
 			</div>
 			<div class="modal-body">
-				<h3 style="line-height:38px;">确认要退出统一认证平台吗？<br>退出后将会登出所有系统！</h3>
+				<h3 style="line-height:38px;">确认要退出吗？</h3>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-outline pull-left" data-dismiss="modal">&lt; 取消</button>
-				<a v-bind:href="[rootUrl+'logout']" class="btn btn-outline">确认登出 &gt;</a>
+				<a v-bind:href="[rootUrl+'user/logout']" class="btn btn-outline">确认登出 &gt;</a>
 			</div>
 		</div>
 		<!-- /.modal-content -->
@@ -127,19 +108,26 @@
 	<section class="sidebar">
 		<div class="user-panel">
 			<div class="pull-left image">
-				<img src="<?=base_url('resource/image/user.png');?>" class="img-circle">
+				<img v-bind:src="[rootUrl+'resource/images/user.png']" class="img-circle">
 			</div>
 			<div class="pull-left info">
 				<p>{{userInfo['nickName']}}</p>
-				<small>{{userInfo['roleName']}}</small>
+				<select id="roleList" style="background-color:rgb(59, 73, 102);border:0;color:#fff;margin-left:-4px;" v-on:change="changeRole" v-model="roleIdSelected">
+					<option v-for="(roleName,roleId) in allRoleInfo" v-bind:value="roleId">{{roleName}}</option>
+				</select>
 			</div>
 		</div>
 		<!-- 菜单树 -->
 		<!-- 父菜单 -->
 		<ul class="sidebar-menu" data-widget="tree">
-			<li v-for="fatherInfo in treeData" v-if="fatherInfo['hasChild']!=1"><a v-bind:href="[rootUrl+fatherInfo['uri']]"><i v-bind:class="['fa fa-'+fatherInfo['icon']]"></i> {{fatherInfo['name']}}</a></li>
+			<li>
+				<a v-bind:href="[rootUrl+'dashborad']">
+					<i class="fa fa-home"></i> 系统主页面
+				</a>
+			</li>
+			<li v-for="fatherInfo in treeData" v-if="fatherInfo['hasChild']!=1 && fatherInfo['type']==1"><a v-bind:href="[rootUrl+fatherInfo['uri']]"><i v-bind:class="['fa fa-'+fatherInfo['icon']]"></i> {{fatherInfo['name']}}</a></li>
 			<!-- 二级菜单 -->
-			<li v-else class="treeview">
+			<li v-else-if="fatherInfo['type']==1" class="treeview">
 				<a href="#">
 					<i v-bind:class="['fa fa-'+fatherInfo['icon']]"></i> <span>{{fatherInfo['name']}}</span>
 					<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
@@ -240,11 +228,11 @@ var headerVm = new Vue({
 	data:{
 		rootUrl:"<?=base_url();?>",
 		apiPath:"<?=$this->API_PATH;?>",
-		unionId:$("#<?=$this->sessPrefix;?>unionId").val(),
+		userId:$("#<?=$this->sessPrefix;?>userId").val(),
 		userInfo:{},
 		treeData:{},
-		navNoticeList:{},
-		navNoticeTotal:0
+		allRoleInfo:{},
+		roleIdSelected:''
 	},
 	methods:{
 		getUserInfo:function(){
@@ -253,7 +241,7 @@ var headerVm = new Vue({
 			$.ajax({
 				url:headerVm.apiPath+"user/getUserInfo",
 				type:"post",
-				data:{"method":"unionId","unionId":headerVm.unionId},
+				data:{"method":"own"},
 				dataType:"json",
 				error:function(e){
 					unlockScreen();
@@ -266,6 +254,7 @@ var headerVm = new Vue({
 						unlockScreen();
 						info=ret.data['userInfo'];
 						headerVm.userInfo=info;
+						headerVm.roleIdSelected=headerVm.userInfo['roleId'];
 						return true;
 					}else{
 						unlockScreen();
@@ -308,23 +297,25 @@ var headerVm = new Vue({
 				}
 			});
 		},
-		getNavbarNotice:function(){
+		getAllRole:function(){
+			allRoleInfo=localStorage.getItem('allRoleInfo');
+			headerVm.allRoleInfo=JSON.parse(allRoleInfo);
+		},
+		changeRole:function(){
+			roleId=$("#roleList").val();
+
+			if(roleId=='' || roleId==headerVm.userInfo['roleId']) return;
+
 			$.ajax({
-				url:headerVm.apiPath+"notice/get",
-				data:{"type":"navbar"},
+				url:headerVm.rootUrl+"user/toChangeRole",
+				type:"post",
+				data:{"roleId":roleId},
 				dataType:"json",
 				error:function(e){
-					showModalTips("服务器错误！"+e.status);
-					console.log(e);
-					return false;
+					console.log(JSON.stringify(e));
 				},
 				success:function(ret){
-					if(ret.code==200){
-						list=ret.data['list'];
-						headerVm.navNoticeList=list;
-						headerVm.navNoticeTotal=list.length;
-						return false;
-					}
+					window.location.href=headerVm.rootUrl;
 				}
 			});
 		}
@@ -333,5 +324,5 @@ var headerVm = new Vue({
 
 headerVm.getUserInfo();
 headerVm.getMenuTree();
-headerVm.getNavbarNotice();
+headerVm.getAllRole();
 </script>

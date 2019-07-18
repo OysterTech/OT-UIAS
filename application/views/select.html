@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title>下拉字母多选框</title>
+	<script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+	<script src="select.js"></script>
+	<style>
+		.mainSelect {
+			display: inline-block
+		}
+
+		.mainSelect > div {
+			position: relative;
+			display: inline-block
+		}
+
+		.mainSelect #selectValue {
+			border: 1px solid #CCCCCC;
+			height: 40px;
+			line-height: 40px;
+			display: inline-block;
+			border-radius: 4px;
+			text-align: center;
+		}
+
+		.mainSelect #maincontent {
+			position: absolute;
+			width: 120px;
+			border: 1px solid #CCCCCC;
+			border-radius: 4px;
+			box-shadow: 0 7px 12px #CCCCCC;
+			text-align: center
+		}
+
+		.mainSelect .normal {
+			padding: 2px 8px 2px 8px;
+			display: block;
+			text-align: left;
+			line-height:25px;
+		}
+
+		.mainSelect .main-content-input {
+			padding: 2px 8px 2px 8px;
+			display: block;
+			line-height:25px;
+		}
+
+		.mainSelect .main-content {
+			display: block;
+			font-size: 14px;
+			font-weight: bold;
+			text-align: left;
+			background-color: #FFFFFF;
+		}
+
+		input[type=checkbox]:hover {
+			cursor: pointer;
+		}
+	</style>
+	<script>
+		var roleList = [
+		{
+			"name": "全选",
+			"city": [
+			{"cityName": "合肥", "cityNumber": "007"},
+			{"cityName": "六安", "cityNumber": "008"},
+			{"cityName": "马鞍山", "cityNumber": "009", "selected": true}
+			]
+		},
+		];
+
+		var option = {
+			el: 'roleSelect',//容器名称
+			type: 'more',//插件类型
+			width: '150px',//内容显示宽度
+			height: '40px',//内容显示高度
+			background: '#FFFFFF',//默认背景色
+			color: '#000000',//默认字体颜色
+			selectBackground: '#337AB7',//选中背景色
+			selectColor: '#FFFFFF',//选中字体颜色
+			show: 'false',//是否展开
+			content: '请选择用户角色',//要显示的内容
+			data: roleList//数据
+		}
+
+		//调用方法
+		$(document).ready(function () {
+			selectTool.initialize(option)
+		})
+
+		function s(){
+			alert($("#roleSelect #selectValue").html());
+		}
+
+	</script>
+</head>
+<body>
+	<div class="mainSelect">
+		<div id="roleSelect"></div>
+	</div>
+	<button onclick="s()">f</button>
+</body>
+</html>

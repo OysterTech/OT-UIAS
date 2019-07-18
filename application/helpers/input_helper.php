@@ -3,21 +3,21 @@
  * @name 生蚝科技统一身份认证平台-H-输入
  * @author Jerry Cheung <master@xshgzs.com>
  * @since 2019-02-11
- * @version 2019-02-16
+ * @version 2019-05-14
  */
 
 function inputGet($dataName="",$allowNull=0,$isAjax=0)
 {
 	if(isset($_GET[$dataName])){
 		if($allowNull!=1 && $_GET[$dataName]==""){
-			return $isAjax==1?returnAjaxData(0,'lack Parameter'):false;
+			return $isAjax==1?returnAjaxData(0,'Lack parameter'):false;
 		}else{
 			return $_GET[$dataName];
 		}
 	}elseif($allowNull==1){
 		return;
 	}else{
-		return $isAjax==1?returnAjaxData(1,'lack Parameter'):false;
+		return $isAjax==1?returnAjaxData(1,'Lack parameter'):false;
 	}
 }
 
@@ -26,14 +26,14 @@ function inputPost($dataName="",$allowNull=0,$isAjax=0)
 {
 	if(isset($_POST[$dataName])){
 		if($allowNull!=1 && $_POST[$dataName]==""){
-			return $isAjax==1?returnAjaxData(0,'lack Parameter'):false;
+			return $isAjax==1?returnAjaxData(0,'Lack parameter'):false;
 		}else{
 			return $_POST[$dataName];
 		}
 	}elseif($allowNull==1){
 		return;
 	}else{
-		return $isAjax==1?returnAjaxData(0,'lack Parameter'):false;
+		return $isAjax==1?returnAjaxData(0,'Lack parameter'):false;
 	}
 }
 

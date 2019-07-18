@@ -1,10 +1,10 @@
 <?php
 /**
- * @name 生蚝科技统一身份认证平台-M-系统配置
- * @author Jerry Cheung <master@xshgzs.com>
- * @since 2019-01-19
- * @version 2019-01-22
- */
+* @name 生蚝科技RBAC开发框架-M-系统配置
+* @author Jerry Cheung <master@xshgzs.com>
+* @since 2018-03-05
+* @version 2018-03-14
+*/
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -22,12 +22,13 @@ class Setting_model extends CI_Model {
 	 */
 	public function save($name,$value)
 	{
-		$sql="UPDATE setting SET value=? WHERE name=?";
-		$this->db->where('name',$name);
-		$query=$this->db->update('setting',['value'=>$value]);
+		$nowTime=date("Y-m-d H:i:s");
+		
+		$sql="UPDATE setting SET value=?,update_time=? WHERE name=?";
+		$query=$this->db->query($sql,[$value,$nowTime,$name]);
 
-		if($query===true){
-			//$this->Log_model->create("系统","修改系统配置：".$name."|".$value);
+		if($this->db->affected_rows()==1){
+			$this->Log_model->create("系统","修改系统配置：".$name."|".$value);
 			return true;
 		}else{
 			return false;
@@ -43,8 +44,7 @@ class Setting_model extends CI_Model {
 	public function get($name)
 	{
 		$sql="SELECT value FROM setting WHERE name=?";
-		$this->db->select('value');
-		$query=$this->db->get_where('setting',['name'=>$name]);
+		$query=$this->db->query($sql,[$name]);
 		
 		if($query->num_rows()==1){
 			$list=$query->result_array();
@@ -61,8 +61,10 @@ class Setting_model extends CI_Model {
 	 */
 	public function list()
 	{
-		$query=$this->db->get('setting');
+		$sql="SELECT * FROM setting";
+		$query=$this->db->query($sql,[]);
 		$list=$query->result_array();
 		return $list;
 	}
+
 }

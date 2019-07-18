@@ -1,12 +1,15 @@
-<?php
+<?php 
 /**
- * @name 生蚝科技统一身份认证平台-登录页
+ * @name 生蚝科技RBAC开发框架-V-登录
  * @author Jerry Cheung <master@xshgzs.com>
- * @since 2018-11-30
- * @version 2019-02-18
+ * @since 2018-02-20
+ * @version 2019-07-18
  */
 ?>
+
+<!DOCTYPE html>
 <html>
+
 <head>
 	<title>登录 / 生蚝科技统一身份认证平台</title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -55,7 +58,8 @@
 	}
 	</style>
 </head>
-<body>
+
+<body style="background-color: #66CCFF;">
 <div class="wrapper fadeInDown">
 	<div id="formContent">
 		<a id="changeLoginMethodBtn" class="loginMethodButton" style="background-position:0 0;" onclick="changeLoginMethod();"></a>
@@ -148,11 +152,64 @@
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="<?=base_url('resource/js/utils.js');?>"></script>
 
+<center>
+	<!-- 页脚版权 -->
+	<p style="font-weight:bold;font-size:20px;line-height:26px;">
+		&copy; <a href="https://www.xshgzs.com?from=rbac" target="_blank" style="font-size:21px;">生蚝科技</a> 2014-2019
+		<a style="color:#07C160" onclick='showWXCode()'><i class="fa fa-weixin fa-lg" aria-hidden="true"></i></a>
+		<a style="color:#FF7043" onclick='launchQQ()'><i class="fa fa-qq fa-lg" aria-hidden="true"></i></a>
+		<a style="color:#29B6F6" href="mailto:master@xshgzs.com"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a>
+		<a style="color:#AB47BC" href="https://github.com/OysterTech" target="_blank"><i class="fa fa-github fa-lg" aria-hidden="true"></i></a>
+		
+		<br>
+		
+		All Rights Reserved.<br>
+		<a href="http://www.miitbeian.gov.cn/" target="_blank" style="color:black;">粤ICP备19018320号-1</a><br><br>
+	</p>
+	<!-- ./页脚版权 -->
+</center>
+
 <script>
 var nowLoginMethod="password";
 var pwdMethodBtnStyle="background-position:0 -57;";
 var qrMethodBtnStyle="background-position:0 0;";
 var checkQrStatus;
+var isAjaxing=0;
+
+function launchQQ(){
+	if(/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)){
+		window.location.href="mqqwpa://im/chat?chat_type=wpa&uin=571339406";
+	}else{
+		window.open("http://wpa.qq.com/msgrd?v=3&uin=571339406");
+	}
+}
+
+function showWXCode(){
+	$("#wxModal").modal('show');
+}
+
+// 监听模态框关闭事件
+$(function (){
+	$('#tipsModal').on('hidden.bs.modal',function (){
+		isAjaxing=0;
+	});
+});
+
+window.onload=function(){
+	/********** ▼ 记住密码 ▼ **********/
+	Remember=getCookie("<?=$this->sessPrefix;?>RmUN");
+	if(Remember!=null){
+		$("#userName").val(Remember);
+		$("#pwd").focus();
+		$("#Remember").attr("checked",true);
+	}else{
+		$("#userName").focus();
+	}
+	/********** ▲ 记住密码 ▲ **********/
+
+	localStorage.removeItem("allRoleInfo");
+	localStorage.removeItem("jwtToken");
+}
 
 function changeLoginMethod(){
 	if(nowLoginMethod=="password"){
@@ -231,7 +288,7 @@ function startCheckStatus(){
 							$("#wxCodeStatusIcon").attr('class','weui-icon-success weui-icon_msg');
 							$("#wxCodeStatusContent").html('正在跳转，请稍候！');
 							setTimeout(function(){
-								window.location.href="<?=$returnUrl;?>";
+								window.location.href="<?=$redirectUrl;?>";
 							},1500);
 							break;
 						default:
@@ -258,16 +315,26 @@ function stopCheckStatus(){
 }
 
 
-function toReg(){
-	window.open("/register_step1");
-}
-
 function toLogin(){
+	// 防止多次提交
+	if(isAjaxing==1){
+		return false;
+	}
+
+	isAjaxing=1;
 	lockScreen();
-	
 	appId=$("#<?=$this->sessPrefix;?>appId").val();
 	userName=$("#<?=$this->sessPrefix;?>userName").val();
 	password=$("#<?=$this->sessPrefix;?>password").val();
+
+	/********** ▼ 记住密码 ▼ **********/
+	Remember=$("input[type='checkbox']").is(':checked');
+	if(Remember==true){
+		setCookie("<?=$this->sessPrefix;?>RmUN",userName);
+	}else{
+		delCookie("<?=$this->sessPrefix;?>RmUN");
+	}
+	/********** ▲ 记住密码 ▲ **********/
 	
 	if(userName.length<5 || userName.length>20){
 		unlockScreen();
@@ -279,9 +346,10 @@ function toLogin(){
 		showModalTips("请正确输入密码！");
 		return false;
 	}
-	
+
+
 	$.ajax({
-		url:"<?=base_url('login/toLogin');?>",
+		url:"toLogin",
 		type:"post",
 		data:{"appId":appId,"userName":userName,"password":password},
 		dataType:"json",
@@ -292,17 +360,24 @@ function toLogin(){
 			return false;
 		},
 		success:function(ret){
-			if(ret.code==200){
-				data=ret.data;
+			unlockScreen();
+			$("#userName").removeAttr("disabled");
+			$("#pwd").removeAttr("disabled");
 
+			if(ret.code==200){
+				localStorage.setItem('allRoleInfo',ret.data['allRoleInfo']);
+				localStorage.setItem('jwtToken',ret.data['jwtToken']);
+				
 				if(appId=="" && getURLParam("service")!=null){url=decodeURIComponent(getURLParam("service"));}
 				else if(appId==""){url="<?=base_url('dashborad');?>";}
-				else{url=data['returnUrl'];}
+				else{url=ret.data['redirectUrl'];}
 
 				window.location.href=url;
 				return true;
+			}else if(ret.code==1){
+				showModalTips("当前用户被禁用！<br>请联系管理员！");
+				return false;
 			}else if(ret.code==4031){
-				unlockScreen();
 				showModalTips("用户名或密码错误！");
 				return false;
 			}else if(ret.code==4032){
@@ -310,16 +385,18 @@ function toLogin(){
 				alert("登录成功~\n当前用户暂无访问此应用权限！\n即将跳转至平台用户中心！");
 				window.location.href="<?=base_url('dashborad');?>";
 				return false;
-			}else if(ret.code==0){
-				unlockScreen();
-				showModalTips("参数缺失！请联系技术支持！");
+			}else if(ret.code==3){
+				showModalTips("用户暂未激活！<br>请尽快进行激活！");
+				return false;
+			}else if(ret.code==2){
+				showModalTips("获取角色信息失败！请联系管理员！");
 				return false;
 			}else{
-				unlockScreen();
-				showModalTips("未知错误！请提交错误码["+ret.code+"]并联系技术支持");
+				console.log(ret);
+				showModalTips("系统错误！<hr>请联系技术支持并提交以下错误码：<br><font color='blue'>"+ret.code+"</font>");
 				return false;
 			}
-		}
+		}  
 	});
 }
 </script>
@@ -328,20 +405,37 @@ function toLogin(){
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true"></span><span class="sr-only">Close</span></button>
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
 				<h3 class="modal-title" id="ModalTitle">温馨提示</h3>
 			</div>
 			<div class="modal-body">
-				<font color="red" style="font-weight:bold;font-size:24px;text-align:center;">
+				<font color="red" style="font-weight:bolder;font-size:24px;text-align:center;">
 					<p id="tips"></p>
 				</font>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" data-dismiss="modal">关闭 &gt;</button>
+				<button type="button" class="btn btn-warning" onclick='isAjaxing=0;$("#tipsModal").modal("hide");'>返回 &gt;</button>
 			</div>
-		</div>
-	</div>
-</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="wxModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+				<h3 class="modal-title">微信公众号二维码</h3>
+			</div>
+			<div class="modal-body">
+				<center><img src="https://www.xshgzs.com/resource/index/images/wxOfficialAccountQRCode.jpg" style="width:85%"></center>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick='$("#wxModal").modal("hide");'>关闭 &gt;</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 </body>
 </html>

@@ -37,7 +37,7 @@ function getIP()
  */
 function logout()
 {
-	die(header("location:/logout/".urlencode('https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'])));
+	die(header("location:/logout/".urlencode($_SERVER['REQUEST_URI'])));
 }
 
 

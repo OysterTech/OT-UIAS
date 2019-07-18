@@ -8,9 +8,9 @@
 
 ▲ 开发商：广州市生蚝科技有限公司（生蚝科技）
 
-▲ 代码版本信息：***Build 00522***
+▲ 代码版本信息：***Build 00608***
 
-▲ 系统版本信息：***1.0.0***
+▲ 系统版本信息：***2.0.0***
 
 ▲ 遵循协议：GNU GPLv3
 
@@ -20,7 +20,7 @@
 
 ## 待开发 TODO
 
-▲ SSO平台管理平台
+▲ APP应用管理
 
 ---
 
@@ -45,6 +45,8 @@
 ---
 
 ## 鸣谢
+
+* [`@SmallOyster`](https://github.com/SmallOyster) 自家提供的[`RBAC开发框架V2.0`](https://github.com/SmallOyster/RBAC-CodeIgniter)，遵循`GNU GPLv3`协议
 
 * [`CodeIgniter`](http://codeigniter.org.cn/) 后端框架
 
