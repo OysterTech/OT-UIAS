@@ -58,7 +58,7 @@ $autoload['packages'] = array();
 |
 |	$autoload['libraries'] = array('user_agent' => 'ua');
 */
-$autoload['libraries'] = array('database','session','Ajax'=>'ajax','Safe'=>'safe');
+$autoload['libraries'] = array('database','session','Safe');
 
 /*
 | -------------------------------------------------------------------
@@ -89,7 +89,7 @@ $autoload['drivers'] = array();
 |
 |	$autoload['helper'] = array('url', 'file');
 */
-$autoload['helper'] = array('url','window','input');
+$autoload['helper'] = array('url','input','window');
 
 /*
 | -------------------------------------------------------------------
@@ -132,4 +132,4 @@ $autoload['language'] = array();
 |
 |	$autoload['model'] = array('first_model' => 'first');
 */
-$autoload['model'] = array('Setting_model'=>'setting','App_model'=>'app','User_model'=>'user');
+$autoload['model'] = array('RBAC_model'=>'rbac','Log_model','User_model'=>'user','Setting_model'=>'setting','App_model'=>'app');
