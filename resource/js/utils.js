@@ -1,7 +1,8 @@
-/**
- * getURLParam 获取URL参数
- * @param String 参数名称
- **/
+﻿/**
+* getURLParam 获取指定URL参数
+* @param  String 参数名称
+* @return String 参数值
+**/
 function getURLParam(name){
 	var reg = new RegExp("(^|&)"+name+"=([^&]*)(&|$)");
 	var r = window.location.search.substr(1).match(reg);
@@ -10,76 +11,81 @@ function getURLParam(name){
 }
 
 
-function showModalTips(content,title=""){
-	$("#tips").html(content);
-	$("#tipsModal").modal("show");
+/**
+* showCNNum 显示汉字的数字
+* @param INT 一位数字
+**/
+function showCNNum(number){
+	rtn="";
+
+	if(number=="1") rtn="一";
+	else if(number=="2") rtn="二";
+	else if(number=="3") rtn="三";
+	else if(number=="4") rtn="四";
+	else if(number=="5") rtn="五";
+	else if(number=="6") rtn="六";
+	else if(number=="7") rtn="七";
+	else if(number=="8") rtn="八";
+	else if(number=="9") rtn="九";
+	else if(number=="0") rtn="零";
+
+	return rtn;
 }
 
 
 /**
- * lockScreen 屏幕锁定
- **/
-function lockScreen(){
-$('body').append(
-	'<div id="lockContent" style="opacity: 0.8; filter:alpha(opacity=20); width: 100%; height: 100%; z-index: 9999; position:fixed; _position:absolute; top:0; left:0;left:50%; margin-left:-20px; top:50%; margin-top:-20px;">'+
-	'<div><i class="fa fa-refresh fa-spin fa-5x fa-fw"></i></div>'+
-	'</div>'+
-	'<div id="lockScreen" style="background: #000; opacity: 0.35; filter:alpha(opacity=20); width: 100%; height: 100%; z-index: 9999; position:fixed; _position:absolute; top:0; left:0;">'+
-	'</div>'
-	);
-}
+* isInArray 检测指定字符串是否存在于数组
+* @param Array  待检测的数组
+* @param String 指定字符串
+**/
+function isInArray(arr,val){
+	length=arr.length;
 
-
-/**
- * unlockScreen 屏幕解锁
- **/
-function unlockScreen(){
-	// 延时，更逼真，不会闪现
-	sleep(150);
-	$('#lockScreen').remove();
-	$('#lockContent').remove();
-}
-
-
-/**
- * sleep 延时
- * @param String 需要延时的毫秒数(1s=1000)
- **/
-function sleep(numberMillis) {
-	var now = new Date();
-	var exitTime = now.getTime() + numberMillis;
-	while (true){
-		now = new Date();
-		if (now.getTime() > exitTime){
-			return;
+	if(length>0){
+		for(var i=0;i<length;i++){
+			if(arr[i] == val){
+				return i;
+			}
 		}
+		return false;
+	}else{
+		return false;
 	}
 }
 
 
 /**
-* -----------------------------------
-* setCookie 设置Cookie
-* -----------------------------------
-* @param String Cookie名称
-* @param String Cookie内容
-* -----------------------------------
+* isChn 字符串是否全为汉字
+* @param String 待检测的字符串
 **/
-function setCookie(name,value)
-{
-	var Days = 30;// Cookies有效天数
-	var exp = new Date();
-	exp.setTime(exp.getTime() + Days*24*60*60*1000);
-	document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
+function isChn(str){ 
+	var reg = /^[\u4E00-\u9FA5]+$/; 
+	if(!reg.test(str)){ 
+		return 0; 
+	}else{
+		return 1;
+	}
 }
 
 
 /**
-* -----------------------------------
-* getCookie 获取Cookie
-* -----------------------------------
+* setCookie 设置Cookie值
 * @param String Cookie名称
-* -----------------------------------
+* @param String Cookie值
+**/
+function setCookie(name,value)
+{
+  var Days = 30;// Cookie有效天数
+  var exp = new Date();
+  exp.setTime(exp.getTime() + Days*24*60*60*1000);
+  document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
+}
+
+
+/**
+* getCookie 获取Cookie
+* @param  String Cookie名称
+* @return String Cookie值
 **/
 function getCookie(name)
 {
@@ -94,11 +100,8 @@ function getCookie(name)
 
 
 /**
-* -----------------------------------
 * delCookie 删除Cookie
-* -----------------------------------
 * @param String Cookie名称
-* -----------------------------------
 **/
 function delCookie(name){
 	var exp = new Date();
@@ -108,31 +111,36 @@ function delCookie(name){
 }
 
 
-function getTransTypeCNName(type){
-	cnName="";
-	
-	switch(type){
-		case "0":
-			cnName="收入";
-			break;
-		case "1":
-			cnName="支出";
-			break;
-		case "2":
-			cnName="冻结";
-			break;
-		case "3":
-			cnName="解冻";
-			break;
-		case "4":
-			cnName="赊欠";
-			break;
-		case "5":
-			cnName="还款";
-			break;
-	}
-	
-	return cnName;
+/**
+* lockScreen 屏幕锁定，显示加载图标
+**/
+function lockScreen(content=""){
+	$('body').append(
+		'<div class="loadingwrap" id="loadingwrap"><div class="spinner"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div><br><font style="color:yellow;font-size:24px;font-weight:bold;">'+content+'</font></div></div>'
+		);
+}
+
+
+/**
+* unlockScreen 屏幕解锁
+**/
+function unlockScreen(){
+	// 0.3s后再删除，防止闪现
+	setTimeout(function(){
+		$('#loadingwrap').remove();
+	},300);	
+}
+
+
+/**
+* showModalTips 模态框显示提醒消息
+* @param String 消息内容
+* @param String 消息标题
+**/
+function showModalTips(msg,title='温馨提示'){
+	$("#tips").html(msg);
+	$("#tipsTitle").html(title);
+	$("#tipsModal").modal("show");
 }
 
 

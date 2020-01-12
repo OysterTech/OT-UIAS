@@ -1,3 +1,9 @@
+/* 页面路径文字 */
+.skin-cyan .content-wrapper .content-header .breadcrumb > li > a {
+	color: #FF3D00;
+}
+/* 页面路径文字[end] */
+
 .skin-cyan .main-header .navbar {
 	background-color: #45C8DC;
 }
@@ -75,7 +81,7 @@
 	border-left-color: #00ddff;
 }
 .skin-cyan .sidebar-menu > li > .treeview-menu {
-	margin: 0 1px;
+	margin: 0 10px;
 	background: #3b4966;
 }
 .skin-cyan .sidebar a {
