@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="author" content="Oyster Cheung">
+
+	<title>{block name='title'}{/block}</title>
+
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdn.staticfile.org/admin-lte/2.4.8/css/AdminLTE.min.css">
+	<link rel="stylesheet" href="https://cdn.staticfile.org/zTree.v3/3.5.33/css/zTreeStyle/zTreeStyle.min.css">
+	<link rel="stylesheet" href="https://static.xshgzs.com/css/adminlte_cyan.css">
+	<link rel="stylesheet" href="https://static.xshgzs.com/css/loading.css">
+
+	<link rel="stylesheet" href="__APP_HOST__public/css/console.css">
+
+	<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.13.0/css/fontawesome.min.css">
+	<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.13.0/css/solid.min.css">
+	<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.13.0/css/brands.min.css">
+
+	<script src="https://cdn.staticfile.org/jquery/3.1.0/jquery.min.js"></script>
+	<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://cdn.staticfile.org/admin-lte/2.4.8/js/adminlte.min.js"></script>
+	<script src="https://cdn.staticfile.org/zTree.v3/3.5.33/js/jquery.ztree.all.min.js"></script>
+
+	<script src="https://static.xshgzs.com/js/utils.js"></script>
+
+	<script src="__APP_HOST__public/js/util.js"></script>
+	<script src="__APP_HOST__public/js/config.js"></script>
+
+	{block name='pageCss'} {/block}
+
+</head>
+
+<body class="hold-transition skin-cyan sidebar-mini">
+
+	<script>
+		window.onload = function () {
+			// PC隐藏缩起菜单的功能键
+			if (!isPhone()) {
+				$(".sidebar-toggle").hide();
+			}
+		}
+	</script>
+
+	<div class="wrapper">
+
+		{include file='/common/navbar' /}
+
+		<!-- 页面内容 -->
+		<div class="content-wrapper" style="background-color: #e9ebed;">
+			<!-- Vue组件 -->
+			{include file="/common/component" /}
+			<!-- /.Vue组件 -->
+
+			<section class="content">
+				<section class="content-header" style="padding: 15px;">
+					<h1>{$pageName}</h1>
+
+					<ol class="breadcrumb">
+						<li>
+							<a href="__APP_HOST__">
+								<i class="fa fa-dashboard"></i>{:getSetting('appName')}
+							</a>
+						</li>
+
+						{foreach $pagePath as $name=>$url}
+						<li><a href="__APP_HOST__{$url}">{$name}</a></li>
+						{/foreach}
+
+						<li class="active">{$pageName}</li>
+					</ol>
+				</section>
+
+				<div id="app">
+					{block name="vueBody"} {/block}
+				</div>
+
+				{block name="body"} {/block}
+			</section>
+		</div>
+		<!-- ./页面内容 -->
+
+		<!-- 脚部版权 -->
+		<footer class="main-footer">
+			<div class="pull-right hidden-xs">
+				<b>Version</b> 1.0.0
+			</div>
+
+			<b>Copyright &copy; <a href="{:getSetting('homepageUrl')}">{:getSetting('companyName')}</a>
+				{:getSetting('companyCreateYear')}-<?=date("Y");?>.</b> All rights reserved.
+		</footer>
+		<!-- /.脚部版权 -->
+	</div>
+	<!-- ./Page -->
+
+	<div class="modal fade" id="tipsModal" style="z-index:99999">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+					<h3 class="modal-title" id="tipsTitle">温馨提示</h3>
+				</div>
+				<div class="modal-body">
+					<p id="tips" style="color:#fb7312;font-weight:bold;font-size:23px;text-align:center;"></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">关闭 &gt;</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{block name="js"} {/block}
+
+</body>
+
+</html>

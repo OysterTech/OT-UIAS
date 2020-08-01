@@ -1,0 +1,313 @@
+<?php
+/**
+ * @name 生蚝科技TP6-RBAC开发框架-V-系统配置管理
+ * @author Oyster Cheung <master@xshgzs.com>
+ * @since 2020-07-15
+ * @version 2020-08-01
+ */
+?>
+
+{extend name="/framework" /}
+
+{block name='title'}{$pageName} / {:getSetting('appName')}{/block}
+
+{block name='pageCss'}{/block}
+
+{block name='vueBody'}
+<table-filter ref="filterRef"
+			  :form="filterForm"
+			  :filter-data.sync="filterData"
+			  submit-event-name="getFilterData">
+</table-filter>
+
+<div class="operateBtnGroup">
+	<button class="btn btn-primary" @click="readyCU('create')">新增配置项</button>
+	<button class="btn btn-default">配置值后带有...的请点击“编辑”查看详情</button>
+</div>
+
+<div class="div_table">
+	<table id="table" class="table table-striped table-bordered table-hover"
+		   style="border-radius: 5px; border-collapse: separate;">
+		<thead style="background-color: #fff;">
+			<tr>
+				<th>唯一标识</th>
+				<th>配置中文名</th>
+				<th>配置值</th>
+				<th>备注</th>
+				<th>创建时间</th>
+				<th>最后修改时间</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr v-for="info in list">
+				<td class="cell-center">{{info.name}}</td>
+				<td class="cell-center">{{info.chinese_name}}</td>
+				<td>{{(info.value.length>50)?info.value.substr(0,50)+"......":info.value}}</td>
+				<td>{{info.remark}}</td>
+				<td class="cell-center">{{info.create_time}}</td>
+				<td class="cell-center">{{info.update_time}}</td>
+				<td class="cell-button-group">
+					<button class="btn btn-info"
+							@click="readyCU('update',info)">编辑</button>
+					<button class="btn btn-danger"
+							@click="readyDelete(info.id,info.chinese_name)">删除</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<pagination ref="pageNav"
+			:now.sync="nowPage"
+			:total="total"
+			:per-page="perPage"
+			getdata-event-name="getList">
+</pagination>
+
+{include file="/system/setting/modal" /}
+
+{/block}
+
+{block name='js'}
+<script>
+	var vm = new Vue({
+		el: '#app',
+		components: {
+			'table-filter': tableFilterVue,
+			'pagination': paginationVue,
+		},
+		data: {
+			total: 0,
+			nowPage: 1,
+			perPage: 25,
+			list: [],
+			detail: [],
+			filterForm: [{
+				name: {
+					type: "input",
+					name: "唯一标识"
+				},
+				chinese_name: {
+					type: "input",
+					name: "配置名称"
+				},
+			}],
+			filterData: {},
+			CUInfo: {
+				operateType: "",
+				showInfo: {
+					name: "",
+					chineseName: "",
+					createTime: "",
+					createIP: "",
+					updateTime: "",
+					updateIP: "",
+				},// 只能看不能修改
+				id: "",
+				name: "",
+				chineseName: "",
+				value: "",
+				remark: "",
+			},
+			deleteInfo: {
+				id: "",
+				chineseName: "",
+				password: "",
+			},
+		},
+		methods: {
+			getFilterData: function () {
+				this.getList();
+			},
+			getList: function () {
+				let that = this;
+
+				if ((this.nowPage - 1) * this.perPage > this.totalPage) {
+					showModalTips("当前页码大于数据总条数，请返回上一页！");
+					return;
+				}
+
+				lockScreen();
+
+				$.ajax({
+					url: window.CONFIG.rootPath + "system/setting/list",
+					dataType: "json",
+					type: "post",
+					data: {
+						filterData: that.filterData,
+						page: that.nowPage,
+						perPage: that.perPage,
+					},
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							that.list = ret.data.list;
+							that.total = ret.data.total;
+
+							that.$refs.pageNav.totalData = that.total;
+							that.$refs.pageNav.totalPage = Math.ceil(that.total / that.perPage);
+							return;
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+						} else {
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				})
+			},
+			readyCU: function (operateType, info) {
+				this.CUInfo.operateType = operateType;
+
+				if (operateType === 'update') {
+					this.CUInfo.showInfo = {
+						name: info.name,
+						chineseName: info.chinese_name,
+						createTime: info.create_time,
+						createIP: info.create_ip,
+						updateTime: info.update_time,
+						updateIP: info.update_ip,
+					};
+					this.CUInfo.id = info.id;
+					this.CUInfo.name = info.name;
+					this.CUInfo.chineseName = info.chinese_name;
+					this.CUInfo.value = info.value;
+					this.CUInfo.remark = info.remark;
+				}
+
+				$("#CUModal").modal("show");
+				return true;
+			},
+			resetCUInfo: function () {
+				this.CUInfo = {
+					operateType: "",
+					showInfo: {
+						name: "",
+						createTime: "",
+						updateTime: "",
+					},
+					id: "",
+					name: "",
+					remark: "",
+				};
+			},
+			toCU: function () {
+				let that = this;
+				let info = JSON.parse(JSON.stringify(that.CUInfo));
+
+				if (info.name.length < 3 || info.name.length > 50) {
+					showModalTips("请输入3~50字的唯一标识");
+					return false;
+				}
+				if (info.chineseName.length < 3 || info.chineseName.length > 50) {
+					showModalTips("请输入3~50字的中文描述");
+					return false;
+				}
+				if (info.value.length < 1) {
+					showModalTips("请正确输入配置值");
+					return false;
+				}
+				if (info.remark.length < 1) {
+					info.remark = "/";
+				}
+
+				delete info.showInfo;
+
+				lockScreen();
+				$("#CUModal").modal("hide");
+
+				$.ajax({
+					url: window.CONFIG.rootPath + "system/setting/toCU",
+					type: "post",
+					dataType: "json",
+					data: {
+						cuInfo: changeArrayKeyToUnderline(info)
+					},
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							alert("操作成功！");
+							that.resetCUInfo();
+							that.getList();
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+						} else {
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				});
+			},
+			readyDelete: function (id, chineseName) {
+				this.deleteInfo.id = id;
+				this.deleteInfo.chineseName = chineseName;
+				this.deleteInfo.password = "";
+				$("#deleteModal").modal("show");
+				return true;
+			},
+			toDelete: function () {
+				let that = this;
+				let deleteInfo = JSON.parse(JSON.stringify(this.deleteInfo));
+
+				if (deleteInfo.password.length < 6) {
+					showModalTips("请正确输入您的密码");
+					return false;
+				}
+
+				lockScreen();
+				$("#deleteModal").modal("hide");
+
+				$.ajax({
+					url: window.CONFIG.rootPath + "system/setting/delete",
+					type: "post",
+					dataType: "json",
+					data: {
+						deleteInfo: deleteInfo
+					},
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							alert("删除成功！");
+
+							that.deleteInfo = {
+								id: "",
+								chineseName: "",
+								password: "",
+							};
+
+							that.getList();
+						} else if (ret.tips !== '') {
+							unlockScreen();
+							showModalTips(ret.tips);
+						} else {
+							unlockScreen();
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				})
+			},
+		},
+		mounted() {
+			this.getList();
+		},
+	});
+</script>
+{/block}

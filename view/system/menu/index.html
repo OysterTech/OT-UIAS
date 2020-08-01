@@ -1,0 +1,274 @@
+<?php
+/**
+ * @name 生蚝科技TP6-RBAC开发框架-V-菜单管理
+ * @author Oyster Cheung <master@xshgzs.com>
+ * @since 2020-07-14
+ * @version 2020-08-01
+ */
+?>
+
+{extend name="/framework" /}
+
+{block name='title'}{$pageName} / {:getSetting('appName')}{/block}
+
+{block name='pageCss'}{/block}
+
+{block name='vueBody'}
+
+<center>
+	<button @click="readyCU('create','',0,'home','系统主菜单')" style="width: 98%;" class="btn btn-primary">新建父菜单</button>
+</center>
+
+<ul id="menuTree" class="ztree"></ul>
+
+{include file="/system/menu/modal" /}
+
+{/block}
+
+{block name='js'}
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: {
+			CUInfo: {
+				operateType: "",
+				id: "",
+				fatherId: "",
+				name: "",
+				icon: "",
+				uri: "",
+				showInfo: {
+					fatherName: "",
+					createTime: "",
+					updateTime: "",
+				},
+			},
+			deleteInfo: {
+				id: "",
+				name: ""
+			},
+			treeSetting: {
+				view: {
+					selectedMulti: false
+				},
+				data: {
+					simpleData: {
+						enable: true
+					}
+				},
+				view: {
+					addHoverDom: addHoverDom,
+					removeHoverDom: removeHoverDom,
+				}
+			}
+		},
+		methods: {
+			makeTree: function () {
+				let that = this;
+
+				// 销毁旧的树
+				try {
+					$.fn.zTree.getZTreeObj("menuTree").destroy();
+				} catch (e) {
+
+				}
+
+				lockScreen();
+				$.ajax({
+					url: window.CONFIG.apiPath + "menu/list",
+					data: {
+						isZtree: 1
+					},
+					dataType: "json",
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						if (ret.code == 200) {
+							$.fn.zTree.init($("#menuTree"), that.treeSetting, ret.data.node);
+							unlockScreen();
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+							unlockScreen();
+						} else {
+							unlockScreen();
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				});
+			},
+			readyCU: function (operateType, id = "", fatherId = "", icon = "", name = "", uri = "", createTime = "", updateTime = "") {
+				let that = this;
+
+				this.CUInfo.operateType = operateType;
+
+				if (operateType == 'update') {
+					this.CUInfo.id = id;
+					this.CUInfo.name = name;
+					this.CUInfo.icon = icon;
+					this.CUInfo.uri = uri;
+					this.CUInfo.showInfo.createTime = createTime;
+					this.CUInfo.showInfo.updateTime = updateTime;
+				} else if (operateType == 'create') {
+					this.CUInfo.fatherId = fatherId;
+
+					// 用来展示父节点信息
+					this.CUInfo.showInfo.name = name;
+					this.CUInfo.showInfo.icon = icon;
+				} else {
+					showModalTips("无效的操作类型");
+					return false;
+				}
+
+				$("#CUModal").modal("show");
+				return true;
+			},
+			resetCUInfo: function () {
+				this.CUInfo = {
+					operateType: "",
+					id: "",
+					fatherId: "",
+					name: "",
+					icon: "",
+					uri: "",
+					showInfo: {
+						createTime: "",
+						updateTime: "",
+						name: "",
+						icon: ""
+					},
+				};
+			},
+			toCU: function () {
+				let that = this;
+				let info = JSON.parse(JSON.stringify(that.CUInfo));
+
+				if (info.name.length < 1 || info.name.length > 20) {
+					showModalTips("请输入[1~20]字的菜单名称");
+					return false;
+				}
+				if (info.icon.length < 2 || info.icon.length > 20) {
+					showModalTips("请正确输入菜单图标");
+					return false;
+				}
+				if (info.uri.length < 1) {
+					showModalTips("请正确输入菜单URI");
+					return false;
+				}
+
+				delete info.showInfo;
+
+				lockScreen();
+				$("#CUModal").modal("hide");
+
+				$.ajax({
+					url: window.CONFIG.rootPath + "system/menu/toCU",
+					type: "post",
+					dataType: "json",
+					data: {
+						cuInfo: changeArrayKeyToUnderline(info)
+					},
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							alert("操作成功！");
+							that.resetCUInfo();
+							that.makeTree();
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+						} else {
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				});
+			},
+			readyDelete: function (id, name) {
+				this.deleteInfo.id = id;
+				this.deleteInfo.name = name;
+				$("#deleteModal").modal("show");
+				return true;
+			},
+			toDelete: function () {
+				let that = this;
+				let deleteInfo = JSON.parse(JSON.stringify(this.deleteInfo));
+
+				lockScreen();
+				$("#deleteModal").modal("hide");
+
+				$.ajax({
+					url: window.CONFIG.rootPath + "system/menu/delete",
+					type: "post",
+					dataType: "json",
+					data: {
+						deleteInfo: deleteInfo
+					},
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							alert("删除成功！");
+
+							that.deleteInfo = {
+								id: "",
+								name: ""
+							};
+
+							that.makeTree();
+						} else if (ret.tips !== '') {
+							unlockScreen();
+							showModalTips(ret.tips);
+						} else {
+							unlockScreen();
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				})
+			},
+
+		},
+		mounted() {
+			this.makeTree();
+		},
+	});
+
+	function addHoverDom(treeId, treeNode) {
+		var aObj = $("#" + treeNode.tId + "_a");
+		var editStr = ""
+			+ "<button class='btn btn-info' id='treeBtn_edit_" + treeNode.id + "' onclick=" + '"' + "vm.readyCU('update','" + treeNode.id + "','','" + treeNode.menuIcon + "','" + treeNode.menuName + "','" + treeNode.uri + "','" + treeNode.createTime + "','" + treeNode.updateTime + "')" + '"' + ">编辑</button> "
+			+ "<button class='btn btn-danger' id='treeBtn_delete_" + treeNode.id + "' onclick=" + '"' + "vm.readyDelete('" + treeNode.id + "','" + treeNode.name + "')" + '"' + ">删除</button> "
+			+ "<button class='btn btn-success' id='treeBtn_add_" + treeNode.id + "' onclick=" + '"' + "vm.readyCU('create','','" + treeNode.id + "','" + treeNode.menuIcon + "','" + treeNode.menuName + "')" + '"' + ">新增子菜单</button>";
+
+		// 如果已存在button就返回
+		if ($("#treeBtn_edit_" + treeNode.id).length > 0) return;
+		if ($("#treeBtn_delete_" + treeNode.id).length > 0) return;
+		if ($("#treeBtn_add_" + treeNode.id).length > 0) return;
+
+		aObj.append(editStr);
+
+		// 不允许直接删除有子节点的菜单
+		if (treeNode.isParent) $("#treeBtn_delete_" + treeNode.id).unbind().remove();
+
+		// 三级菜单不允许新增子菜单
+		if (treeNode.level >= 2) $("#treeBtn_add_" + treeNode.id).remove();
+	}
+
+	function removeHoverDom(treeId, treeNode) {
+		$("#treeBtn_edit_" + treeNode.id).unbind().remove();
+		$("#treeBtn_delete_" + treeNode.id).unbind().remove();
+		$("#treeBtn_add_" + treeNode.id).unbind().remove();
+	}
+</script>
+{/block}

@@ -1,0 +1,90 @@
+<div class="modal fade" id="CUModal" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+				<h3 class="modal-title">
+					{{ CUInfo.operateType=='create'?'新建':'修改' }}配置项
+
+					<template v-if="CUInfo.operateType=='update'">
+						&nbsp;[<font color="#fb7312">{{CUInfo.showInfo.chineseName}}({{CUInfo.showInfo.name}})</font>]
+					</template>
+				</h3>
+			</div>
+			<div class="modal-body">
+				<table class="table table-striped table-bordered table-hover"
+					   style="border-radius: 5px; border-collapse: separate;">
+					<tr>
+						<th style="vertical-align: middle;">唯一标识</th>
+						<td>
+							<input v-model="CUInfo.name" v-if="CUInfo.operateType==='create'" class="form-control">
+							<input :value="CUInfo.showInfo.name" v-else class="form-control" disabled>
+						</td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">配置中文名</th>
+						<td><input v-model="CUInfo.chineseName" class="form-control"></td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">配置值</th>
+						<td><textarea v-model="CUInfo.value" class="form-control" rows="3"></textarea></td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">备注</th>
+						<td><textarea v-model="CUInfo.remark" class="form-control" rows="3"></textarea></td>
+					</tr>
+					<tr v-if="CUInfo.operateType==='update'">
+						<th style="vertical-align: middle;">创建时间</th>
+						<td><input :value="CUInfo.showInfo.createTime" class="form-control" disabled></td>
+					</tr>
+					<tr v-if="CUInfo.operateType==='update'">
+						<th style="vertical-align: middle;">创建人IP</th>
+						<td><input :value="CUInfo.showInfo.createIP" class="form-control" disabled></td>
+					</tr>
+					<tr v-if="CUInfo.operateType==='update'">
+						<th style="vertical-align: middle;">修改时间</th>
+						<td><input :value="CUInfo.showInfo.updateTime" class="form-control" disabled></td>
+					</tr>
+					<tr v-if="CUInfo.operateType==='update'">
+						<th style="vertical-align: middle;">修改人IP</th>
+						<td><input :value="CUInfo.showInfo.updateIP" class="form-control" disabled></td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary" @click="resetCUInfo" data-dismiss="modal">&lt; 放弃</button>
+				<button class="btn btn-success" @click="toCU">确认 &gt;</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="deleteModal" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+				<h3 class="modal-title">
+					删除确认提示
+				</h3>
+			</div>
+			<div class="modal-body" style="color:#3f51b5;font-size:23px;text-align:center;">
+				请确认您需要删除<br>
+				<b>
+					<font color="#4caf50">{{deleteInfo.chineseName}}</font>
+				</b> 配置项
+
+				<hr>
+
+				<div class="input-group">
+					<span class="input-group-addon">输入您的密码以验证身份</span>
+					<input v-model="deleteInfo.password" class="form-control" type="password">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-info" data-dismiss="modal">&lt; 放弃</button>
+				<button class="btn btn-danger" @click="toDelete">确认删除 &gt;</button>
+			</div>
+		</div>
+	</div>
+</div>

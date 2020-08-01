@@ -1,0 +1,704 @@
+<!-- 多选模态框 -->
+<!-- @Oyster Cheung(20200105-20200801) -->
+<style>
+	.select-picker {
+		padding: 10px;
+	}
+
+	.select-picker ul {
+		padding-left: 8px;
+	}
+
+	.select-picker li {
+		list-style: none;
+		padding-left: 40px;
+		line-height: 40px;
+		background: url("/public/image/icon-radio.png") left center no-repeat;
+		background-size: 24px;
+	}
+
+	.select-picker li.on {
+		background: url("/public/image/icon-radio-on.png") left center no-repeat;
+		background-size: 24px;
+	}
+
+	.select-picker .checkbox li {
+		background: url("/public/image/icon-checkbox.png") left center no-repeat;
+		background-size: 24px;
+	}
+
+	.select-picker .checkbox li.on {
+		background: url("/public/image/icon-checkbox-on.png") left center no-repeat;
+		background-size: 24px;
+	}
+
+	.select-picker .checkbox li.on-disable {
+		background: url("/public/image/icon-checkbox-on-disable.png") left center no-repeat;
+		background-size: 24px;
+	}
+
+	.select-picker .radio li {
+		background: url("/public/image/icon-radio.png") left center no-repeat;
+		background-size: 24px;
+	}
+
+	.select-picker .radio li.on {
+		background: url("/public/image/icon-radio-on.png") left center no-repeat;
+		background-size: 24px;
+	}
+</style>
+
+<template id="choose-item-template">
+	<div class="modal fade bs-example-modal-lg" :id="['chooseItemModalMain_'+modalId]">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h3 class="modal-title">{{title}}</h3>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<input @input="filterData" v-model="filterText" class="form-control"
+										   placeholder="输入内容以筛选">
+								</div>
+								<div style="height: 300px; overflow: auto" class="select-picker">
+									<ul i="ul-body" :class="[(multiple===true)?'checkbox':'radio']">
+										<!-- 是否初次打开选择框 -->
+										<template v-if="filteredList===''">
+											<li v-for="(name,id) in itemList"
+												:class="[(checkedList.indexOf(id)>=0)?'on':'']"
+												@click="checked(id)">{{name}}</li>
+										</template>
+										<template v-else>
+											<li v-for="(name,id) in filteredList"
+												:class="[(checkedList.indexOf(id)>=0)?'on':'']"
+												@click="checked(id)">{{name}}</li>
+										</template>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button v-if="multiple===true" class="btn btn-warning" @click="clearAll">清空</button>
+					<button class="btn btn-primary" @click="close">关闭</button>
+					<button class="btn btn-success" @click="returnCheckedId">确定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+	var chooseItemModalVue = {
+		template: '#choose-item-template',
+		props: [
+			'modalId',
+			'title',// 模态框标题
+			'itemList',// 节点列表（一维id:name）
+			'propCheckedList',// 默认选中的节点列表
+			'multiple',// 是否允许多选
+			'saveMethodName',// 父组件中，保存选中数据的方法名
+		],
+		data: function () {
+			return {
+				checkedList: this.propCheckedList,
+				filterText: "",
+				filteredList: ""
+			}
+		},
+		methods: {
+			returnCheckedId: function () {
+				this.$emit('update:checked-node', this.checkedList);
+				this.$parent[this.saveMethodName]();
+
+				$("#chooseItemModalMain_" + this.modalId).modal('hide');
+			},
+			filterData: function () {
+				if (this.filterText == "") {
+					this.filteredList = "";
+					return;
+				}
+
+				this.filteredList = [];
+
+				for (i in this.itemList) {
+					if (this.itemList[i].indexOf(this.filterText) > -1) {
+						this.filteredList[i] = this.itemList[i];
+					}
+				}
+			},
+			show: function () {
+				// 第二次调用时要更新节点列表
+				this.checkedList = this.propCheckedList;
+
+				$("#chooseItemModalMain_" + this.modalId).modal('show');
+				return true;
+			},
+			checked: function (id) {
+				if (this.multiple === true) {
+					let loc = this.checkedList.indexOf(id);
+
+					// 如果已选中，去除掉
+					if (loc >= 0) {
+						this.checkedList.splice(loc, 1);
+					} else {
+						this.checkedList.push(id);
+					}
+				} else {
+					// 单选直接赋值就好
+					this.checkedList = [id];
+				}
+			},
+			clearAll: function () {
+				this.checkedList = [];
+				this.filterText = "";
+				this.filteredList = "";
+			},
+			close: function () {
+				this.clearAll();
+				$("#chooseItemModalMain_" + this.modalId).modal('hide');
+			}
+		}
+	};
+</script>
+<!-- /.多选模态框 -->
+
+
+<!-- 数据表头筛选组 -->
+<!-- @Oyster Cheung(20200531-20200801) -->
+<style>
+	.table-filter-group div {
+		padding-left: 100px;
+	}
+
+	.table-filter-group label {
+		width: 100px;
+		position: absolute;
+		top: 7px;
+		left: 0;
+		text-align: right;
+	}
+
+	.table-filter-group input {
+		padding: 3px 10px;
+		border-color: #ccd7ef;
+		border-radius: 4px;
+	}
+</style>
+
+<template id="table-filter-template">
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<div class="row" v-for="(row,rowIndex) in form">
+				<div v-for="(cell,cellIndex) in row"
+					 :class='["col-md-"] + (12/(Object.getOwnPropertyNames(row).length-1))'>
+					<div class="form-group table-filter-group">
+						<label>{{cell.name}}：</label>
+
+						<!-- 普通输入框 -->
+						<div v-if="cell.type=='input'">
+							<input class="form-control" v-model="formData[cellIndex]" autocomplete="off"
+								   :placeholder="cell.name">
+						</div>
+
+						<!-- 日期 -->
+						<div v-else-if="cell.type=='date'">
+							<input type="hidden">
+						</div>
+
+						<!-- 日期区间 -->
+						<div v-else-if="cell.type=='dateRange'">
+							<input type="hidden">
+						</div>
+
+						<!-- 选择框 -->
+						<div v-else-if="cell.type=='option'">
+							<input class="form-control"
+								   @click="showChooseModal(cellIndex,cell.name,cell.nodeList,cell.isMultiple)"
+								   :value="'已选中'+(formData[cellIndex]==undefined?0:formData[cellIndex].length)+'项'"
+								   readonly>
+						</div>
+
+						<!-- ztree树 -->
+						<div v-else-if="cell.type=='ztree'">
+							<input :id="'filterZtreeInput_'+cellIndex" class="form-control"
+								   @click="showChooseZtree(cellIndex,cell.name,cell.setting,cell.treeData)"
+								   :placeholder="'请点击选择'+cell.name"
+								   readonly>
+						</div>
+
+						<div v-else>未支持的输入类型</div>
+					</div>
+				</div>
+			</div>
+
+			<button @click="search" class="btn btn-primary"><i class="glyphicon glyphicon-search"></i> 搜索</button>
+			<button @click="reset" class="btn btn-info"><i class="glyphicon glyphicon-refresh"></i> 重置</button>
+		</div>
+
+		<choose-item-modal ref="tableFilterChooseModal" modal-id="filter"
+						   :title="chooseItemModal.chooseItemModalName"
+						   :item-list='chooseItemModal.nodeList'
+						   :prop-checked-list="chooseItemModal.nowNode"
+						   :checked-node.sync="chooseItemModal.checkedId"
+						   :multiple="chooseItemModal.isMultiple"
+						   save-method-name="saveChecked">
+		</choose-item-modal>
+
+		<div class="modal fade" id="filterZtreeModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+						<h3 class="modal-title">请选择{{ztree.name}}</h3>
+					</div>
+					<div class="modal-body">
+						<ul id="filterTree" class="ztree"></ul>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-dismiss="modal">&lt; 放弃</button>
+						<button type="button" class="btn btn-success" @click="sureChooseZtree">确认选择 &gt;</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+	var tableFilterVue = {
+		template: '#table-filter-template',
+		props: [
+			'form',
+			'filterData',
+			'submitEventName',
+		],
+		components: {
+			'choose-item-modal': chooseItemModalVue,
+		},
+		data: function () {
+			return {
+				formData: {},
+				eventName: this.submitEventName,
+				chooseItemModal: {
+					nodeId: "",// 当前选择框的筛选对象ID
+					nodeList: {},
+					isMultiple: false,
+					nowNode: [],// 提前选中的节点列表
+					checkedId: [],// 已选中的节点ID
+					chooseItemModalName: "",
+				},
+				ztree: {
+					id: "",
+					name: "",
+				},
+			}
+		},
+		methods: {
+			search: function () {
+				for (i in this.formData) {
+					if (this.formData[i] == "") delete this.formData[i];
+				}
+
+				this.$emit('update:filter-data', this.formData);
+				this.$parent[this.eventName]();
+			},
+			reset: function () {
+				this.formData = {};
+				$("[id^=filterZtreeInput_]").val("请点击选择");
+			},
+			showChooseModal: function (id, name, nodeList, isMultiple) {
+				this.chooseItemModal.chooseItemModalName = "请选择" + name;
+				this.chooseItemModal.nodeId = id;
+				this.chooseItemModal.nodeList = nodeList;
+				this.chooseItemModal.isMultiple = isMultiple;
+				this.$refs.tableFilterChooseModal.show();
+			},
+			saveChecked: function () {
+				this.formData[this.chooseItemModal.nodeId] = this.chooseItemModal.checkedId;
+				this.chooseItemModal.nowNode = this.chooseItemModal.checkedId;
+			},
+			showChooseZtree: function (id, name, setting, data) {
+				this.ztree.id = id;
+				this.ztree.name = name;
+
+				// 销毁旧的树
+				try {
+					$.fn.zTree.getZTreeObj("filterTree").destroy();
+				} catch (e) { }
+
+				$.fn.zTree.init($("#filterTree"), setting, data);
+				$("#filterZtreeModal").modal("show");
+			},
+			sureChooseZtree: function () {
+				let treeNodeList = $.fn.zTree.getZTreeObj("filterTree").getCheckedNodes(true);
+				let rtn = [];
+
+				for (i in treeNodeList) {
+					rtn.push(treeNodeList[i].id);
+				}
+
+				this.formData[this.ztree.id] = rtn;
+				$("#filterZtreeModal").modal("hide");
+				$("#filterZtreeInput_" + this.ztree.id).val('已选中' + this.formData[this.ztree.id].length + '项');
+			}
+		}
+	};
+</script>
+<!-- /.数据表头筛选组 -->
+
+
+<!-- 表格分页条 -->
+<!-- @Oyster Cheung(20200531-20200721) -->
+<template id="pagination-template">
+	<div>
+		<p style="float: left;">
+			当前显示{{(nowPage-1)*perPage+1}}~{{(nowPage*perPage>=total) ? total : nowPage*perPage}}条，共{{total}}条数据
+		</p>
+
+		<p style="float: right;">
+			第<input v-model="inputNowPage" @keyup.enter="changePage(parseInt(inputNowPage))"
+				   style="width: 50px;" data-toggle="tooltip" data-placement="right"
+				   title="按回车即可跳转">页，共{{totalPage}}页
+		</p>
+
+		<center>
+			<ul class="pagination">
+				<li v-if="nowPage-2>=1" :class="{hidden:(nowPage<=1)}">
+					<a @click="changePage(1)"><span aria-hidden="true">«</span></a>
+				</li>
+				<li v-if="nowPage-1>=1" :class="{hidden:(nowPage<=1)}">
+					<a @click="changePage(nowPage-1)"><span aria-hidden="true">&lt;</span></a>
+				</li>
+
+				<li v-if="nowPage-2>=1"><a @click="changePage(nowPage-2)">{{nowPage-2}}</a></li>
+				<li v-if="nowPage-1>=1"><a @click="changePage(nowPage-1)">{{nowPage-1}}</a></li>
+
+				<li class="active"><a>{{nowPage}}</a></li>
+
+				<li v-if="nowPage+1<=totalPage"><a @click="changePage(nowPage+1)">{{nowPage+1}}</a></li>
+				<li v-if="nowPage+2<=totalPage"><a @click="changePage(nowPage+2)">{{nowPage+2}}</a></li>
+
+				<li v-if="nowPage+1<=totalPage" :class="{hidden:(nowPage==totalPage)}">
+					<a @click="changePage(nowPage+1)"><span aria-hidden="true">&gt;</span></a>
+				</li>
+				<li v-if="nowPage+2<=totalPage" :class="{hidden:(nowPage==totalPage)}">
+					<a @click="changePage(totalPage)"><span aria-hidden="true">»</span></a>
+				</li>
+			</ul>
+		</center>
+	</div>
+</template>
+
+<script>
+	$(function () {
+		$('[data-toggle="tooltip"]').tooltip();
+	})
+
+	var paginationVue = {
+		template: '#pagination-template',
+		props: [
+			'now',
+			'total',
+			'perPage',
+			'getdataEventName',
+		],
+		data: function () {
+			return {
+				nowPage: this.now,
+				inputNowPage: this.now,
+				totalData: 0,
+				totalPage: 0,
+			}
+		},
+		methods: {
+			changePage: function (page) {
+				if (page > this.totalPage) {
+					alert("页码超过最大页数，当前数据共" + this.totalPage + "页");
+					return;
+				}
+
+				this.nowPage = page;
+				this.inputNowPage = page;
+				this.$emit('update:now', page);
+				this.$parent[this.getdataEventName]();
+			}
+		}
+	};
+</script>
+<!-- /.表格分页条 -->
+
+
+<!-- 文件统一上传模态框 -->
+<!-- @Oyster Cheung(20200722-20200730) -->
+<template id="unified-upload-modal-template">
+	<div class="modal fade" id="uploadModal" style="z-index:99990">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+					<h3 class="modal-title" id="uploadTitle">上传{{title}}文件</h3>
+				</div>
+				<div class="modal-body">
+					<div class="progress">
+						<div class="progress-bar progress-bar-striped active" id="uploadProgressBar"></div>
+					</div>
+					<form method="post" enctype="multipart/form-data">
+						<div v-if="max>0">
+							<div v-for="i in parseInt(max)" class="input-group" style="margin-bottom: 8px;">
+								<span class="input-group-addon">{{i}}</span>
+
+								<input :id="'uploadForm_'+(i-1)" class="form-control" type="file">
+								<input :id="'uploadShowUrl_'+(i-1)" class="form-control" style="display:none;" disabled>
+
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-primary" :id="'uploadBtn_'+(i-1)"
+											@click="toUpload((i-1))">上传</button>
+									<button type="button" class="btn btn-warning" :id="'uploadAgainBtn_'+(i-1)"
+											@click="uploadAgain((i-1))" style="display: none;">重新上传</button>
+								</span>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-warning" @click="giveupUpload">&lt; 放弃上传</button>
+					<button type="button" class="btn btn-success" @click="success">上传完成 &gt;</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+	var unifiedUploadVue = {
+		template: "#unified-upload-modal-template",
+		props: [
+			"title",
+			"type",
+			"max",
+			"sizeLimit",
+			"extensionLimit",
+			"saveMethodName",
+		],
+		data: function () {
+			return {
+				url: [],
+				upload: {
+					clock: null,
+					cuttingLength: 1024 * 1024 * 1, // 每次上传的大小
+					start: 0, // 每次上传的开始字节
+					end: 1024 * 1024 * 1, // 每次上传的结尾字节
+					sending: false, // 是否正在上传
+					blob: null, // 二进制对象
+					percent: 0,
+				}
+			}
+		},
+		computed: {
+			extensionLimitArr: function () {
+				return this.extensionLimit.split(",")
+			}
+		},
+		methods: {
+			beginUpload: function () {
+				this.url = [];
+				$("input[id^='uploadForm_']").show();
+				$("input[id^='uploadShowUrl_']").hide();
+				$("input[id^='uploadForm_']").val("");
+				$("input[id^='uploadShowUrl_']").val("");
+				$("input[id^='uploadForm_']").removeAttr("disabled");
+				$("button[id^='uploadBtn_']").show();
+				$("button[id^='uploadBtn_']").removeAttr("disabled");
+				$("button[id^='uploadAgainBtn_']").hide();
+				$("#uploadProgressBar").attr("style", "width:0%");
+				$("#uploadProgressBar").attr("class", "progress-bar progress-bar-striped active");
+
+				let i = 0;
+				while (i < this.max) {
+					$("#uploadForm_" + (i + 1)).attr("disabled", true);
+					i++;
+				}
+
+				this.upload = {
+					clock: null,
+					cuttingLength: 1024 * 1024 * 1, // 每次上传的大小
+					start: 0, // 每次上传的开始字节
+					end: 1024 * 1024 * 1, // 每次上传的结尾字节
+					sending: false, // 是否正在上传
+					blob: null, // 二进制对象
+					percent: 0,
+				}
+
+				$("#uploadModal").modal("show");
+			},
+			toUpload: function (i) {
+				let that = this;
+
+				this.upload = {
+					clock: null,
+					cuttingLength: 1024 * 1024 * 1, // 每次上传的大小
+					start: 0, // 每次上传的开始字节
+					end: 1024 * 1024 * 1, // 每次上传的结尾字节
+					sending: false, // 是否正在上传
+					blob: null, // 二进制对象
+					percent: 0,
+				}
+
+				$("#uploadProgressBar").attr("style", "width:0%");
+				$("#uploadProgressBar").attr("class", "progress-bar progress-bar-striped active");
+
+				$("#uploadBtn_" + i).attr("disabled", true);
+				lockScreen();
+
+				this.upload.clock = setInterval(function () { that.toUpload2(i) }, 1000);
+			},
+			toUpload2: function (i) {
+				let that = this;
+				let file = document.getElementById('uploadForm_' + i).files[0];
+
+				if (file == undefined) {
+					showModalTips("请先选择需要上传的文件");
+					return false;
+				}
+
+				// 获取扩展名
+				extension = file.name.substring(file.name.lastIndexOf("\.") + 1, file.name.length);
+
+				if (this.sizeLimit > 0 && file.size > this.sizeLimit) {
+					clearInterval(this.upload.clock);
+					showModalTips("文件大小超出限制");
+					return false;
+				}
+				if (this.extensionLimitArr !== [] && $.inArray(extension, this.extensionLimitArr) == -1) {
+					clearInterval(this.upload.clock);
+					showModalTips("不允许上传此类文件<hr>支持的文件扩展名：<font color='#36d01a'>" + this.extensionLimitArr.join(" | ") + "</font>");
+					return false;
+				}
+
+				// 如果有块正在上传，则不进行上传
+				if (this.upload.sending == true) {
+					return;
+				}
+
+				// 如果起始位置大于文件大小即已全部上传
+				if (this.upload.start > file.size) {
+					clearInterval(this.upload.clock);
+					return;
+				}
+
+				// 截取文件
+				this.upload.blob = file.slice(this.upload.start, this.upload.end);
+
+				let formData = new FormData();
+				formData.append("type", this.type);
+				formData.append("fileInfo", this.upload.blob);
+				formData.append("name", file.name);
+				formData.append("end", (this.upload.end >= file.size));
+
+				$.ajax({
+					url: "/file/upload",
+					type: 'POST',
+					data: formData,
+					dataType: 'json',
+					cache: false,
+					async: false,
+					contentType: false,
+					processData: false,
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						$("#uploadBtn_" + i).removeAttr("disabled");
+						clearInterval(that.upload.clock);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						if (ret.code == 200) {
+							that.url[i] = ret.data.url;
+
+							$("#uploadForm_" + i).hide();
+							$("#uploadForm_" + i).attr("disabled", true);
+							$("#uploadForm_" + (i + 1)).removeAttr("disabled");
+							$("#uploadShowUrl_" + i).val(ret.data.url);
+							$("#uploadShowUrl_" + i).show();
+
+							// 重新设置截取的始末位置
+							that.upload.start = that.upload.end;
+							that.upload.end = that.upload.start + that.upload.cuttingLength;
+
+							// 本块已上传完成
+							that.upload.sending = false;
+
+							// 设置进度条位置
+							that.upload.percent = 100 * that.upload.start / file.size;
+
+							// 已全部上传
+							if (that.upload.percent > 100) {
+								unlockScreen();
+								that.upload.percent = 100;
+								$("#uploadBtn_" + i).hide();
+								$("#uploadAgainBtn_" + i).show();
+								$("#uploadProgressBar").attr("class", "progress-bar progress-bar-striped active progress-bar-success");
+							}
+
+							$("#uploadProgressBar").attr("style", "width:" + that.upload.percent + "%");
+						} else if (ret.tips !== '') {
+							$("#uploadBtn_" + i).removeAttr("disabled");
+							showModalTips(ret.tips);
+							clearInterval(that.upload.clock);
+							unlockScreen();
+						} else {
+							$("#uploadBtn_" + i).removeAttr("disabled");
+							unlockScreen();
+							clearInterval(that.upload.clock);
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				});
+			},
+			uploadAgain: function (i) {
+				delete this.url[i];
+				$("#uploadForm_" + i).show();
+				$("#uploadForm_" + i).val("");
+				$("#uploadForm_" + i).removeAttr("disabled");
+				$("#uploadForm_" + (i + 1)).attr("disabled", true);
+				$("#uploadShowUrl_" + i).val("");
+				$("#uploadShowUrl_" + i).hide();
+
+				$("#uploadBtn_" + i).show();
+				$("#uploadBtn_" + i).removeAttr("disabled");
+				$("#uploadAgainBtn_" + i).hide();
+
+				$("#uploadProgressBar").attr("style", "width:0%");
+				$("#uploadProgressBar").attr("class", "progress-bar progress-bar-striped active");
+
+				this.upload = {
+					clock: null,
+					cuttingLength: 1024 * 1024 * 1, // 每次上传的大小
+					start: 0, // 每次上传的开始字节
+					end: 1024 * 1024 * 1, // 每次上传的结尾字节
+					sending: false, // 是否正在上传
+					blob: null, // 二进制对象
+					percent: 0,
+				}
+			},
+			giveupUpload: function () {
+				this.url = [];
+				$("#uploadModal").modal("hide");
+			},
+			success: function () {
+				this.$emit('update:url', this.url);
+				this.$parent[this.saveMethodName]();
+
+				$("#uploadModal").modal("hide");
+				return true;
+			},
+		}
+	};
+</script>
+<!-- /.文件统一上传模态框 -->

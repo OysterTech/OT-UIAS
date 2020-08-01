@@ -1,0 +1,220 @@
+<?php
+/**
+ * @name 生蚝科技TP6-RBAC开发框架-V-导航栏
+ * @author Oyster Cheung <master@xshgzs.com>
+ * @since 2020-07-11
+ * @version 2020-07-14
+ */
+?>
+<div id="header">
+	<header class="main-header">
+		<a :href="rootPath" class="logo">
+			<span class="logo-mini"><img src="https://www.xshgzs.com/resource/index/images/logo2.png"
+					 style="width:85%"></span>
+			<span class="logo-lg"><img src="https://www.xshgzs.com/resource/index/images/logo2.png"
+					 style="width:20%"> <b>{:getSetting('companyName')}</b></span>
+		</a>
+		<nav class="navbar navbar-static-top">
+			<a class="sidebar-toggle" data-toggle="push-menu" role="button"><i class="fas fa-bars"></i></a>
+
+			<div class="navbar-custom-menu">
+				<ul class="nav navbar-nav">
+					<li class="dropdown user user-menu">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							<img src="https://static.xshgzs.com/image/user.png" class="user-image">
+							<span class="hidden-xs">{{userInfo['nickName']}}</span>
+						</a>
+						<ul class="dropdown-menu">
+							<li class="user-header">
+								<img src="https://static.xshgzs.com/image/user.png" class="img-circle">
+								<p>{{userInfo['userName']}} -
+									{{userInfo['nickName']}}</p>
+							</li>
+							<!-- Menu Footer-->
+							<li class="user-footer">
+								<div class="pull-left">
+									<a :href="[rootPath+'user/index']" class="btn btn-default btn-flat">用户中心</a>
+								</div>
+								<div class="pull-right">
+									<button data-toggle="modal" data-target="#logoutModal"
+											class="btn btn-default btn-flat">登出</button>
+								</div>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</nav>
+	</header>
+
+	<!-- 侧边导航栏 -->
+	<aside class="main-sidebar">
+		<section class="sidebar">
+			<div class="user-panel">
+				<div class="pull-left image">
+					<img src="https://static.xshgzs.com/image/user.png" class="img-circle">
+				</div>
+				<div class="pull-left info">
+					<p>{{userInfo['nickName']}}<br><br>{{userInfo['roleName']}}</p>
+				</div>
+			</div>
+			<!-- 菜单树 -->
+			<ul class="sidebar-menu" data-widget="tree">
+				<li>
+					<a onclick="window.location.href=window.CONFIG.indexUrl">
+						<i class="fas fa-home"></i> 系统首页
+					</a>
+				</li>
+
+
+				<li v-for="fatherInfo in treeData" v-if="fatherInfo['hasChild']!=1 && fatherInfo['type']==1">
+					<a :href="[rootPath+fatherInfo['uri']]">
+						<i :class="['fas fa-'+fatherInfo['icon']]"></i> {{fatherInfo['name']}}
+					</a>
+				</li>
+				<!-- 二级菜单 -->
+				<li v-else-if="fatherInfo['type']==1" class="treeview">
+					<a href="#">
+						<i :class="['fas fa-'+fatherInfo['icon']]"></i> <span>{{fatherInfo['name']}}</span>
+						<span class="pull-right-container"><i class="fas fa-angle-left pull-right"></i></span>
+					</a>
+					<ul class="treeview-menu">
+						<li v-for="childInfo in fatherInfo['child']" v-if="childInfo['hasChild']!=1">
+							<a :href="[rootPath+childInfo['uri']]">
+								<i :class="['fas fa-'+childInfo['icon']]"></i> {{childInfo['name']}}
+							</a>
+						</li>
+						<!-- 三级菜单 -->
+						<li v-else class="treeview">
+							<a href="#">
+								<i :class="['fas fa-'+childInfo['icon']]"></i> <span>{{childInfo['name']}}</span>
+								<span class="pull-right-container"><i class="fas fa-angle-left pull-right"></i></span>
+							</a>
+							<ul class="treeview-menu">
+								<li v-for="grandsonInfo in childInfo['child']">
+									<a :href="[rootPath+grandsonInfo['uri']]">
+										<i :class="['fas fa-'+grandsonInfo['icon']]"></i> {{grandsonInfo['name']}}
+									</a>
+								</li>
+							</ul>
+						</li>
+						<!-- ./三级菜单 -->
+					</ul>
+				</li>
+				<!-- ./二级菜单 -->
+			</ul>
+			<!-- /.菜单树 -->
+		</section>
+	</aside><!-- /.侧边导航栏 -->
+
+	<div class="modal modal-primary fade" id="logoutModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+							  aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">登出提示</h4>
+				</div>
+				<div class="modal-body">
+					<h3 style="line-height:38px;">确认要退出吗？</h3>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-outline pull-left" data-dismiss="modal">&lt; 取消</button>
+					<button class="btn btn-outline" @click="navbarLogout">确认登出 &gt;</a>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+</div>
+
+<script>
+	var headerVm = new Vue({
+		el: '#header',
+		data: {
+			rootPath: window.CONFIG.rootPath,
+			apiPath: window.CONFIG.apiPath,
+			userInfo: {},
+			treeData: {},
+		},
+		methods: {
+			getUserInfo: function () {
+				let that = this;
+				lockScreen();
+
+				$.ajax({
+					url: this.apiPath + "user/getCurrentUserInfo",
+					dataType: "json",
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						if (ret.code == 200) {
+							unlockScreen();
+							headerVm.userInfo = ret.data.userInfo;
+							return true;
+						} else if (ret.code == 403) {
+							that.navbarLogout(1);
+							return false;
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+						} else {
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				});
+			},
+			getMenuTree: function () {
+				let that = this;
+				lockScreen();
+
+				$.ajax({
+					url: this.apiPath + "menu/getCurrentUserMenu",
+					dataType: "json",
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						if (ret.code == 200) {
+							treeData = ret.data['treeData'];
+							headerVm.treeData = treeData;
+							if (treeData == "") {
+								showModalTips("用户菜单获取失败 或 用户暂无权限！");
+							}
+							unlockScreen();
+							return true;
+						} else if (ret.code == 403) {
+							that.navbarLogout(1);
+							return false;
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+						} else {
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				});
+			},
+			navbarLogout: function (isForce = 0) {
+				logoutUrl = this.rootPath + "logout";
+
+				if (isForce == 1) showModalTips('请重新登录！');
+				else showModalTips('您已安全登出系统！');
+
+				setTimeout(function () {
+					window.location.href = logoutUrl;
+				}, 700);
+
+				return true;
+			}
+		}
+	});
+
+	headerVm.getUserInfo();
+	headerVm.getMenuTree();
+</script>

@@ -1,0 +1,434 @@
+<?php
+/**
+ * @name 生蚝科技TP6-RBAC开发框架-V-角色管理
+ * @author Oyster Cheung <master@xshgzs.com>
+ * @since 2020-07-13
+ * @version 2020-08-01
+ */
+?>
+
+{extend name="/framework" /}
+
+{block name='title'}{$pageName} / {:getSetting('appName')}{/block}
+
+{block name='pageCss'}{/block}
+
+{block name='vueBody'}
+<table-filter ref="filterRef"
+			  :form="filterForm"
+			  :filter-data.sync="filterData"
+			  submit-event-name="getFilterData">
+</table-filter>
+
+<div class="operateBtnGroup">
+	<button class="btn btn-primary" @click="readyCU('create')">新增角色</button>
+	<button class="btn">点击角色备注可查看完整内容 | 默认角色指用户注册时的初始角色</button>
+</div>
+
+<div class="div_table">
+	<table id="table" class="table table-striped table-bordered table-hover"
+		   style="border-radius: 5px; border-collapse: separate;">
+		<thead style="background-color: #fff;">
+			<tr>
+				<th>ID</th>
+				<th>名称</th>
+				<th>备注</th>
+				<th>创建时间</th>
+				<th>最后修改时间</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr v-for="info in list">
+				<td>{{info.id}}</td>
+				<td class="cell-center">{{info.name}}</td>
+				<td class="cell-center">{{info.remark}}</td>
+				<td class="cell-center">{{info.create_time}}</td>
+				<td class="cell-center">{{info.update_time}}</td>
+				<td class="cell-button-group">
+					<button class="btn btn-info"
+							@click="readyCU('update',info)">编辑</button>
+					<button class="btn btn-primary"
+							@click="chooseRolePermission(info.id,info.name)">分配权限</button>
+					<button class="btn btn-danger"
+							@click="readyDelete(info.id,info.name)">删除</button>
+					<button v-if="info.is_default===0" class="btn btn-success"
+							@click="setDefaultRole(info.id)">设为默认角色</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<pagination ref="pageNav"
+			:now.sync="nowPage"
+			:total="total"
+			:per-page="perPage"
+			getdata-event-name="getList">
+</pagination>
+
+{include file="/system/role/modal" /}
+
+{/block}
+
+{block name='js'}
+<script>
+	var vm = new Vue({
+		el: '#app',
+		components: {
+			'table-filter': tableFilterVue,
+			'pagination': paginationVue,
+		},
+		data: {
+			total: 0,
+			nowPage: 1,
+			perPage: 25,
+			list: [],
+			detail: [],
+			filterForm: [{
+				id: {
+					type: "input",
+					name: "ID"
+				},
+				idLast5: {
+					type: "input",
+					name: "ID后5位"
+				},
+			}, {
+				name: {
+					type: "input",
+					name: "角色名称"
+				},
+			}],
+			filterData: {},
+			CUInfo: {
+				operateType: "",
+				showInfo: {
+					name: "",
+					createTime: "",
+					updateTime: "",
+				},// 只能看不能修改
+				id: "",
+				name: "",
+				remark: "",
+			},
+			deleteInfo: {
+				id: "",
+				name: ""
+			},
+			permissionInfo: {
+				id: "",
+				name: "",
+				node: {}
+			},
+			treeSetting: {
+				view: {
+					selectedMulti: false
+				},
+				check: {
+					enable: true
+				},
+				data: {
+					simpleData: {
+						enable: true
+					}
+				}
+			}
+		},
+		methods: {
+			getFilterData: function () {
+				this.getList();
+			},
+			getList: function () {
+				let that = this;
+
+				if ((this.nowPage - 1) * this.perPage > this.totalPage) {
+					showModalTips("当前页码大于数据总条数，请返回上一页！");
+					return;
+				}
+
+				lockScreen();
+
+				$.ajax({
+					url: window.CONFIG.rootPath + "system/role/list",
+					dataType: "json",
+					type: "post",
+					data: {
+						filterData: that.filterData,
+						page: that.nowPage,
+						perPage: that.perPage,
+					},
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							that.list = ret.data.list;
+							that.total = ret.data.total;
+
+							that.$refs.pageNav.totalData = that.total;
+							that.$refs.pageNav.totalPage = Math.ceil(that.total / that.perPage);
+							return;
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+						} else {
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				})
+			},
+			readyCU: function (operateType, info) {
+				let that = this;
+				this.CUInfo.operateType = operateType;
+
+				if (operateType === 'update') {
+					this.CUInfo.showInfo = {
+						name: info.name,
+						createTime: info.create_time,
+						updateTime: info.update_time,
+					};
+					this.CUInfo.id = info.id;
+					this.CUInfo.name = info.name;
+					this.CUInfo.remark = info.remark;
+				}
+
+				$("#CUModal").modal("show");
+				return true;
+			},
+			resetCUInfo: function () {
+				this.CUInfo = {
+					operateType: "",
+					showInfo: {
+						name: "",
+						createTime: "",
+						updateTime: "",
+					},
+					id: "",
+					name: "",
+					remark: "",
+				};
+			},
+			toCU: function () {
+				let that = this;
+				let info = JSON.parse(JSON.stringify(that.CUInfo));
+
+				if (info.name.length < 1 || info.name.length > 20) {
+					showModalTips("请输入[1~20]字的角色名称");
+					return false;
+				}
+				if (info.remark.length < 1 || info.remark.length > 200) {
+					showModalTips("请输入[1~200]字的角色备注");
+					return false;
+				}
+
+				delete info.showInfo;
+
+				lockScreen();
+				$("#CUModal").modal("hide");
+
+				$.ajax({
+					url: window.CONFIG.rootPath + "system/role/toCU",
+					type: "post",
+					dataType: "json",
+					data: {
+						cuInfo: changeArrayKeyToUnderline(info)
+					},
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							alert("操作成功！");
+							that.resetCUInfo();
+							that.getList();
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+						} else {
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				});
+			},
+			readyDelete: function (id, name) {
+				this.deleteInfo.id = id;
+				this.deleteInfo.name = name;
+				$("#deleteModal").modal("show");
+				return true;
+			},
+			toDelete: function () {
+				let that = this;
+				let deleteInfo = JSON.parse(JSON.stringify(this.deleteInfo));
+
+				lockScreen();
+				$("#deleteModal").modal("hide");
+
+				$.ajax({
+					url: window.CONFIG.rootPath + "system/role/delete",
+					type: "post",
+					dataType: "json",
+					data: {
+						deleteInfo: deleteInfo
+					},
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							alert("删除成功！");
+
+							that.deleteInfo = {
+								id: "",
+								name: ""
+							};
+
+							that.getList();
+						} else if (ret.tips !== '') {
+							unlockScreen();
+							showModalTips(ret.tips);
+						} else {
+							unlockScreen();
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				})
+			},
+			setDefaultRole: function (id) {
+				let that = this;
+				lockScreen();
+
+				$.ajax({
+					url: window.CONFIG.rootPath + "system/role/setDefault",
+					type: "post",
+					dataType: "json",
+					data: {
+						id: id
+					},
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							alert("设置成功！");
+							that.getList();
+						} else if (ret.tips !== '') {
+							unlockScreen();
+							showModalTips(ret.tips);
+						} else {
+							unlockScreen();
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				})
+			},
+			chooseRolePermission: function (id, name) {
+				let that = this;
+
+				that.permissionInfo = {
+					id: id,
+					name: name,
+					node: {}
+				};
+
+				// 销毁旧的树
+				try {
+					$.fn.zTree.getZTreeObj("rolePermissionTree").destroy();
+				} catch (e) {
+
+				}
+
+				lockScreen();
+				$.ajax({
+					url: window.CONFIG.apiPath + "menu/roleMenuForZtree",
+					data: {
+						"roleId": id
+					},
+					dataType: "json",
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						if (ret.code == 200) {
+							$.fn.zTree.init($("#rolePermissionTree"), that.treeSetting, ret.data.node);
+							unlockScreen();
+							$("#permissionModal").modal("show");
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+							unlockScreen();
+						} else {
+							unlockScreen();
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				});
+			},
+			toSetRolePermission: function () {
+				let that = this;
+				let node = [];
+				let checkNode = $.fn.zTree.getZTreeObj("rolePermissionTree").getCheckedNodes();
+
+				for (i in checkNode) {
+					node.push(checkNode[i].id);
+				}
+
+				// 将已选中的节点写入vueData中
+				this.permissionInfo.node = node;
+
+				if (node.length <= 0) {
+					showModalTips("至少选择一个权限节点！");
+					return;
+				}
+
+				lockScreen();
+				$.ajax({
+					url: window.CONFIG.rootPath + "system/role/setPermission",
+					data: {
+						permissionInfo: that.permissionInfo
+					},
+					dataType: "json",
+					type: "post",
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						if (ret.code == 200) {
+							alert("成功给[" + that.permissionInfo.name + "]授予" + node.length + "项权限");
+							unlockScreen();
+							$("#permissionModal").modal("hide");
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+							unlockScreen();
+						} else {
+							unlockScreen();
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				});
+			},
+		},
+		mounted() {
+			this.getList();
+		},
+	});
+</script>
+{/block}

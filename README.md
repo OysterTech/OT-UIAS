@@ -1,55 +1,51 @@
-# 生蚝科技统一身份认证平台
+# RBAC-ThinkPHP6
 
 ---
 
-## 简介
+## 简介 Description
 
-▲ 主要功能：SSO单点登录，用户资料统一管理
+▲ 系统名称：RBAC权限管理系统（使用ThinkPHP6、AdminLTE、Vue.js框架开发）
 
-▲ 开发商：广州市生蚝科技有限公司（生蚝科技）
+▲ 开发商：生蚝科技
 
-▲ 代码版本信息：***Build 00637***
+▲ 代码版本信息：***Build 00092***
 
-▲ 系统版本信息：***2.0.0***
+▲ 系统版本信息：***V1.0.1***
 
-▲ 遵循协议：GNU GPLv3
-
-▲ 特点：允许跨父域/二级域名/文件夹 | 每个用户拥有唯一的SSO-UnionID便于管理 | 支持第三方互联登录 | 支持微信扫码登录
+▲ LICENSE：***GNU GPLv3***
 
 ---
 
-## 待开发 TODO
+## 用法 Usage
 
-▲ APP应用管理
+1. 在你的服务器网站根目录下新建“rbac”文件夹，下载并上传整个项目至此
 
----
+2. 导入tp6_rbac.sql到数据库
 
-## 第三方应用接入方法 Third Party Application Access Method
+3. 命令行执行 ``composer install``
 
-① 在SSO中心数据库的app表添加你的app信息（appId尽量用同一套算法生成25位字符串！！）
+4. 根据普通的ThinkPHP6配置来配置我们的项目（如：Nginx/各种配置文件）
 
-② 修改[`ssoTest.php`](https://github.com/OysterTech/OT-SSO/blob/master/ssoTest.php)里的常量，访问此文件即可自动发送请求到SSO中心API，并显示获取用户信息
+5. 访问 http://example.com/rbac 并使用演示账户 【super|123456】 以登录系统
 
----
-
-## 插件 Plugin
-
-▲ 微信小程序扫码登录：[`API_WXMP.php`](https://github.com/OysterTech/OT-SSO/blob/master/application/controllers/API/API_WXMP.php)填入小程序AppID和AppSecret
+6. Congratulations! Your project has been completed! Please explore it or secondary develop it.
 
 ---
 
-## 第三方登录配置 Third-party Login Setting
+## 鸣谢（排名不分先后） Thanks
 
-▲ Github：[`login.php`](https://github.com/OysterTech/OT-SSO/blob/master/login.php#L109)填入clientId，[`github.php`](https://github.com/OysterTech/OT-SSO/blob/master/thirdLogin/github.php)填入clientId和clientSecret
+* [`@OysterTech`](https://github.com/OysterTech) 自家提供的[`静态资源中心`](https://static.xshgzs.com)
 
----
+* [`jQuery`](https://jquery.org/)，遵循`MIT`协议
 
-## 鸣谢
+* [`Vue.js`](https://github.com/vuejs/vue) 前端框架，遵循`MIT`协议
 
-* [`@SmallOyster`](https://github.com/SmallOyster) 自家提供的[`RBAC开发框架V2.0`](https://github.com/SmallOyster/RBAC-CodeIgniter)，遵循`GNU GPLv3`协议
+* [`AdminLTE`](https://github.com/almasaeed2010/AdminLTE) UI框架，遵循`MIT`协议
 
-* [`CodeIgniter`](http://codeigniter.org.cn/) 后端框架
+* [`ThinkPHP 6`](https://github.com/top-think/framework) 后端框架，遵循`Apache2`协议
 
-* [`Vue.js`](https://vuejs.org/) 前端框架
+* [`WeUI`](https://github.com/Tencent/weui)，遵循`MIT`协议
 
-* [`AdminLTE`](https://github.com/almasaeed2010/AdminLTE) UI框架
+* [`Staticfile CDN`](https://github.com/staticfile/static) CDN服务
+
+* Github提供的免费代码仓库

@@ -1,0 +1,248 @@
+<?php
+/**
+ * @name 生蚝科技TP6-RBAC开发框架-V-用户中心
+ * @author Oyster Cheung <master@xshgzs.com>
+ * @since 2020-07-14
+ * @version 2020-07-15
+ */
+?>
+
+{extend name="/framework" /}
+
+{block name='title'}{$pageName} / {:getSetting('appName')}{/block}
+
+{block name='pageCss'}{/block}
+
+{block name='vueBody'}
+
+<button data-toggle="modal" data-target="#updatePasswordModal" class="btn btn-block btn-warning">
+	<i class="fa fa-key" aria-hidden="true"></i> 修 改 密 码 &gt;
+</button>
+
+<br>
+
+<!-- Page main -->
+<div class="box">
+	<div class="box-body">
+		<div class="row">
+			<div class="form-group">
+				<label class="col-sm-2 col-lg-2 control-label">登录用户名 / UserName</label>
+				<div class="col-sm-10 col-lg-10">
+					<input class="form-control" :value="userInfo.userName" disabled>
+				</div>
+			</div>
+		</div><br>
+
+		<div class="row">
+			<div class="form-group">
+				<label class="col-sm-2 col-lg-2 control-label">用户昵称 / NickName</label>
+				<div class="col-sm-10 col-lg-10">
+					<input class="form-control" v-model="inputData.nickName">
+				</div>
+			</div>
+		</div><br>
+
+		<div class="row">
+			<div class="form-group">
+				<label class="col-sm-2 col-lg-2 control-label">手机号码 / Phone</label>
+				<div class="col-sm-10 col-lg-10">
+					<input type="number" class="form-control" v-model="inputData.phone">
+				</div>
+			</div>
+		</div><br>
+
+		<div class="row">
+			<div class="form-group">
+				<label class="col-sm-2 col-lg-2 control-label">邮箱地址 / Email</label>
+				<div class="col-sm-10 col-lg-10">
+					<input type="email" class="form-control" v-model="inputData.email">
+				</div>
+			</div>
+		</div><br>
+
+		<div class="row">
+			<div class="form-group">
+				<label class="col-sm-2 col-lg-2 control-label">注册日期 / Register Date</label>
+				<div class="col-sm-10 col-lg-10">
+					<input class="form-control" :value="userInfo.createTime" disabled>
+				</div>
+			</div>
+		</div>
+
+		<hr>
+
+		<center>
+			<button class="btn btn-primary" style="width:49%" onclick="history.go(-1);">&lt; 取 消 操 作</button>
+			<button class="btn btn-success" style="width:49%" @click="updateUserInfo">确 认 修 改 &gt;</button>
+		</center>
+	</div>
+</div>
+
+<div class="modal fade" id="updatePasswordModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true"></span><span
+						  class="sr-only">Close</span></button>
+				<h3 class="modal-title">修改密码</h3>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="form-group">
+						<label class="col-sm-2 col-lg-2 control-label">旧密码</label>
+						<div class="col-sm-10 col-lg-10">
+							<input type="password" class="form-control" v-model="password.old">
+						</div>
+					</div>
+				</div><br>
+
+				<div class="row">
+					<div class="form-group">
+						<label class="col-sm-2 col-lg-2 control-label">新密码</label>
+						<div class="col-sm-10 col-lg-10">
+							<input type="password" class="form-control" v-model="password.new">
+						</div>
+					</div>
+				</div><br>
+
+				<div class="row">
+					<div class="form-group">
+						<label class="col-sm-2 col-lg-2 control-label">请再次输入新密码</label>
+						<div class="col-sm-10 col-lg-10">
+							<input type="password" class="form-control" v-model="password.sure">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" data-dismiss="modal">&lt; 关闭</button>
+				<button type="button" class="btn btn-warning" @click="updatePassword">确认修改 &gt;</button>
+			</div>
+		</div>
+	</div>
+</div>
+{/block}
+
+{block name='js'}
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				userInfo: JSON.parse(window.sessionStorage.userInfo),
+				inputData: {
+					nickName: "",
+					email: "",
+					phone: "",
+				},
+				password: {
+					old: "",
+					new: "",
+					sure: ""
+				},
+			}
+		},
+		methods: {
+			updateUserInfo: function () {
+				let that = this;
+				let updateData = {};
+
+				for (i in this.inputData) {
+					if (this.inputData[i] != this.userInfo[i]) {
+						updateData[changeCamelToUnderline(i)] = this.inputData[i];
+					}
+				}
+
+				if (checkObjectNull(updateData)) {
+					showModalTips('请修改您想要修改的数据');
+					return false;
+				}
+
+				lockScreen();
+				$.ajax({
+					url: window.CONFIG.rootPath + "user/modifyProfile",
+					type: "post",
+					data: {
+						data: updateData
+					},
+					dataType: "json",
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							showModalTips("修改成功<br>资料变动将在您下次登录时呈现");
+							return true;
+						} else if (ret.tips != "") {
+							showModalTips(ret.tips);
+							return false;
+						} else {
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+							return false;
+						}
+					}
+				})
+			},
+			updatePassword: function () {
+				let that = this;
+				let password = JSON.parse(JSON.stringify(this.password));
+
+				if (password.old == "") {
+					showModalTips("请正确输入旧密码！");
+					return false;
+				}
+				if (password.new.length < 6 || password.new.length > 20) {
+					showModalTips("请输入6~20位的新密码！");
+					return false;
+				}
+				if (password.sure !== password.new) {
+					showModalTips("两次输入的新密码不相符！");
+					return false;
+				}
+				if (password.old == password.new) {
+					showModalTips("新密码与旧密码相同！");
+					return false;
+				}
+
+				lockScreen();
+				$.ajax({
+					url: window.CONFIG.rootPath + "user/modifyPassword",
+					type: "post",
+					data: {
+						old: that.password.old,
+						new: that.password.new
+					},
+					dataType: "json",
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							showModalTips("修改成功<br>请在下次登录时使用新密码");
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+						} else {
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+						}
+					}
+				})
+			},
+		},
+		mounted() {
+			this.inputData = {
+				nickName: this.userInfo.nickName,
+				email: this.userInfo.email,
+				phone: this.userInfo.phone,
+			}
+		},
+	});
+</script>
+{/block}

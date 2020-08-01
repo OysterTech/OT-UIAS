@@ -1,0 +1,96 @@
+/**
+ * @author Oyster Cheung <master@xshgzs.com>
+ * @since 2020-06-25
+ * @version 2020-07-24
+*/
+
+td,
+th {
+    vertical-align: middle !important;
+}
+
+th {
+    text-align: center;
+}
+
+.cell-center {
+    text-align: center;
+}
+
+.cell-button-group {
+    padding: 4px !important;
+}
+
+.cell-button-group button {
+    padding: 3px 7px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+tbody tr:hover {
+    color: #8a6d3b !important;
+    background-color: #fcf8e3 !important;
+    border-color: #faebcc !important;
+}
+
+.main-header .sidebar-toggle:before {
+    content: "";
+}
+
+.modal {
+    overflow-y: auto;
+}
+
+/* 方便表格左右移动 [start] */
+.div_table {
+    overflow: auto;
+    display: block;
+}
+
+.div_table table {
+    min-width: 100%;
+}
+
+/* 方便表格左右移动 [end] */
+
+.operateBtnGroup {
+    padding-bottom: 15px;
+}
+
+.input-group .input-group-addon {
+    background-color: #eee !important;
+}
+
+.btn-purple {
+    background-color: #f95aff;
+    color: white;
+}
+
+.btn-purple:hover,
+.btn-purple:focus {
+    background-color: #d913e0;
+    color: white;
+}
+
+.ztree li span.button.add {
+    margin-left: 2px;
+    margin-right: -1px;
+    background-position: -144px 0;
+    vertical-align: top;
+    *vertical-align: middle
+}
+
+ul.ztree {
+    margin-top: 10px;
+    border: 1px solid #617775;
+    background: #f0f6e4;
+    height: 360px;
+    overflow-y: scroll;
+    overflow-x: auto;
+}
+
+@media (min-width: 768px) {
+    #CUModal > div {
+        width: 700px;
+    }
+}
