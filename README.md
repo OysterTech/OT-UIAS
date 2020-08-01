@@ -1,38 +1,38 @@
-# RBAC-ThinkPHP6
+# 生蚝科技统一身份认证平台
 
 ---
 
-## 简介 Description
+## 简介
 
-▲ 系统名称：RBAC权限管理系统（使用ThinkPHP6、AdminLTE、Vue.js框架开发）
+▲ 主要功能：SSO单点登录，用户资料统一管理
 
-▲ 开发商：生蚝科技
+▲ 开发商：广州市生蚝科技有限公司（生蚝科技）
 
-▲ 代码版本信息：***Build 00092***
+▲ 代码版本信息：***Build 00638***
 
-▲ 系统版本信息：***V1.0.1***
+▲ 系统版本信息：***3.0.0***
 
-▲ LICENSE：***GNU GPLv3***
+▲ 遵循协议：GNU GPLv3
 
----
-
-## 用法 Usage
-
-1. 在你的服务器网站根目录下新建“rbac”文件夹，下载并上传整个项目至此
-
-2. 导入tp6_rbac.sql到数据库
-
-3. 命令行执行 ``composer install``
-
-4. 根据普通的ThinkPHP6配置来配置我们的项目（如：Nginx/各种配置文件）
-
-5. 访问 http://example.com/rbac 并使用演示账户 【super|123456】 以登录系统
-
-6. Congratulations! Your project has been completed! Please explore it or secondary develop it.
+▲ 特点：允许跨父域/二级域名/文件夹 | 每个用户拥有唯一的SSO-UnionID便于管理 | 支持第三方互联登录 | 支持微信扫码登录
 
 ---
 
-## 鸣谢（排名不分先后） Thanks
+## 待开发 TODO
+
+▲ ALL
+
+---
+
+## 第三方应用接入方法 Third Party Application Access Method
+
+TODO
+
+---
+
+## 鸣谢
+
+* [`@SmallOyster`](https://github.com/SmallOyster) 自家开发的[`RBAC-ThinkPHP6`](https://github.com/SmallOyster/RBAC-ThinkPHP6)
 
 * [`@OysterTech`](https://github.com/OysterTech) 自家提供的[`静态资源中心`](https://static.xshgzs.com)
 
