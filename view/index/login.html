@@ -1,9 +1,9 @@
 <?php 
 /**
- * @name 生蚝科技TP6-RBAC开发框架-V-登录
+ * @name 生蚝科技统一身份认证平台-V-登录
  * @author Oyster Cheung <master@xshgzs.com>
- * @since 2020-07-12
- * @version 2020-07-16
+ * @since 2018-02-20
+ * @version V3.0 2020-08-02
  */
 ?>
 
@@ -16,12 +16,10 @@
 	<title>登录 / {:getSetting('appName')}</title>
 
 	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdn.staticfile.org/admin-lte/2.4.8/css/AdminLTE.min.css">
 	<link rel="stylesheet" href="https://static.xshgzs.com/css/loading.css">
+	<link rel="stylesheet" href="__APP_HOST__/public/css/login.css">
 
-	<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.13.0/css/fontawesome.min.css">
-	<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.13.0/css/solid.min.css">
-	<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.13.0/css/brands.min.css">
+	<link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
 	<script src="https://cdn.staticfile.org/jquery/3.1.0/jquery.min.js"></script>
 	<!-- 开发环境版本，包含了有帮助的命令行警告 -->
@@ -30,68 +28,144 @@
 	<script src="https://cdn.staticfile.org/admin-lte/2.4.8/js/adminlte.min.js"></script>
 
 	<script src="https://static.xshgzs.com/js/utils.js"></script>
-	<script src="{:think\\facade\\Config::get('app.app_host')}/public/js/config.js"></script>
-
-	<style>
-		body {
-			padding-top: 20px;
-		}
-	</style>
+	<script src="__APP_HOST__/public/js/config.js"></script>
 </head>
 
-<body style="background-color: #66CCFF;">
-	<div class="container">
-		<div class="col-md-6 col-md-offset-3">
-			<center><img src="{:getSetting('companyLogo')}" style="display: inline-block;height: auto;max-width: 100%;"></center><br>
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title" style="text-align:center;line-height:23px;">
-						欢迎登录<br>{:getSetting('appName')}</h3>
+<body
+	  style="background-image: url(https://static.xshgzs.com/image/backstage_bg.png); background-position: center center; background-repeat: repeat;">
+
+	<input type="hidden" id="appId" value="<?=$appId;?>">
+	<input type="hidden" id="appName" value="<?=$appName;?>">
+
+	<!-- 登陆面板 -->
+	<div class="login_page">
+		<div class="login_box_m">
+			<div class="content">
+
+				<div class="logo">
+					<img src="{:getSetting('companyLogo')}">
 				</div>
-				<div class="panel-body">
-					<div class="form-group">
-						<label for="userName">用户名</label>
-						<input class="form-control" placeholder="用户名 / UserName" id="userName"
-							   onkeyup='if(event.keyCode==13)$("#password").focus();'>
-					</div>
-					<br>
-					<div class="form-group">
-						<label for="password">密码</label>
-						<a href="forgetPassword" target="_blank">（忘记密码 Forget Password）</a>
-						<input class="form-control" placeholder="密码 / Password" id="password" type="password"
-							   onkeyup='if(event.keyCode==13)toLogin();'>
+
+				<div class="login_form">
+					<div class="login_form_title">
+						<center>
+							<h3>用户登录<br>正在通过统一认证平台快速登录：<b>
+									<?=$appName;?>
+								</b></h3>
+						</center>
 					</div>
 
-					<div class="checkbox">
-						<label for="Remember">
-							<input type="checkbox" id="Remember">记住用户名
-						</label>
-					</div>
+					<div class="login_form_detail">
+						<!-- 登录表单 -->
+						<div class="left_side">
 
-					<center>
-						<a class="btn btn-primary" style="width:49%" href='register'>注册 / Register</a>
-						<button class="btn btn-success" style="width:49%" onclick='toLogin();'>登录 / Login &gt;</button>
-					</center>
+							<div class="input_div">
+								<i class="_icon _i-user"></i>
+								<input id="userName" placeholder="请输入您的通行证帐号">
+							</div>
+
+							<div class="input_div psw" style="margin-bottom: 20px;">
+								<i class="_icon _i-psw"></i>
+								<input type="password" id="password" placeholder="请输入通行证密码" onkeyup="if(event.keyCode == 13){toLogin();}">
+							</div>
+
+							<button class="sub_btn" style="cursor: pointer;" onclick="toLogin()">登录</button>
+
+							<!-- 忘记密码? -->
+							<div class="clearfix">
+								<a class="forgetPassword" href="/user/register" target="_blank">注册</a>&nbsp;
+								<a class="forgetPassword" onclick="alert('很抱歉，此功能正在升级完善中~\n\n如忘记密码请联系管理员！');">忘记密码</a>
+							</div>
+
+						</div>
+
+						<!-- 右侧 -->
+						<div class="right_side clearfix">
+							<!-- 第三方互联登录 -->
+							<div class="div1">
+								<div class="login_form_title2">
+									<center>
+										<h3>第三方互联登录<br></h3>
+									</center>
+								</div>
+
+								<!-- 移动端分割线 -->
+								<div class="connectHr">
+									<hr>
+								</div>
+								<!-- /.移动端分割线 -->
+
+								<a style="color:#07C160;text-decoration: none;">
+									<i class="fa fa-weixin"></i>
+									<b class="connectText">微信扫码<br></b>
+								</a>
+								<a href="/thirdLogin/github" style="color:#24292e;text-decoration: none;">
+									<i class="fa fa-github"></i>
+									<b class="connectText">Github互联<br></b>
+								</a>
+								<a style="text-decoration: none;">
+									<img src="__APP_HOST__/public/image/thirdLoginIcon/weixinWork.png">
+									<b class="connectText">企业微信扫码<br></b>
+								</a>
+								<a href="/thirdLogin/gzlib" style="text-decoration: none;">
+									<img src="__APP_HOST__/public/image/thirdLoginIcon/gzlib_origin.jpg"
+										 style="border-radius:50%;">
+									<b class="connectText">广州图书馆互联<br></b>
+								</a>
+								<a href="/thirdLogin/gdyht" style="text-decoration: none;">
+									<img src="__APP_HOST__/public/image/thirdLoginIcon/gdyht.png">
+									<b class="connectText">广东一号通互联<br></b>
+								</a>
+								<a href="/thirdLogin/yuque" style="text-decoration: none;">
+									<img src="https://gw.alipayobjects.com/zos/rmsportal/XuVpGqBFxXplzvLjJBZB.svg">
+									<b class="connectText">语雀<br></b>
+								</a>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+	<!-- /.登陆面板 -->
 
-	<center>
-		<!-- 页脚版权 -->
-		<p style="font-weight:bold;font-size:20px;line-height:26px;">
-			&copy; <a href="{:getSetting('homepageUrl')}" target="_blank"
-			   style="font-size:21px;">{:getSetting('companyName')}</a>
-			{:getSetting('companyCreateYear')}-{:date('Y')}
+	<script>
+		function loadWxLoginQrCode() {
+			width = $("#loginForm").width();
+			width -= 80;
+			if (width < 280) width = 280;
+			$("#qrCodeImg").attr('src', '/api/wxmp/getQrCode/<?=session_id();?>/<?=$appId;?>/' + width);
+			$("#qrCodeImg").attr('style', 'width:' + width + 'px;height:' + width + 'px;');
+			$("#wxCodeStatusDiv").attr('style', 'display:none');
+			startCheckStatus();
+		}
+	</script>
 
-			<br>
+	<div class="page-copy">
+		<center>
+			<!-- 页脚版权 -->
+			<p style="font-weight:bold;font-size:18px;line-height:26px;">
+				&copy; <a href="{:getSetting('homepageUrl')}" target="_blank"
+				   style="font-size:21px;">{:getSetting('companyName')}</a>
+				{:getSetting('companyCreateYear')}-{:date('Y')}
 
-			All Rights Reserved.<br>
-			<a href="http://miit.beian.gov.cn/" target="_blank"
-			   style="color:black;">{:getSetting('beianCode')}</a><br><br>
-		</p>
-		<!-- ./页脚版权 -->
-	</center>
+				<a style="color:#07C160" onclick='showWXCode()'><i class="fa fa-weixin fa-lg"
+					   aria-hidden="true"></i></a>
+				<a style="color:#FF7043" onclick='launchQQ()'><i class="fa fa-qq fa-lg" aria-hidden="true"></i></a>
+				<a style="color:#29B6F6" href="mailto:master@xshgzs.com"><i class="fa fa-envelope fa-lg"
+					   aria-hidden="true"></i></a>
+				<a style="color:#AB47BC" href="https://github.com/OysterTech" target="_blank"><i
+					   class="fa fa-github fa-lg" aria-hidden="true"></i></a>
+
+				<br>
+
+				All Rights Reserved.<br>
+				<a href="http://miit.beian.gov.cn/" target="_blank"
+				   style="color:black;">{:getSetting('beianCode')}</a><br><br>
+			</p>
+			<!-- ./页脚版权 -->
+		</center>
+	</div>
 
 	<script>
 		var isAjaxing = 0;// 防止重复登录
@@ -127,6 +201,8 @@
 			isAjaxing = 1;
 			$("#userName").attr("disabled", true);
 			$("#password").attr("disabled", true);
+
+			appId = $("#appId").val();
 			userName = $("#userName").val();
 			password = $("#password").val();
 
@@ -156,7 +232,7 @@
 			$.ajax({
 				url: "toLogin",
 				type: "post",
-				data: { "userName": userName, "password": password },
+				data: { "appId": appId, "userName": userName, "password": password },
 				dataType: "json",
 				error: function (e) {
 					console.log(JSON.stringify(e));
@@ -174,6 +250,7 @@
 
 					if (ret.code == 200) {
 						sessionStorage.setItem("userInfo", JSON.stringify(ret.data.userInfo));
+						sessionStorage.setItem('jwtToken', ret.data['jwtToken']);
 
 						// 如果有重定向地址且base64有效
 						if (getURLParam("redirect") != null) {
@@ -191,8 +268,13 @@
 					} else if (ret.code == 1) {
 						showModalTips("当前用户被禁用！<br>请联系管理员！");
 						return false;
-					} else if (ret.code == 403) {
+					} else if (ret.code == 4031) {
 						showModalTips("用户名或密码错误！");
+						return false;
+					} else if (ret.code == 4032) {
+						unlockScreen();
+						alert("登录成功~\n当前用户暂无访问此应用权限！\n即将跳转至平台用户中心！");
+						window.location.href = "/";
 						return false;
 					} else if (ret.code == 3) {
 						showModalTips("用户暂未激活！<br>请尽快进行激活！");
@@ -210,26 +292,22 @@
 		}
 	</script>
 
-	<div class="modal fade" id="tipsModal">
+	<div class="modal fade" id="tipsModal" style="z-index:99999">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
-							  class="sr-only">Close</span></button>
-					<h3 class="modal-title" id="ModalTitle">温馨提示</h3>
+					<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+					<h3 class="modal-title" id="tipsTitle">温馨提示</h3>
 				</div>
 				<div class="modal-body">
-					<font color="red" style="font-weight:bolder;font-size:24px;text-align:center;">
-						<p id="tips"></p>
-					</font>
+					<p id="tips" style="color:#fb7312;font-weight:bold;font-size:23px;text-align:center;"></p>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-warning"
-							onclick='isAjaxing=0;$("#tipsModal").modal("hide");'>返回 &gt;</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal">关闭 &gt;</button>
 				</div>
-			</div><!-- /.modal-content -->
-		</div><!-- /.modal-dialog -->
-	</div><!-- /.modal -->
+			</div>
+		</div>
+	</div>
 
 </body>
 

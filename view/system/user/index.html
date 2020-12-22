@@ -3,7 +3,7 @@
  * @name 生蚝科技TP6-RBAC开发框架-V-用户管理
  * @author Oyster Cheung <master@xshgzs.com>
  * @since 2020-07-11
- * @version 2020-08-01
+ * @version 2020-07-21
  */
 ?>
 
@@ -59,7 +59,7 @@
 					<div v-if="info.id!==getUserInfo().id">
 						<button class="btn btn-info"
 								@click="readyCU('update',info)">编辑</button>
-						<button class="btn btn-purple"
+						<button class="btn btn-pink"
 								@click="readyResetPassword(info.id,info.user_name,info.nick_name)">重置密码</button>
 						<button v-if="info.status===1" class="btn btn-warning"
 								@click="readyBanOrOpen('ban',info.id,info.user_name,info.nick_name)">禁用</button>
@@ -330,7 +330,7 @@
 				let info = JSON.parse(JSON.stringify(that.CUInfo));
 
 				if (info.userName.length < 1 || info.userName.length > 20 || info.userName.match(/[^\x00-\xff]/ig) || !testUserName(info.userName)) {
-					showModalTips("请输入[1~20]位的用户名<br>仅可含有[数字/字母/下划线]");
+					showModalTips("请输入[3~20]位的用户名<br>仅可含有[数字/字母/下划线]");
 					return false;
 				}
 				if (info.nickName.length < 1 || info.nickName.length > 20) {

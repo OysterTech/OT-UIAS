@@ -4,7 +4,7 @@
  * @name 生蚝科技TP6-RBAC开发框架-C-菜单接口
  * @author Oyster Cheung <master@xshgzs.com>
  * @since 2020-07-12
- * @version 2020-07-14
+ * @version 2020-10-22
  */
 
 namespace app\controller\api;
@@ -23,7 +23,7 @@ class Menu extends BaseController
 		else return packApiData(403, 'User not login', [], '用户未登录');
 
 		$obj_Rbac = new Rbac();
-		return packApiData(200, 'success', ['treeData' => $obj_Rbac->getAllMenuByRole($roleId)]);
+		return packApiData(200, 'success', ['treeData' => $obj_Rbac->getAllMenuByRole($roleId, '1')], '', false);
 	}
 
 
@@ -37,7 +37,7 @@ class Menu extends BaseController
 		$rtn = [];
 		$allPermission = [];
 
-		$menuList = MenuModel::select()->toArray();
+		$menuList = MenuModel::order('sort')->select()->toArray();
 		$permissionList = RolePermissionModel::field('menu_id')
 			->where('role_id', $roleId)
 			->select()
@@ -56,12 +56,13 @@ class Menu extends BaseController
 			$rtn[$key]['uri'] = $info['uri'];
 			$rtn[$key]['type'] = $info['type'];
 			$rtn[$key]['name'] = $info['name'];
+			$rtn[$key]['sort'] = $info['sort'];
 			$rtn[$key]['checked'] = in_array($info['id'], $allPermission) ? true : false;
 			$rtn[$key]['createTime'] = $info['create_time'];
 			$rtn[$key]['updateTime'] = $info['update_time'];
 		}
 
-		return packApiData(200, 'success', ['node' => $rtn]);
+		return packApiData(200, 'success', ['node' => $rtn], '', false);
 	}
 
 
@@ -72,7 +73,7 @@ class Menu extends BaseController
 	public function getList()
 	{
 		$isZtree = inputGet('isZtree', 1, 1);
-		$list = MenuModel::select();
+		$list = MenuModel::order('sort')->select();
 
 		if ($isZtree == 1) {
 			$key = [];
@@ -85,13 +86,14 @@ class Menu extends BaseController
 				$rtn[$key]['uri'] = $info['uri'];
 				$rtn[$key]['type'] = $info['type'];
 				$rtn[$key]['name'] = $info['name'];
+				$rtn[$key]['sort'] = $info['sort'];
 				$rtn[$key]['createTime'] = $info['create_time'];
 				$rtn[$key]['updateTime'] = $info['update_time'];
 			}
 
-			return packApiData(200, 'success', ['node' => $rtn]);
+			return packApiData(200, 'success', ['node' => $rtn], '', false);
 		} else {
-			return packApiData(200, 'success', ['list' => $list]);
+			return packApiData(200, 'success', ['list' => $list], '', false);
 		}
 	}
 }

@@ -4,12 +4,11 @@
  * @name 生蚝科技TP6-RBAC开发框架-C-RBAC核心
  * @author Oyster Cheung <master@xshgzs.com>
  * @since 2020-07-12
- * @version 2020-07-12
+ * @version 2020-10-22
  */
 
 namespace app\controller;
 
-use app\model\User as UserModel;
 use app\model\Menu as MenuModel;
 use app\model\RolePermission as RolePermissionModel;
 
@@ -55,30 +54,32 @@ class Rbac
 	 * 根据角色和父菜单Id获取子菜单信息
 	 * @param string 角色Id
 	 * @param string 父菜单Id
+	 * @param string 限定菜单类型
 	 * @return array 子菜单信息
 	 */
-	public function getChildMenuByRole($roleId = '', $fatherId = '')
+	public function getChildMenuByRole($roleId = '', $fatherId = '', $type = '')
 	{
-		return MenuModel::getListByRole($roleId, $fatherId);
+		return MenuModel::getListByRole($roleId, $fatherId, $type);
 	}
 
 
 	/**
 	 * 根据角色获取所有菜单详细信息
 	 * @param string 角色Id
+	 * @param string 限定菜单类型
 	 * @return array 菜单详细信息
 	 */
-	public function getAllMenuByRole($roleId = '')
+	public function getAllMenuByRole($roleId = '', $type = '')
 	{
 		$allMenu = array();
 
-		$allMenu = $this->getChildMenuByRole($roleId, '0');
+		$allMenu = $this->getChildMenuByRole($roleId, '0', $type);
 		$allMenu_total = count($allMenu);
 
 		// 搜寻二级菜单
 		for ($i = 0; $i < $allMenu_total; $i++) {
 			$fatherId = $allMenu[$i]['id'];
-			$child_list = $this->getChildMenuByRole($roleId, $fatherId);
+			$child_list = $this->getChildMenuByRole($roleId, $fatherId, $type);
 
 			if ($child_list == null) {
 				// 没有二级菜单
@@ -95,7 +96,7 @@ class Rbac
 				// 搜寻三级菜单
 				for ($j = 0; $j < $child_list_total; $j++) {
 					$father2Id = $child_list[$j]['id'];
-					$child2_list = $this->getChildMenuByRole($roleId, $father2Id);
+					$child2_list = $this->getChildMenuByRole($roleId, $father2Id, $type);
 
 					if ($child2_list == null) {
 						// 没有三级菜单

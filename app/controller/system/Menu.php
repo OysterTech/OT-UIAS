@@ -31,11 +31,11 @@ class Menu extends BaseController
 		$cuType = $cuInfo['operate_type'];
 
 		if ($cuType == 'update') {
-			MenuModel::update($cuInfo, ['id' => $cuInfo['id']], ['name', 'icon', 'uri']);
+			MenuModel::update($cuInfo, ['id' => $cuInfo['id']], ['name', 'icon', 'uri', 'sort']);
 			return packApiData(200, 'success');
 		} elseif ($cuType == 'create') {
 			$cuInfo['id'] = makeUUID();
-			MenuModel::create($cuInfo, ['id', 'father_id', 'name', 'icon', 'uri']);
+			MenuModel::create($cuInfo, ['id', 'father_id', 'name', 'icon', 'uri', 'sort']);
 			return packApiData(200, 'success');
 		} else {
 			return packApiData(5002, 'Invalid cu type', [], '非法操作行为');

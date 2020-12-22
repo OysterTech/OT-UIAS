@@ -25,22 +25,23 @@
 				{/if}
 			</div>
 			<div class="weui-msg__text-area">
+				{if $hideTitle!=='1'}
 				<p class="weui-msg__title" style="font-size: 25px;">温馨提示</p>
+				{/if}
 				<p class="weui-msg__desc" style="font-size: 22px;">{$content|raw}</p>
 			</div>
 			<div class="weui-msg__opr-area">
 				<p class="weui-btn-area">
-					<a onclick="history.go(-1);" class="weui-btn weui-btn_primary">返回上一页</a>
+					{if $canBack=='1'}
+					<a onclick="history.go(-1)" class="weui-btn weui-btn_primary">返回上一页</a>
+					{/if}
+					<a href="{:url('/')}" class="weui-btn weui-btn_primary">返回首页</a>
 				</p>
 			</div>
 			<div class="weui-msg__tips-area">
 			</div>
 			<div class="weui-msg__extra-area">
 				<div class="weui-footer">
-					<p class="weui-footer__links">
-						<a class="weui-footer__link" style="font-size: 19px;line-height: 37px;"
-						   href="https://www.xshgzs.com" target="_blank">生蚝科技首页</a>
-					</p>
 					<p class="weui-footer__text" style="font-size: 18px;">&copy; {:getSetting('companyName')}
 						{:getSetting('companyCreateYear')}-{:date('Y')}</p>
 				</div>

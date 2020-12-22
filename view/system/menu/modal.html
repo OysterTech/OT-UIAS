@@ -36,12 +36,28 @@
 								<span class="input-group-addon">
 									<i :class="'fas fa-'+CUInfo.icon" aria-hidden="true" style="font-weight:bold;"></i>
 								</span>
+								<span class="input-group-btn">
+									<button class="btn btn-info"
+											onclick="vm.CUInfo.icon='circle-notch'">设为默认图标</button>
+								</span>
 							</div>
 						</td>
 					</tr>
 					<tr>
 						<th style="vertical-align: middle;">菜单URI</th>
-						<td><input v-model="CUInfo.uri" class="form-control"></td>
+						<td>
+							<div class="input-group">
+								<input v-model="CUInfo.uri" class="form-control">
+
+								<span class="input-group-btn">
+									<button class="btn btn-info" onclick="vm.CUInfo.uri='#'">设为父菜单</button>
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">菜单排序</th>
+						<td><input v-model="CUInfo.sort" class="form-control" type="number"></td>
 					</tr>
 					<tr v-if="CUInfo.operateType==='update'">
 						<th style="vertical-align: middle;">创建时间</th>

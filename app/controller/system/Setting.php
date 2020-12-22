@@ -4,7 +4,7 @@
  * @name 生蚝科技TP6-RBAC开发框架-C-系统配置管理
  * @author Oyster Cheung <master@xshgzs.com>
  * @since 2020-07-15
- * @version 2020-08-01
+ * @version 2020-08-17
  */
 
 namespace app\controller\system;
@@ -34,8 +34,8 @@ class Setting extends BaseController
 		$query = SettingModel::field('*');
 
 		foreach ($filterData as $key => $value) {
-			$countQuery = $countQuery->where($key, $value);
-			$query = $query->where($key, $value);
+			$countQuery = $countQuery->whereLike($key, '%' . $value . '%');
+			$query = $query->whereLike($key, '%' . $value . '%');
 		}
 
 		$countQuery = $countQuery->count('id');

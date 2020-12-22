@@ -1,0 +1,373 @@
+body {
+    position: relative;
+    width: 100%;
+    font-size: 14px;
+    font-family: 微软雅黑, Microsoft Yahei, regular;
+}
+
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+nav,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+code,
+form,
+fieldset,
+legend,
+input,
+button,
+textarea,
+p,
+blockquote,
+th,
+td,
+a {
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    -webkit-transform-origin: left top;
+    -ms-transform-origin: left top;
+    -o-transform-origin: left top;
+    transform-origin: left top;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-size: 100%;
+    font-weight: inherit;
+}
+
+.login_page {
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 555;
+}
+
+.login_box_m {
+    width: 670px;
+    height: 530px;
+    margin: 45px auto 40px;
+    border-radius: 12px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 9.5px 0.5px rgba(101, 101, 101, 0.25);
+}
+
+.login_box_m .content {
+    width: 570px;
+    margin: 0 auto;
+}
+
+.login_box_m .logo {
+    padding-top: 40px;
+}
+
+.login_box_m .logo img {
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.login_box_m .login_form_title {
+    position: relative;
+    height: 60px;
+    margin-bottom: 40px;
+}
+
+.login_box_m .login_form_title h3 {
+    color: #7e7e7e;
+    font-size: 20px;
+    padding-top: 30px;
+}
+
+.div1 i {
+    line-height: .75em;
+    font-size: 1.3em;
+}
+
+.div1 img {
+    width: 20px;
+    height: 20px;
+    margin-top: -12px;
+}
+
+.div1 .connectHr {
+    display: none;
+}
+
+.login_box_m .login_form_detail .left_side {
+    float: left;
+    width: 415px;
+    border-right: 1px solid #ddd;
+}
+
+.login_box_m .login_form_detail .left_side .input_div {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #cccccc;
+    border-radius: 4px;
+    background-color: rgba(221, 221, 221, 0);
+    position: relative;
+    margin-bottom: 20px;
+    width: 394px;
+    height: 44px;
+}
+
+.login_box_m .login_form_detail .left_side .input_div input {
+    display: inline-block;
+    _zoom: 1;
+    _display: inline;
+    line-height: 44px;
+    height: 44px;
+    background: none;
+    width: 300px;
+    vertical-align: top;
+}
+
+.login_box_m .login_form_detail .left_side .input_div ._icon {
+    display: inline-block;
+    _zoom: 1;
+    _display: inline;
+    width: 40px;
+    height: 44px;
+    margin-right: 4px;
+    position: relative;
+}
+
+.login_box_m .login_form_detail .left_side .input_div ._icon:after {
+    position: absolute;
+    width: 1px;
+    height: 20px;
+    border-right: 1px solid #ddd;
+    right: 3px;
+    top: 12px;
+    content: "";
+}
+
+.login_box_m .login_form_detail .left_side .input_div ._icon._i-user {
+    background: url(../image/user.gif) no-repeat center center;
+}
+
+.login_box_m .login_form_detail .left_side .input_div ._icon._i-psw {
+    background: url(../image/psw.gif) no-repeat center center;
+}
+
+.login_box_m .login_form_detail .left_side .sub_btn {
+    border: none;
+    background: none;
+    outline: none;
+    box-shadow: none;
+    display: block;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #cccccc;
+    border-radius: 4px;
+    background-color: #38b4e6;
+    width: 394px;
+    height: 38px;
+    color: #fff;
+    line-height: 38px;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.login_box_m .login_form_detail .left_side .forgetPassword {
+    float: right;
+    text-decoration: underline;
+    margin-right: 20px;
+    font-size: 14px;
+    font-family: "Microsoft YaHei";
+    color: #38b4e6;
+    line-height: 1.214;
+    -moz-transform: matrix(0.99950771, 0, 0, 1, 0, 0);
+    -webkit-transform: matrix(0.99950771, 0, 0, 1, 0, 0);
+    -ms-transform: matrix(0.99950771, 0, 0, 1, 0, 0);
+}
+
+.login_box_m .right_side {
+    padding-left: 25px;
+    float: left;
+}
+
+.login_box_m .right_side .div1 {
+    line-height: 35px;
+    height: 44px;
+    margin-bottom: 22px;
+    color: #7e7e7e;
+}
+
+._1 {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 306px;
+    height: 100px;
+    z-index: 22;
+}
+
+._24h {
+    font-size: 6px;
+    font-family: "Microsoft YaHei";
+    color: #ffffff;
+    line-height: 1.2;
+    position: absolute;
+    left: 38.656px;
+    top: 50.4px;
+    z-index: 20;
+}
+
+.page-copy {
+    margin: 0 auto;
+    left: 20%;
+    text-align: center;
+}
+
+@media screen and (max-width: 720px) {
+    .login_box_m .logo img {
+        display: block;
+        margin: 0 auto;
+    }
+
+    .login_form_detail {
+        width: 90%;
+        margin: 0 auto;
+    }
+
+    /* 登录 */
+    .login_box_m {
+        width: 90%;
+        font-size: 12px;
+        height: auto !important;
+        margin: 60px auto 10px;
+    }
+
+    .login_box_m .content {
+        width: 90%;
+    }
+
+    .login_box_m .logo {
+        padding-top: 20px;
+    }
+
+    .login_box_m .login_form_title2 {
+        display: none;
+        position: relative;
+        height: 30px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .div1 i {
+        font-size: 2.8em;
+        margin-right: 5px;
+    }
+
+    .div1 img {
+        width: 30px;
+        height: 30px;
+        margin-right: 5px;
+    }
+
+    .div1 .connectHr {
+        display: inline;
+    }
+
+    .div1 .connectText {
+        display: none;
+    }
+
+    .login_box_m .login_form_title2 h3 {
+        color: #7e7e7e;
+        background-color: #fff;
+        position: absolute;
+        font-size: 12px;
+        width: 100px;
+        text-align: center;
+        bottom: -18px;
+        left: 50%;
+        margin-left: -50px;
+    }
+
+    .login_box_m .login_form_detail .left_side {
+        float: none;
+        width: 100%;
+        border-right: 0;
+    }
+
+    .login_box_m .login_form_detail .left_side .input_div {
+        width: 100%;
+        height: 30px;
+    }
+
+    .login_box_m .login_form_detail .left_side .input_div input {
+        display: block;
+        box-sizing: border-box;
+        line-height: 30px;
+        height: 30px;
+        width: inherit;
+        padding-right: 10px;
+        padding-left: 40px;
+    }
+
+    .login_box_m .login_form_detail .left_side .input_div ._icon {
+        position: absolute;
+        left: 0;
+        width: 32px;
+        height: 30px;
+    }
+
+    .login_box_m .login_form_detail .left_side .input_div ._icon:after {
+        height: 18px;
+        right: -2px;
+        top: 6px;
+        content: "";
+    }
+
+    .login_box_m .login_form_detail .left_side .input_div ._icon._i-user {
+        background-size: auto 18px;
+    }
+
+    .login_box_m .login_form_detail .left_side .input_div ._icon._i-psw {
+        background-size: auto 18px;
+    }
+
+    .login_box_m .login_form_detail .left_side .sub_btn {
+        width: 100%;
+        height: 30px;
+        line-height: 30px;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .login_box_m .login_form_detail .left_side .forgetPassword {
+        margin-right: 10px;
+        font-size: 12px;
+    }
+
+    .login_box_m .right_side {
+        padding-left: 0;
+        float: none;
+    }
+
+    .login_box_m .right_side .div1 {
+        font-size: 12px;
+        text-align: center;
+        margin-top: 20px;
+    }
+}

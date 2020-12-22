@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @name 生蚝科技TP6-RBAC开发框架-C-首页
+ * @name 生蚝科技统一身份认证平台-C-首页
  * @author Oyster Cheung <master@xshgzs.com>
  * @since 2020-07-12
- * @version 2020-07-16
+ * @version 2020-08-03
  */
 
 namespace app\controller;
@@ -12,6 +12,8 @@ namespace app\controller;
 use think\facade\Session;
 use app\model\User as UserModel;
 use app\model\Role as RoleModel;
+use app\model\App as AppModel;
+use app\model\LoginToken as LoginTokenModel;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class Index
@@ -34,7 +36,41 @@ class Index
 
 	public function login()
 	{
-		return view('/index/login');
+		$appId = inputGet('appId', 1);
+		$redirectUrl = inputGet('redirectUrl', 1);
+
+		$showAppId = getSetting('ssoCenterAppId');
+		$showAppName = getSetting('appName');
+
+		// 如果有设定应用ID
+		if (strlen($appId) == 20) {
+			$appQuery = AppModel::field('name,redirect_url')->where('app_id', $appId)->find();
+
+			if (isset($appQuery['name'])) {
+				if (urldecode($redirectUrl) !== $appQuery['redirect_url']) gotourl('/error/appInfo');
+
+				$showAppId = $appId;
+				$showAppName = $appQuery['name'];
+			}
+		} else {
+			$redirectUrl = (string) url('/')->domain(true);
+		}
+
+		// 已登录，生成token并直接跳转
+		if (Session::has('userInfo.id')) {
+			$token = sha1(getRandomStr(10));
+			LoginTokenModel::insert([
+				'token' => $token,
+				'ip' => getIP(),
+				'status' => 1,
+				'user_id' => Session::get('userInfo.id'),
+				'expire_time' => date("Y-m-d H:i:s", strtotime("+2 hours"))
+			]);
+			die(header('location:' . $redirectUrl . '?token=' . $token));
+		}
+
+		Session::set('loginAppInfo', ['id' => $appId, 'name' => $showAppName, 'redirectUrl' => $redirectUrl]);
+		return view('/index/login', ['appId' => $showAppId, 'appName' => $showAppName]);
 	}
 
 
@@ -70,8 +106,20 @@ class Index
 		// 更新用户最后登录时间
 		UserModel::update(['last_login' => date('Y-m-d H:i:s')], ['user_name' => $userName]);
 
+		$token = sha1(getRandomStr(10));
+		LoginTokenModel::insert([
+			'token' => $token,
+			'ip' => getIP(),
+			'status' => 1,
+			'user_id' => $userInfo['id'],
+			'expire_time' => date("Y-m-d H:i:s", strtotime("+2 hours"))
+		]);
+
+		if (Session::has('loginAppInfo.redirectUrl')) $url = Session::get('loginAppInfo.redirectUrl') . '?token=' . $token;
+		else $url = \think\facade\Config::get('app.app_host');
+
 		return packApiData(200, 'success', [
-			'url' => \think\facade\Config::get('app.app_host'),
+			'url' => $url,
 			'userInfo' => $userInfo
 		]);
 	}

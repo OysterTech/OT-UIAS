@@ -4,6 +4,29 @@
 use think\facade\Request;
 
 /**
+ * camelize 下划线转小驼峰
+ * @param string  $uncamelized_words 待转换的字符串
+ * @return string                    小驼峰式的字符串
+ */
+function camelize($uncamelizedWord = '')
+{
+	$uncamelizedWord = '_' . str_replace('_', ' ', strtolower($uncamelizedWord));
+	return ltrim(str_replace(' ', '', ucwords($uncamelizedWord)), '_');
+}
+
+
+/**
+ * uncamelize 驼峰命名转下划线命名
+ * @param string $camelCaps 待转换的驼峰式字符串
+ * @return string           下划线式字符串
+ */
+function uncamelize($camelCaps = '')
+{
+	return strtolower(preg_replace('/([a-z])([A-Z])/', "$1" . '_' . "$2", $camelCaps));
+}
+
+
+/**
  * getSetting 获取数据库中的系统配置
  * @param  string $configName 配置键名
  * @return string             配置值
@@ -278,15 +301,16 @@ function inputPost($dataName = '', $allowNull = 0, $isAjax = 0, $errorCode = 0, 
  * @param  string  $type         请求类型(get/post)
  * @param  array   $postData     需要POST的数据
  * @param  string  $postDataType POST数据类型(array/json)
+ * @param  array   $header       自定义请求头
  * @param  string  $returnType   返回数据类型(origin/json)
  * @param  integer $timeout      超时秒数
  * @param  string  $userAgent    UserAgent
  * @return string|array          返回结果(类型看returnType)
  * @author Oyster Cheung <master@xshgzs.com>
  * @since 2019-11-17
- * @version 2020-04-04
+ * @version 2020-08-03
  */
-function curl($url, $type = 'get', $postData = array(), $postDataType = 'array', $returnType = 'origin', $timeout = 5, $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
+function curl($url, $type = 'get', $postData = array(), $postDataType = 'array', $header = array(), $returnType = 'origin', $timeout = 5, $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
 {
 	if ($url == '' || $timeout <= 0) {
 		return false;
@@ -305,12 +329,14 @@ function curl($url, $type = 'get', $postData = array(), $postDataType = 'array',
 			return false;
 		} else if ($postDataType === 'json') {
 			$postData = json_encode($postData);
-			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+			array_push($header,'Content-Type:application/json');
 		}
 
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
 	}
+
+	curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
 
 	$rtn = curl_exec($ch);
 	if ($rtn === false) $rtn = 'curlError:' . curl_errno($ch);

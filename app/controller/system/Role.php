@@ -127,9 +127,7 @@ class Role extends BaseController
 		$node = $info['node'];
 
 		// 清空原有权限
-		$clearOrigin = RolePermissionModel::where('role_id', $roleId)->delete();
-
-		if ($clearOrigin <= 0) return packApiData(4001, 'Failed to clear original permission', [], '清空此角色原有权限失败');
+		RolePermissionModel::where('role_id', $roleId)->delete();
 
 		$insertData = [];
 		foreach ($node as $menuId) {
