@@ -4,16 +4,15 @@
  * @name 生蚝科技TP6-RBAC开发框架-C-用户
  * @author Oyster Cheung <master@xshgzs.com>
  * @since 2020-07-14
- * @version 2020-07-15
+ * @version 2021-08-04
  */
 
 namespace app\controller;
 
-use app\BaseController;
 use think\facade\Session;
 use app\model\User as UserModel;
 
-class User extends BaseController
+class User
 {
 	public function index()
 	{
@@ -53,5 +52,16 @@ class User extends BaseController
 
 		UserModel::update($updateData, ['user_name' => $userName]);
 		return packApiData(200, 'success');
+	}
+
+
+	public function checkDuplicate()
+	{
+		$type = inputPost('type', 0, 1);
+		$value = inputPost('value', 0, 1);
+		$query = UserModel::where($type, $value)->find();
+
+		if ($query === null) return packApiData(404, 'This value not exists', [], '', false);
+		else return packApiData(200, 'This value already exists', [], '', false);
 	}
 }

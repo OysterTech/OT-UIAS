@@ -3,7 +3,7 @@
  * @name 生蚝科技TP6-RBAC开发框架-V-用户管理
  * @author Oyster Cheung <master@xshgzs.com>
  * @since 2020-07-11
- * @version 2020-07-21
+ * @version 2021-08-20
  */
 ?>
 
@@ -117,10 +117,12 @@
 					type: "input",
 					name: "ID"
 				},
-				idLast5: {
-					type: "input",
-					name: "ID后5位"
-				},
+				role_id: {
+					type: "option",
+					name: "角色",
+					isMultiple: true,
+					nodeList: {}
+				}
 			}, {
 				user_name: {
 					type: "input",
@@ -130,12 +132,6 @@
 					name: "昵称"
 				},
 			}, {
-				role_id: {
-					type: "option",
-					name: "角色",
-					isMultiple: true,
-					nodeList: {}
-				},
 				email: {
 					type: "input",
 					name: "邮箱"
@@ -233,7 +229,7 @@
 						} else if (ret.tips !== '') {
 							showModalTips(ret.tips);
 						} else {
-							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
 						}
 					}
 				})
@@ -244,7 +240,7 @@
 				lockScreen();
 
 				$.ajax({
-					url: window.CONFIG.apiPath + "role/list",
+					url: window.CONFIG.apiPath + "v3/role/list",
 					dataType: "json",
 					error: function (e) {
 						unlockScreen();
@@ -263,12 +259,12 @@
 							}
 
 							that.allRoleList = arr;
-							that.filterForm[2].role_id.nodeList = arr;
+							that.filterForm[0].role_id.nodeList = arr;
 							return;
 						} else if (ret.tips !== '') {
 							showModalTips(ret.tips);
 						} else {
-							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
 						}
 					}
 				})
@@ -390,7 +386,7 @@
 						} else if (ret.tips !== '') {
 							showModalTips(ret.tips);
 						} else {
-							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
 						}
 					}
 				});
@@ -451,7 +447,7 @@
 						} else if (ret.tips !== '') {
 							showModalTips(ret.tips);
 						} else {
-							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
 						}
 					}
 				});
@@ -499,7 +495,7 @@
 						} else if (ret.tips !== '') {
 							showModalTips(ret.tips);
 						} else {
-							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
 						}
 					}
 				})
@@ -544,7 +540,7 @@
 						} else if (ret.tips !== '') {
 							showModalTips(ret.tips);
 						} else {
-							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
 						}
 					}
 				})

@@ -4,7 +4,7 @@
  * @name 生蚝科技TP6-RBAC开发框架-C-用户管理
  * @author Oyster Cheung <master@xshgzs.com>
  * @since 2020-07-11
- * @version 2020-07-23
+ * @version 2021-08-20
  */
 
 namespace app\controller\system;
@@ -33,13 +33,12 @@ class User extends BaseController
 		$query = UserModel::field('*');
 
 		foreach ($filterData as $key => $value) {
-			if ($key === 'idLast5') {
-				// 根据ID最后5位查询，方便用户快查
-				$countQuery = $countQuery->whereRaw('RIGHT(id,5)=:id', ['id' => $value]);
-				$query = $query->whereRaw('RIGHT(id,5)=:id', ['id' => $value]);
-			} elseif ($key === 'role_id') {
+			if ($key === 'role_id') {
 				$countQuery = $countQuery->where('role_id', 'in', $value);
 				$query = $query->where('role_id', 'in', $value);
+			} elseif (in_array($key, ['user_name', 'nick_name'])) {
+				$countQuery = $countQuery->whereLike($key, $value . '%');
+				$query = $query->whereLike($key, $value . '%');
 			} else {
 				// 其他条件
 				$countQuery = $countQuery->where($key, $value);

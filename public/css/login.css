@@ -60,7 +60,7 @@ h6 {
 }
 
 .login_box_m {
-    width: 670px;
+    width: 700px;
     height: 530px;
     margin: 45px auto 40px;
     border-radius: 12px;
@@ -70,7 +70,7 @@ h6 {
 }
 
 .login_box_m .content {
-    width: 570px;
+    width: 615px;
     margin: 0 auto;
 }
 
@@ -113,7 +113,7 @@ h6 {
 
 .login_box_m .login_form_detail .left_side {
     float: left;
-    width: 415px;
+    width: 450px;
     border-right: 1px solid #ddd;
 }
 
@@ -125,7 +125,7 @@ h6 {
     background-color: rgba(221, 221, 221, 0);
     position: relative;
     margin-bottom: 20px;
-    width: 394px;
+    width: 415px;
     height: 44px;
 }
 
@@ -179,7 +179,7 @@ h6 {
     border-color: #cccccc;
     border-radius: 4px;
     background-color: #38b4e6;
-    width: 394px;
+    width: 415px;
     height: 38px;
     color: #fff;
     line-height: 38px;
@@ -254,7 +254,7 @@ h6 {
         width: 90%;
         font-size: 12px;
         height: auto !important;
-        margin: 60px auto 10px;
+        margin: 45px auto 10px;
     }
 
     .login_box_m .content {

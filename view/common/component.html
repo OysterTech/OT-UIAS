@@ -673,7 +673,7 @@
 							$("#uploadBtn_" + i).removeAttr("disabled");
 							unlockScreen();
 							clearInterval(that.upload.clock);
-							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
 						}
 					}
 				});

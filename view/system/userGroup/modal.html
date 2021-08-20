@@ -1,0 +1,177 @@
+<div class="modal fade" id="CUModal" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+				<h3 class="modal-title">
+					{{ CUInfo.operateType=='create'?'新建':'修改' }}用户
+
+					<template v-if="CUInfo.operateType=='update'">
+						&nbsp;[<font color="#fb7312">
+							{{ CUInfo.showInfo.nickName }}({{ CUInfo.showInfo.userName }})
+						</font>]
+					</template>
+				</h3>
+			</div>
+			<div class="modal-body">
+				<table class="table table-striped table-bordered table-hover"
+					   style="border-radius: 5px; border-collapse: separate;">
+					<tr v-if="CUInfo.operateType==='update'">
+						<th style="vertical-align: middle;">用户ID</th>
+						<td><input :value="CUInfo.id" class="form-control" disabled></td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">用户名</th>
+						<td><input v-model="CUInfo.userName" class="form-control"></td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">昵称</th>
+						<td><input v-model="CUInfo.nickName" class="form-control"></td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">手机</th>
+						<td><input v-model="CUInfo.phone" class="form-control"></td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">邮箱</th>
+						<td><input v-model="CUInfo.email" class="form-control"></td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">角色</th>
+						<td><input @click="showCheckRole"
+								   :value="allRoleList[CUInfo.roleId]" class="form-control" readonly></td>
+					</tr>
+					<tr v-if="CUInfo.operateType==='update'">
+						<th style="vertical-align: middle;">创建时间</th>
+						<td><input :value="CUInfo.showInfo.createTime" class="form-control" disabled></td>
+					</tr>
+					<tr v-if="CUInfo.operateType==='update'">
+						<th style="vertical-align: middle;">最后修改时间</th>
+						<td><input :value="CUInfo.showInfo.updateTime" class="form-control" disabled></td>
+					</tr>
+					<tr v-if="CUInfo.operateType==='update'">
+						<th style="vertical-align: middle;">最后登录时间</th>
+						<td><input :value="CUInfo.showInfo.lastLogin" class="form-control" disabled></td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary" @click="resetCUInfo" data-dismiss="modal">&lt; 放弃</button>
+				<button class="btn btn-success" @click="toCU">确认 &gt;</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="initialPasswordModal" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+				<h3 class="modal-title">
+					初始密码
+				</h3>
+			</div>
+			<div class="modal-body">
+				<table class="table table-striped table-bordered table-hover"
+					   style="border-radius: 5px; border-collapse: separate;">
+					<tr>
+						<th style="vertical-align: middle;">用户名</th>
+						<td><input :value="initialPasswordInfo.userName" class="form-control" disabled></td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">昵称</th>
+						<td><input :value="initialPasswordInfo.nickName" class="form-control" disabled></td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">初始密码</th>
+						<td><input :value="initialPasswordInfo.password" class="form-control" disabled></td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-success" data-dismiss="modal">关闭 &gt;</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="resetPasswordModal" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+				<h3 class="modal-title">
+					重置密码确认提示
+				</h3>
+			</div>
+			<div class="modal-body" style="color:#3f51b5;font-size:23px;text-align:center;">
+				请确认您需要重置<br>
+				<b>
+					<font color="#4caf50">{{resetPasswordInfo.nickName}}({{resetPasswordInfo.userName}})</font>
+				</b> 的登录密码
+
+				<hr>
+
+				<div class="input-group">
+					<span class="input-group-addon">新密码</span>
+					<input v-model="resetPasswordInfo.password" class="form-control">
+					<span class="input-group-btn">
+						<button class="btn btn-info" @click="generateNewPassword">生成密码</button>
+					</span>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-info" data-dismiss="modal">&lt; 放弃</button>
+				<button class="btn btn-danger" @click="toResetPasswordInfo">确认重置密码 &gt;</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="deleteModal" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+				<h3 class="modal-title">
+					删除确认提示
+				</h3>
+			</div>
+			<div class="modal-body" style="color:#3f51b5;font-size:23px;text-align:center;">
+				请确认您需要删除<br>
+				<b>
+					<font color="#4caf50">{{deleteInfo.nickName}}({{deleteInfo.userName}})</font>
+				</b> 的账户
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-info" data-dismiss="modal">&lt; 放弃</button>
+				<button class="btn btn-danger" @click="toDelete">确认删除 &gt;</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="BOModal" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+				<h3 class="modal-title">
+					操作确认提示
+				</h3>
+			</div>
+			<div class="modal-body" style="color:#3f51b5;font-size:23px;text-align:center;">
+				请确认您需要<br>
+				<b>{{ BOInfo.operateType=='ban'?'禁用':'启用'}}</b>
+				<font color="#4caf50">{{BOInfo.nickName}}({{BOInfo.userName}})</font> 的账户
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-info" data-dismiss="modal">&lt; 放弃</button>
+				<button v-if="BOInfo.operateType=='ban'" class="btn btn-danger" @click="toBanOrOpen">确认禁用 &gt;</button>
+				<button v-else-if="BOInfo.operateType=='open'" class="btn btn-success" @click="toBanOrOpen">确认启用
+					&gt;</button>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,21 @@
+/* 企业微信扫码登录css */
+.impowerBox .qrcode {
+    width: 180px;
+}
+
+.impowerBox .title {
+    display: none;
+}
+
+.impowerBox .info {
+    width: 200px;
+}
+
+.status_icon {
+    /* display: none !important */
+}
+
+.impowerBox .status {
+    text-align: center;
+    margin-top: 5px;
+}

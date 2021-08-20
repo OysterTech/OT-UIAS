@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>激活通行证 / {:getSetting('appName')}</title>
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+	<link rel="shortcut icon" href="/favicon.ico">
+	<link rel="stylesheet" href="https://cdn.staticfile.org/weui/2.4.4/style/weui.min.css">
+</head>
+
+<body>
+	<div class="page">
+		<div class="weui-msg">
+			<div class="weui-msg__icon-area">
+				<i class="weui-icon-success weui-icon_msg"></i>
+			</div>
+			<div class="weui-msg__text-area">
+				<p class="weui-msg__title" style="font-size: 25px;">温馨提示</p>
+				<p class="weui-msg__desc" style="font-size: 22px;">
+					欢迎注册{:getSetting('companyName')}通行证<br>
+					现已激活成功，请您重新登录
+				</p>
+			</div>
+			<div class="weui-msg__opr-area">
+				<p class="weui-btn-area">
+					<a href="{:url('/')}" class="weui-btn weui-btn_primary">返回首页</a>
+				</p>
+			</div>
+			<div class="weui-msg__tips-area">
+			</div>
+			<div class="weui-msg__extra-area">
+				<div class="weui-footer">
+					<p class="weui-footer__text" style="font-size: 18px;">&copy; {:getSetting('companyName')}
+						{:getSetting('companyCreateYear')}-{:date('Y')}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

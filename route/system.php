@@ -42,3 +42,9 @@ Route::group('system', function () {
 		Route::post('delete', 'system.Setting/toDelete');
 	});
 });
+
+Route::group('error', function () {
+	Route::get('appInfo', 'error/appInfo');
+	Route::get('noPermission', 'error/noPermission');
+	Route::get('/', 'Error/index');
+});

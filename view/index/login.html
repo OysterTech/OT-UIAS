@@ -3,7 +3,7 @@
  * @name 生蚝科技统一身份认证平台-V-登录
  * @author Oyster Cheung <master@xshgzs.com>
  * @since 2018-02-20
- * @version V3.0 2020-08-02
+ * @version V3.1 2021-08-01
  */
 ?>
 
@@ -17,22 +17,21 @@
 
 	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://static.xshgzs.com/css/loading.css">
-	<link rel="stylesheet" href="__APP_HOST__/public/css/login.css">
-
-	<link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="__APP_HOST__/public/css/login.css?v=1627819700">
+	<link rel="stylesheet" href="__APP_HOST__/public/css/fonts.css">
 
 	<script src="https://cdn.staticfile.org/jquery/3.1.0/jquery.min.js"></script>
 	<!-- 开发环境版本，包含了有帮助的命令行警告 -->
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="https://cdn.staticfile.org/admin-lte/2.4.8/js/adminlte.min.js"></script>
+	<script src="https://wwcdn.weixin.qq.com/node/wework/wwopen/js/wwLogin-1.2.4.js"></script>
 
 	<script src="https://static.xshgzs.com/js/utils.js"></script>
 	<script src="__APP_HOST__/public/js/config.js"></script>
 </head>
 
-<body
-	  style="background-image: url(https://static.xshgzs.com/image/backstage_bg.png); background-position: center center; background-repeat: repeat;">
+<body style="background-image: url(https://static.xshgzs.com/image/backstage_bg.png); background-position: center center; background-repeat: repeat;">
 
 	<input type="hidden" id="appId" value="<?=$appId;?>">
 	<input type="hidden" id="appName" value="<?=$appName;?>">
@@ -48,35 +47,46 @@
 
 				<div class="login_form">
 					<div class="login_form_title">
-						<center>
-							<h3>用户登录<br>正在通过统一认证平台快速登录：<b>
-									<?=$appName;?>
-								</b></h3>
+						<center style="font-size: 20px;color: #7e7e7e;padding-top: 5px;">
+							用户登录<br>
+							正通过统一认证平台快速登录：
+							<b style="color:#8f46df;">
+								<?=$appName;?>
+							</b>
 						</center>
 					</div>
 
 					<div class="login_form_detail">
-						<!-- 登录表单 -->
+						<!-- 登录区 -->
 						<div class="left_side">
+							<!-- 帐密表单 -->
+							<div id="loginForm">
+								<div class="input_div">
+									<i class="_icon _i-user"></i>
+									<input id="userName" placeholder="请输入您的通行证帐号">
+								</div>
 
-							<div class="input_div">
-								<i class="_icon _i-user"></i>
-								<input id="userName" placeholder="请输入您的通行证帐号">
+								<div class="input_div psw" style="margin-bottom: 20px;">
+									<i class="_icon _i-psw"></i>
+									<input type="password" id="password" placeholder="请输入通行证密码" onkeyup="if(event.keyCode == 13){toLogin();}">
+								</div>
+
+								<button class="sub_btn" style="cursor: pointer;" onclick="toLogin()">登录</button>
+
+								<!-- 忘记密码? -->
+								<div class="clearfix">
+									<a class="forgetPassword" href="/register" target="_blank">注册</a>&nbsp;
+									<a class="forgetPassword" onclick="alert('很抱歉，此功能正在升级完善中~\n\n如忘记密码请联系管理员！');">忘记密码</a>
+								</div>
 							</div>
 
-							<div class="input_div psw" style="margin-bottom: 20px;">
-								<i class="_icon _i-psw"></i>
-								<input type="password" id="password" placeholder="请输入通行证密码" onkeyup="if(event.keyCode == 13){toLogin();}">
+							<!-- 企微二维码表单 -->
+							<div id="wwQrCodeForm" style="display: none;">
+								<!-- <a onclick="backToPassword()">
+									<img src="__APP_HOST__/public/image/back.png" alt="使用帐密登录">
+								</a> -->
+								<div id="workWeixinQrCode" style="width: 300px;height: 300px;margin-top: -40px;"></div>
 							</div>
-
-							<button class="sub_btn" style="cursor: pointer;" onclick="toLogin()">登录</button>
-
-							<!-- 忘记密码? -->
-							<div class="clearfix">
-								<a class="forgetPassword" href="/user/register" target="_blank">注册</a>&nbsp;
-								<a class="forgetPassword" onclick="alert('很抱歉，此功能正在升级完善中~\n\n如忘记密码请联系管理员！');">忘记密码</a>
-							</div>
-
 						</div>
 
 						<!-- 右侧 -->
@@ -93,28 +103,23 @@
 								<div class="connectHr">
 									<hr>
 								</div>
-								<!-- /.移动端分割线 -->
 
 								<a style="color:#07C160;text-decoration: none;">
-									<i class="fa fa-weixin"></i>
+									<i class="fab fa-weixin"></i>
 									<b class="connectText">微信扫码<br></b>
 								</a>
-								<a href="/thirdLogin/github" style="color:#24292e;text-decoration: none;">
-									<i class="fa fa-github"></i>
-									<b class="connectText">Github互联<br></b>
-								</a>
-								<a style="text-decoration: none;">
+								<a style="text-decoration: none;" onclick="loadWorkWeixinQrCode()">
 									<img src="__APP_HOST__/public/image/thirdLoginIcon/weixinWork.png">
 									<b class="connectText">企业微信扫码<br></b>
+								</a>
+								<a href="/thirdLogin/github" style="color:#24292e;text-decoration: none;">
+									<i class="fab fa-github"></i>
+									<b class="connectText">Github互联<br></b>
 								</a>
 								<a href="/thirdLogin/gzlib" style="text-decoration: none;">
 									<img src="__APP_HOST__/public/image/thirdLoginIcon/gzlib_origin.jpg"
 										 style="border-radius:50%;">
 									<b class="connectText">广州图书馆互联<br></b>
-								</a>
-								<a href="/thirdLogin/gdyht" style="text-decoration: none;">
-									<img src="__APP_HOST__/public/image/thirdLoginIcon/gdyht.png">
-									<b class="connectText">广东一号通互联<br></b>
 								</a>
 								<a href="/thirdLogin/yuque" style="text-decoration: none;">
 									<img src="https://gw.alipayobjects.com/zos/rmsportal/XuVpGqBFxXplzvLjJBZB.svg">
@@ -127,7 +132,7 @@
 			</div>
 		</div>
 	</div>
-	<!-- /.登陆面板 -->
+	<!-- /.登录面板 -->
 
 	<script>
 		function loadWxLoginQrCode() {
@@ -145,17 +150,18 @@
 		<center>
 			<!-- 页脚版权 -->
 			<p style="font-weight:bold;font-size:18px;line-height:26px;">
-				&copy; <a href="{:getSetting('homepageUrl')}" target="_blank"
-				   style="font-size:21px;">{:getSetting('companyName')}</a>
+				&copy; <a href="{:getSetting('homepageUrl')}" target="_blank" style="font-size:21px;">
+					{:getSetting('companyName')}</a>
 				{:getSetting('companyCreateYear')}-{:date('Y')}
 
-				<a style="color:#07C160" onclick='showWXCode()'><i class="fa fa-weixin fa-lg"
-					   aria-hidden="true"></i></a>
-				<a style="color:#FF7043" onclick='launchQQ()'><i class="fa fa-qq fa-lg" aria-hidden="true"></i></a>
-				<a style="color:#29B6F6" href="mailto:master@xshgzs.com"><i class="fa fa-envelope fa-lg"
-					   aria-hidden="true"></i></a>
-				<a style="color:#AB47BC" href="https://github.com/OysterTech" target="_blank"><i
-					   class="fa fa-github fa-lg" aria-hidden="true"></i></a>
+				<a style="color:#07C160" onclick='showWXCode()'><i class="fab fa-weixin fa-lg" aria-hidden="true"></i></a>
+				<a style="color:#FF7043" onclick='launchQQ()'><i class="fab fa-qq fa-lg" aria-hidden="true"></i></a>
+				<a style="color:#29B6F6" href="mailto:master@xshgzs.com">
+					<i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+				</a>
+				<a style="color:#AB47BC" href="https://github.com/OysterTech" target="_blank">
+					<i class="fab fa-github fa-lg" aria-hidden="true"></i>
+				</a>
 
 				<br>
 
@@ -230,7 +236,7 @@
 
 			lockScreen();
 			$.ajax({
-				url: "toLogin",
+				url: window.CONFIG.rootPath + "toLogin",
 				type: "post",
 				data: { "appId": appId, "userName": userName, "password": password },
 				dataType: "json",
@@ -289,6 +295,35 @@
 					}
 				}
 			});
+		}
+
+		function backToPassword() {
+			$("#loginForm").show();
+			$("#wwQrCodeForm").hide();
+			alert();
+		}
+
+		function loadWorkWeixinQrCode() {
+			if (isPhone()) {
+				let url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={:env('WORKWEIXIN.CORP_ID')}&redirect_uri=" + encodeURIComponent(window.CONFIG.rootPath + "thirdLogin/workWeixin") + "&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect";
+				window.location.href = url;
+			} else {
+				$("#loginForm").hide();
+				$("#wwQrCodeForm").show();
+
+				let loginFormWidth = $(".left_side").width() - 24;
+				$("#wwQrCodeForm").attr("style", "width:" + loginFormWidth + "px;height:260px;margin-top:-20px;padding:0 " + ((loginFormWidth - 300) / 2) + "px;")
+
+				var wwLogin = new WwLogin({
+					"id": "workWeixinQrCode",
+					"appid": "{:env('WORKWEIXIN.CORP_ID')}",
+					"agentid": "{:env('WORKWEIXIN.AGENT_ID')}",
+					"redirect_uri": encodeURIComponent(window.CONFIG.rootPath + "thirdLogin/workWeixin"),
+					"state": "STATE",
+					"href": window.CONFIG.rootPath + "public/css/workWeixin.css?v=1629181245",
+					"lang": "zh",
+				});
+			}
 		}
 	</script>
 

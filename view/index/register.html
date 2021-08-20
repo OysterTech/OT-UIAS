@@ -1,0 +1,288 @@
+<?php 
+/**
+ * @name 生蚝科技统一身份认证平台-V-注册
+ * @author Oyster Cheung <master@xshgzs.com>
+ * @since 2021-07-13
+ * @version V3.0 2021-08-16
+ */
+?>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="author" content="Oyster Cheung">
+	<title>注册 / {:getSetting('appName')}</title>
+
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://static.xshgzs.com/css/loading.css">
+	<link rel="stylesheet" href="__APP_HOST__/public/css/login.css?v=1627831055">
+	<link rel="stylesheet" href="__APP_HOST__/public/css/register.css?v=1628038431">
+	<link rel="stylesheet" href="__APP_HOST__/public/css/fonts.css">
+</head>
+
+<body style="background-image: url(https://static.xshgzs.com/image/backstage_bg.png); background-position: center center; background-repeat: repeat;">
+	<!-- 注册面板 -->
+	<div class="login_page">
+		<div class="login_box_m" style="height: 700px;">
+			<div class="content">
+				<div class="logo">
+					<img src="{:getSetting('companyLogo')}">
+				</div>
+
+				<div class="login_form reg-form">
+					<div class="login_form_title" style="height: 50px;margin-bottom: 20px;margin-top: -20px;">
+						<center>
+							<h3>用户注册</h3>
+						</center>
+					</div>
+
+					<div class="login_form_detail">
+						<!-- 登录表单 -->
+						<div class="left_side">
+
+							<div class="input_div">
+								<i class="_icon reg-icon far fa-id-badge"></i>
+								<input id="userName" placeholder="请输入您的通行证帐号" onblur="checkDuplicate('userName',this.value)">
+							</div>
+
+							<div class="input_div">
+								<i class="_icon reg-icon far fa-user"></i>
+								<input id="nickName" placeholder="请输入您的通行证昵称">
+							</div>
+
+							<div class="input_div">
+								<i class="_icon reg-icon far fa-key"></i>
+								<input type="password" id="password" placeholder="请输入通行证密码">
+							</div>
+
+							<div class="input_div">
+								<i class="_icon reg-icon far fa-shield-check"></i>
+								<input type="password" id="password2" placeholder="请再次输入通行证密码">
+							</div>
+
+							<div class="input_div">
+								<i class="_icon reg-icon far fa-phone-square"></i>
+								<input id="phone" placeholder="请输入您的中国大陆手机号" onblur="checkDuplicate('phone',this.value)" onchange="if(this.value.length==11){checkDuplicate('phone',this.value);}">
+							</div>
+
+							<div class="input_div">
+								<i class="_icon reg-icon far fa-envelope"></i>
+								<input id="email" placeholder="请输入您的邮箱地址" onkeyup="if(event.keyCode == 13){toRegister();}">
+							</div>
+
+							<button class="sub_btn" style="cursor: pointer;" onclick="toRegister()">注册 &gt;</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /.注册面板 -->
+
+	<div class="page-copy">
+		<center>
+			<!-- 页脚版权 -->
+			<p style="font-weight:bold;font-size:18px;line-height:26px;">
+				&copy; <a href="{:getSetting('homepageUrl')}" target="_blank" style="font-size:21px;">
+					{:getSetting('companyName')}</a>
+				{:getSetting('companyCreateYear')}-{:date('Y')}
+
+				<a style="color:#07C160" onclick='showWXCode()'><i class="fab fa-weixin fa-lg" aria-hidden="true"></i></a>
+				<a style="color:#FF7043" onclick='launchQQ()'><i class="fab fa-qq fa-lg" aria-hidden="true"></i></a>
+				<a style="color:#29B6F6" href="mailto:master@xshgzs.com">
+					<i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+				</a>
+				<a style="color:#AB47BC" href="https://github.com/OysterTech" target="_blank">
+					<i class="fab fa-github fa-lg" aria-hidden="true"></i>
+				</a>
+
+				<br>
+
+				All Rights Reserved.<br>
+				<a href="http://miit.beian.gov.cn/" target="_blank"
+				   style="color:black;">{:getSetting('beianCode')}</a><br><br>
+			</p>
+			<!-- ./页脚版权 -->
+		</center>
+	</div>
+
+	<script src="https://cdn.staticfile.org/jquery/3.1.0/jquery.min.js"></script>
+	<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://cdn.staticfile.org/admin-lte/2.4.8/js/adminlte.min.js"></script>
+	<script src="https://cdn.staticfile.org/jsencrypt/3.2.1/jsencrypt.min.js"></script>
+
+	<script src="https://static.xshgzs.com/js/utils.js"></script>
+	<script src="https://static.xshgzs.com/js/password.js?v=1629121520"></script>
+	<script src="__APP_HOST__/public/js/config.js"></script>
+
+	<script>
+		var isAjaxing = 0;// 防止重复注册
+		var duplicate = 0;
+		const PUBLIC_KEY = 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCoaOvHCLpRQ/ppF4wl2GScUMg79JyC1WDOd5b70ZuyOtw4psTiknzoSeWdUgpY+QcW/SktqjLm2IRcRQSO4BYJmdWL838yqY/xc7p10BJs0I2tR6H4gWi1lP4ZjweEeO2UNi+3i/P2K6PpOTcHBfXbSMiB/NuckdUB88QsjuDd0QIDAQAB';
+		var encrypt = new JSEncrypt();
+		encrypt.setPublicKey('-----BEGIN PUBLIC KEY-----' + PUBLIC_KEY + '-----END PUBLIC KEY-----');
+
+		// 监听模态框关闭事件
+		$(function () {
+			$('#tipsModal').on('hidden.bs.modal', function () {
+				isAjaxing = 0;
+			});
+		});
+
+		function toRegister() {
+			// 防止多次提交
+			if (isAjaxing == 1) {
+				return false;
+			} else {
+				isAjaxing = 1;
+			}
+
+			userName = $("#userName").val();
+			nickName = $("#nickName").val();
+			password = $("#password").val();
+			password2 = $("#password2").val();
+			phone = $("#phone").val();
+			email = $("#email").val();
+
+			if (userName.length < 3 || userName.length > 20 || !/^(?![0-9]+$)[A-Za-z_][A-Za-z_0-9]{2,20}$/.test(userName)) {
+				showModalTips("通行证用户名须为3~20位<br>仅限字母数字下划线");
+				return false;
+			}
+			if (nickName.length < 3 || nickName.length > 20) {
+				showModalTips("通行证昵称须为3~20位");
+				return false;
+			}
+			if (!(/^1[3|5|6|7|8|9][0-9]\d{4,8}$/.test(phone))) {
+				showModalTips("请正确输入11位的中国大陆手机号");
+				return false;
+			}
+			if (!(/^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/.test(email))) {
+				showModalTips("请正确输入邮箱地址");
+				return false;
+			}
+
+			if (!checkPassword(password, 2, 6, false)) return false;
+
+			checkDuplicate("userName", userName)
+			if (duplicate == 1) return false;
+
+			checkDuplicate("phone", phone)
+			if (duplicate == 1) return false;
+
+			if (password !== password2) {
+				showModalTips("两次输入的密码不相同，请重新输入");
+				return false;
+			}
+
+			lockScreen();
+			$.ajax({
+				url: window.CONFIG.rootPath + "toRegister",
+				type: "post",
+				data: {
+					"user_name": userName,
+					"nick_name": nickName,
+					"password": encrypt.encrypt(password),
+					"phone": phone,
+					"email": email
+				},
+				dataType: "json",
+				error: function (e) {
+					console.log(JSON.stringify(e));
+					unlockScreen();
+					showModalTips("服务器错误！<hr>请联系技术支持并提交以下错误码：<br><font color='blue'>" + e.status + "</font>");
+					return false;
+				},
+				success: function (ret) {
+					unlockScreen();
+
+					if (ret.code == 200) {
+						alert("通行证注册成功！\n\n请先登录邮箱进行初次激活\n如需要内部应用的权限，请联系应用管理员进行授权")
+						return true;
+					} else if (ret.tips != '') {
+						showModalTips(ret.tips);
+						return false;
+					} else {
+						console.log(ret);
+						showModalTips("系统错误！<hr>请联系技术支持并提交以下错误码：<br><font color='blue'>" + ret.code + "</font>");
+						return false;
+					}
+				}
+			});
+		}
+
+		function checkDuplicate(type = "", value = "") {
+			var typeCN = "";
+
+			switch (type) {
+				case 'phone':
+					typeCN = "手机号"
+					break;
+				case 'userName':
+					typeCN = "用户名"
+					break;
+				default:
+					break;
+			}
+
+			if (value.length < 1) {
+				showModalTips(typeCN + "不能为空")
+				duplicate = 1;
+				return false;
+			}
+
+			$.ajax({
+				url: window.CONFIG.rootPath + "user/checkDuplicate",
+				type: "post",
+				data: {
+					"type": changeCamelToUnderline(type),
+					"value": value
+				},
+				dataType: "json",
+				error: function (e) {
+					console.log(JSON.stringify(e));
+					showModalTips("服务器错误！<hr>请联系技术支持并提交以下错误码：<br><font color='blue'>" + e.status + "</font>");
+					return false;
+				},
+				success: function (ret) {
+					if (ret.code == 404) {
+						duplicate = 0
+					} else if (ret.code == 200) {
+						showModalTips("此" + typeCN + "已存在");
+						duplicate = 1
+					} else if (ret.tips !== '') {
+						showModalTips(ret.tips);
+						return false;
+					} else {
+						console.log(ret);
+						showModalTips("系统错误！<hr>请联系技术支持并提交以下错误码：<br><font color='blue'>" + ret.code + "</font>");
+						return false;
+					}
+				}
+			});
+		}
+	</script>
+
+	<div class="modal fade" id="tipsModal" style="z-index:99999">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+					<h3 class="modal-title" id="tipsTitle">温馨提示</h3>
+				</div>
+				<div class="modal-body">
+					<p id="tips" style="color:#fb7312;font-weight:bold;font-size:23px;text-align:center;"></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">关闭 &gt;</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+
+</html>

@@ -59,7 +59,7 @@ class ExceptionHandle extends Handle
 
 		if ($statusCode === 404) return parent::render($request, $e);
 
-		$requestId=makeUUID();
+		$requestId = makeUUID();
 		ApiRequestLog::create([
 			'request_id' => $requestId,
 			'path' => Request::baseUrl(),
@@ -71,14 +71,13 @@ class ExceptionHandle extends Handle
 			'res_data' => json_encode([
 				'file' => $e->getFile(),
 				'line' => $e->getLine(),
-				//'trace' => $e->getTrace(),
 				'session' => Session::all()
 			]),
 		]);
 
-		Session::set('errorRequestId', $requestId);
+		return packApiData($statusCode, 'error', ['errorRequestId' => $requestId, 'errorInfo' => $e], '', false);
 
 		// 其他错误交给系统处理
-		return parent::render($request, $e);
+		// return parent::render($request, $e);
 	}
 }

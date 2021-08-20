@@ -74,7 +74,7 @@
 
 				lockScreen();
 				$.ajax({
-					url: window.CONFIG.apiPath + "menu/list",
+					url: window.CONFIG.apiPath + "v3/menu/list",
 					data: {
 						isZtree: 1
 					},
@@ -93,7 +93,7 @@
 							unlockScreen();
 						} else {
 							unlockScreen();
-							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
 						}
 					}
 				});
@@ -186,7 +186,7 @@
 						} else if (ret.tips !== '') {
 							showModalTips(ret.tips);
 						} else {
-							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
 						}
 					}
 				});
@@ -233,7 +233,7 @@
 							showModalTips(ret.tips);
 						} else {
 							unlockScreen();
-							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
 						}
 					}
 				})

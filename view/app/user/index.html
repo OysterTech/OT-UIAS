@@ -1,0 +1,129 @@
+<?php
+/**
+ * @name 生蚝科技统一身份认证平台-V-我的应用列表
+ * @author Oyster Cheung <master@xshgzs.com>
+ * @since 2020-12-23
+ * @version 2021-08-20
+ */
+?>
+
+{extend name="/framework" /}
+
+{block name='title'}{$pageName} / {:getSetting('appName')}{/block}
+
+{block name='pageCss'}{/block}
+
+{block name='vueBody'}
+<table-filter ref="filterRef"
+			  :form="filterForm"
+			  :filter-data.sync="filterData"
+			  submit-event-name="getFilterData">
+</table-filter>
+
+<div class="div_table">
+	<table id="table" class="table table-striped table-bordered table-hover"
+		   style="border-radius: 5px; border-collapse: separate;">
+		<thead style="background-color: #fff;">
+			<tr>
+				<th>#</th>
+				<th>应用名</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr v-for="(info,index) in list">
+				<td class="cell-center">{{parseInt(index)+1}}</td>
+				<td class="cell-center">{{info.name}}</td>
+				<td class="cell-button-group">
+					<a class="btn btn-primary" :href="info.main_page" target="_blank">访问首页</a>
+					<a class="btn btn-pink" :href="info.redirect_url" target="_blank">登录</a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<pagination ref="pageNav"
+			:now.sync="nowPage"
+			:total="total"
+			:per-page="perPage"
+			getdata-event-name="getList">
+</pagination>
+{/block}
+
+{block name='js'}
+<script>
+	var vm = new Vue({
+		el: '#app',
+		components: {
+			'table-filter': tableFilterVue,
+			'pagination': paginationVue,
+			'choose-item-modal': chooseItemModalVue,
+		},
+		data: {
+			total: 0,
+			nowPage: 1,
+			perPage: 25,
+			list: [],
+			filterForm: [{
+				name: {
+					type: "input",
+					name: "应用名(模糊查找)"
+				}
+			}],
+			filterData: {},
+		},
+		methods: {
+			getFilterData: function () {
+				this.getList();
+			},
+			getList: function () {
+				let that = this;
+
+				if ((this.nowPage - 1) * this.perPage > this.totalPage) {
+					showModalTips("当前页码大于数据总条数，请返回上一页！");
+					return;
+				}
+
+				lockScreen();
+
+				$.ajax({
+					url: window.CONFIG.rootPath + "app/user/list",
+					dataType: "json",
+					type: "post",
+					data: {
+						filterData: that.filterData,
+						page: that.nowPage,
+						perPage: that.perPage,
+					},
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							that.list = ret.data.list;
+							that.total = ret.data.total;
+
+							that.$refs.pageNav.totalData = that.total;
+							that.$refs.pageNav.totalPage = Math.ceil(that.total / that.perPage);
+							return;
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+						} else {
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
+						}
+					}
+				})
+			},
+		},
+		mounted() {
+			this.getList();
+		},
+	});
+</script>
+{/block}

@@ -45,6 +45,35 @@ function getSetting($configName = '')
 
 
 /**
+ * getWWAT 获取企业微信AccessToken
+ * @return string 企业微信AccessToken（为空则获取失败）
+ * @author Oyster Cheung <oyster@easypus.com>
+ * @since 2021-03-31
+ * @version 2021-03-31
+ */
+function getWWAT()
+{
+	$redis = new Redis();
+	$redis->connect('127.0.0.1', 6379);
+	$redis->auth('Red@EasyPus.2020');
+	$redis->select(2);
+	$at = $redis->get('id_ww_at');
+
+	if ($at) return $at;
+	else {
+		$query = curl('https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=' . env('workweixin.corp_id') . '&corpsecret=' . env('workweixin.secret'), 'get', 'json');
+
+		if ($query['access_token']) {
+			$redis->set('id_ww_at', $query['access_token'], $query['expires_in']);
+			return $query['access_token'];
+		} else {
+			return '';
+		}
+	}
+}
+
+
+/**
  * checkUUID 校验UUID是否符合格式
  * @param  string $string 待检测字符串
  * @return string         合法字符串（若不合法则直接die）
@@ -299,18 +328,18 @@ function inputPost($dataName = '', $allowNull = 0, $isAjax = 0, $errorCode = 0, 
  * curl请求封装函数
  * @param  string  $url          请求URL
  * @param  string  $type         请求类型(get/post)
- * @param  array   $postData     需要POST的数据
- * @param  string  $postDataType POST数据类型(array/json)
+ * @param  string  $returnType   返回数据类型(空/json)
  * @param  array   $header       自定义请求头
- * @param  string  $returnType   返回数据类型(origin/json)
- * @param  integer $timeout      超时秒数
+ * @param  array   $postData     需要POST的数据
+ * @param  string  $postDataType POST数据类型(form/json)
+ * @param  integer $timeout      超时秒数(单位:秒)
  * @param  string  $userAgent    UserAgent
  * @return string|array          返回结果(类型看returnType)
  * @author Oyster Cheung <master@xshgzs.com>
  * @since 2019-11-17
- * @version 2020-08-03
+ * @version 2021-06-13
  */
-function curl($url, $type = 'get', $postData = array(), $postDataType = 'array', $header = array(), $returnType = 'origin', $timeout = 5, $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
+function curl($url, $type = 'get', $returnType = '', $header = [], $postData = [], $postDataType = 'form', $timeout = 5, $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
 {
 	if ($url == '' || $timeout <= 0) {
 		return false;
@@ -325,21 +354,19 @@ function curl($url, $type = 'get', $postData = array(), $postDataType = 'array',
 	curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
 
 	if ($type === 'post') {
-		if ($postData == array()) {
-			return false;
-		} else if ($postDataType === 'json') {
+		if ($postDataType === 'json') {
 			$postData = json_encode($postData);
-			array_push($header,'Content-Type:application/json');
+			array_push($header, 'Content-Type: application/json');
 		}
 
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
 	}
 
-	curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+	if (count($header) > 0) curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
 
 	$rtn = curl_exec($ch);
-	if ($rtn === false) $rtn = 'curlError:' . curl_errno($ch);
+	if ($rtn === false) $rtn = 'curlError:' . curl_error($ch);
 	curl_close($ch);
 
 	$rtn = ($returnType === 'json') ? json_decode($rtn, true) : $rtn;

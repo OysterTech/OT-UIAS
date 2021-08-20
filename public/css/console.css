@@ -1,8 +1,12 @@
 /**
  * @author Oyster Cheung <master@xshgzs.com>
  * @since 2020-06-25
- * @version 2020-07-24
+ * @version 2020-12-23
 */
+table {
+    border-radius: 5px;
+    border-collapse: separate;
+}
 
 td,
 th {
@@ -21,7 +25,8 @@ th {
     padding: 4px !important;
 }
 
-.cell-button-group button {
+.cell-button-group button,
+.cell-button-group a {
     padding: 3px 7px;
     font-size: 14px;
     line-height: 1.5;
@@ -47,8 +52,9 @@ tbody tr:hover {
     display: block;
 }
 
-.div_table table {
-    min-width: 100%;
+.div_table table td {
+    word-break: keep-all !important;
+    white-space: nowrap !important;
 }
 
 /* 方便表格左右移动 [end] */
@@ -61,14 +67,25 @@ tbody tr:hover {
     background-color: #eee !important;
 }
 
+.btn-pink {
+    background-color: #ed9dff;
+    color: white;
+}
+
+.btn-pink:hover,
+.btn-pink:focus {
+    background-color: #fb7cff;
+    color: white;
+}
+
 .btn-purple {
-    background-color: #f95aff;
+    background-color: #978dfd;
     color: white;
 }
 
 .btn-purple:hover,
 .btn-purple:focus {
-    background-color: #d913e0;
+    background-color: #9d6be5;
     color: white;
 }
 
@@ -94,3 +111,104 @@ ul.ztree {
         width: 700px;
     }
 }
+
+/* 模态框的步骤显示 */
+.flow {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.flow .dots {
+    padding-left: 0 !important;
+    display: flex;
+    width: 100%;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+
+.flow .dots .item {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-justify-content: space-around;
+    -ms-flex-pack: distribute;
+    justify-content: space-around;
+    position: relative;
+}
+
+.flow .dots .item.active:after {
+    border-bottom: 3px solid #3e97df;
+}
+
+.flow .dots .item:after {
+    position: absolute;
+    bottom: 8.5px;
+    z-index: 0;
+    display: block;
+    content: '';
+    width: 100%;
+    height: 0;
+    border-bottom: 3px solid #e1e1e1;
+}
+
+.flow .dots .item:first-child:after {
+    width: 50%;
+    left: 50%;
+}
+
+.flow .dots .item:last-child:after {
+    width: 50%;
+    right: 50%;
+}
+
+.flow .dots .item.active .text {
+    color: #3e97df;
+}
+
+.flow .dots .item.active .dot {
+    background: #3e97df;
+}
+
+.flow .dots .item .dot {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: #e1e1e1;
+    position: relative;
+    border-radius: 50%;
+    z-index: 10;
+}
+
+/* 模态框的步骤显示 [end] */

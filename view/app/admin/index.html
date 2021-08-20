@@ -1,0 +1,373 @@
+<?php
+/**
+ * @name 生蚝科技统一身份认证平台-V-所有应用管理
+ * @author Oyster Cheung <master@xshgzs.com>
+ * @since 2021-08-05
+ * @version 2021-08-06
+ */
+?>
+
+{extend name="/framework" /}
+
+{block name='title'}{$pageName} / {:getSetting('appName')}{/block}
+
+{block name='pageCss'}
+<link rel="stylesheet" href="https://cdn.staticfile.org/bootstrap-switch/4.0.0-alpha.1/css/bootstrap-switch.min.css">
+{/block}
+
+{block name='vueBody'}
+<table-filter ref="filterRef"
+			  :form="filterForm"
+			  :filter-data.sync="filterData"
+			  submit-event-name="getFilterData">
+</table-filter>
+
+<div class="operateBtnGroup">
+	<button class="btn btn-primary" @click="readyCU('create')">新增应用</button>
+</div>
+
+<div class="div_table">
+	<table id="table" class="table table-striped table-bordered table-hover"
+		   style="border-radius: 5px; border-collapse: separate;">
+		<thead style="background-color: #fff;">
+			<tr>
+				<th>应用ID</th>
+				<th>应用名</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr v-for="(info,index) in list">
+				<td class="cell-center">{{info.app_id}}</td>
+				<td class="cell-center">{{info.name}}</td>
+				<td class="cell-button-group">
+					<button class="btn btn-warning" v-if="info.is_show==1" @click="switchShowStatus(0,info.id)">隐藏</button>
+					<button class="btn btn-success" v-else @click="switchShowStatus(1,info.id)">显示</button>
+					<button class="btn btn-info" @click='readyCU("update",info)'>编辑</button>
+					<a class="btn btn-primary" :href="info.main_page">访问首页</a>
+					<a class="btn btn-pink" :href="info.redirect_url">登录</a>
+					<button class="btn btn-danger" @click="readyDelete(info.id,info.app_id,info.name)">删除</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<pagination ref="pageNav"
+			:now.sync="nowPage"
+			:total="total"
+			:per-page="perPage"
+			getdata-event-name="getList">
+</pagination>
+
+{include file="/app/admin/modal" /}
+
+{/block}
+
+{block name='js'}
+<script src="https://cdn.staticfile.org/bootstrap-switch/4.0.0-alpha.1/js/bootstrap-switch.min.js"></script>
+<script>
+	window.onload = function () {
+
+	}
+
+	var vm = new Vue({
+		el: '#app',
+		components: {
+			'table-filter': tableFilterVue,
+			'pagination': paginationVue,
+			'choose-item-modal': chooseItemModalVue,
+		},
+		data: {
+			total: 0,
+			nowPage: 1,
+			perPage: 25,
+			list: [],
+			filterForm: [{
+				name: {
+					type: "input",
+					name: "应用名(模糊查找)"
+				}
+			}],
+			filterData: {},
+			CUModalStep: {
+				now: 0,
+				info: ["基础信息", "开发配置"]
+			},
+			CUInfo: {
+				operateType: "",
+				showInfo: {
+					appId: "",
+					name: "",
+					createTime: "",
+					updateTime: ""
+				},
+				id: "",
+				name: "",
+				mainPage: "",
+				redirectUrl: "",
+			},
+			deleteInfo: {
+				id: "",
+				appId: "",
+				name: "",
+			},
+		},
+		methods: {
+			switchShowStatus: function (isShow, id) {
+				let that = this;
+				$.ajax({
+					url: window.CONFIG.rootPath + "app/admin/switchShowStatus",
+					dataType: "json",
+					type: "post",
+					data: {
+						isShow: isShow,
+						id: id
+					},
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							let statusCN = (isShow == 1) ? "显示" : "隐藏";
+							alert(statusCN + "成功");
+							that.getList()
+							return;
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+						} else {
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
+						}
+					}
+				})
+			},
+			getFilterData: function () {
+				this.getList();
+			},
+			getList: function () {
+				let that = this;
+
+				if ((this.nowPage - 1) * this.perPage > this.totalPage) {
+					showModalTips("当前页码大于数据总条数，请返回上一页！");
+					return;
+				}
+
+				lockScreen();
+
+				$.ajax({
+					url: window.CONFIG.rootPath + "app/admin/list",
+					dataType: "json",
+					type: "post",
+					data: {
+						filterData: that.filterData,
+						page: that.nowPage,
+						perPage: that.perPage,
+					},
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							that.list = ret.data.list;
+							that.total = ret.data.total;
+
+							that.$refs.pageNav.totalData = that.total;
+							that.$refs.pageNav.totalPage = Math.ceil(that.total / that.perPage);
+							return;
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+						} else {
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
+						}
+					}
+				})
+			},
+			turnStep: function (go) {
+				this.CUModalStep.now = this.CUModalStep.now + go;
+			},
+			readyCU: function (operateType, appInfo) {
+				let that = this;
+				this.resetCUInfo();
+				this.CUInfo.operateType = operateType;
+
+				if (operateType === 'update') {
+					this.CUInfo.showInfo = {
+						appId: appInfo.app_id,
+						name: appInfo.name,
+						createTime: appInfo.create_time,
+						updateTime: appInfo.update_time
+					};
+					this.CUInfo.id = appInfo.id;
+					this.CUInfo.name = appInfo.name;
+					this.CUInfo.mainPage = appInfo.main_page;
+					this.CUInfo.redirectUrl = appInfo.redirect_url;
+					this.CUInfo.status = appInfo.status;
+					this.CUInfo.isShow = appInfo.is_show;
+				}
+
+				$('#statusSwitch').bootstrapSwitch({
+					state: operateType === 'update' ? ((appInfo.status == 1) ? true : false) : true,
+					onText: "对外公开",
+					offText: "内部使用",
+					onColor: "success",
+					offColor: "info",
+					size: "large",
+					onSwitchChange(event, state) {
+						that.CUInfo.status = (state == true) ? 1 : 2;
+					}
+				});
+
+				$("#CUModal").modal("show");
+				return true;
+			},
+			resetCUInfo: function () {
+				$('#statusSwitch').bootstrapSwitch('destroy');
+				this.CUModalStep.now = 0;
+				this.CUInfo = {
+					operateType: "",
+					showInfo: {
+						appId: "",
+						name: "",
+						createTime: "",
+						updateTime: ""
+					},
+					id: "",
+					name: "",
+					mainPage: "",
+					redirectUrl: "",
+					status: 1,
+					isShow: 1
+				};
+			},
+			toCU: function () {
+				let that = this;
+				let info = JSON.parse(JSON.stringify(that.CUInfo));
+
+				if (info.name.length < 4 || info.name.length > 30) {
+					showModalTips("应用名称须为4~30位");
+					return false;
+				}
+				if (!/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/.test(info.mainPage)) {
+					showModalTips("请正确输入应用的主页URL");
+					return false;
+				}
+				if (!/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/.test(info.redirectUrl)) {
+					showModalTips("请正确输入登录回调URL");
+					return false;
+				}
+				if (info.redirectUrl.split("?").length > 1) {
+					showModalTips("登录回调URL不得带有参数");
+					return false;
+				}
+				if (info.status != 1 && info.status != 2) {
+					showModalTips("请选择应用状态")
+					return false;
+				}
+				if (info.isShow != 1 && info.isShow != 0) {
+					showModalTips("请选择应用是否显示在列表")
+					return false;
+				}
+
+				delete info.showInfo;
+
+				lockScreen();
+				this.turnStep(1);
+
+				$.ajax({
+					url: window.CONFIG.rootPath + "app/admin/toCU",
+					type: "post",
+					dataType: "json",
+					data: {
+						type: info.operateType,
+						cuInfo: changeArrayKeyToUnderline(info)
+					},
+					error: function (e) {
+						that.turnStep(-1);
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							alert("操作成功！");
+							$("#CUModal").modal("hide");
+							$('#statusSwitch').bootstrapSwitch('destroy');
+							that.resetCUInfo();
+							that.getList();
+						} else if (ret.tips !== '') {
+							that.turnStep(-1);
+							showModalTips(ret.tips);
+						} else {
+							that.turnStep(-1);
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
+						}
+					}
+				});
+			},
+			readyDelete: function (id, appId, name) {
+				this.deleteInfo = {
+					id: id,
+					appId: appId,
+					name: name
+				}
+
+				$("#deleteModal").modal("show");
+			},
+			toDelete: function () {
+				let that = this;
+				let deleteInfo = JSON.parse(JSON.stringify(this.deleteInfo));
+
+				lockScreen();
+				$("#deleteModal").modal("hide");
+
+				$.ajax({
+					url: window.CONFIG.rootPath + "app/admin/delete",
+					type: "post",
+					dataType: "json",
+					data: {
+						deleteInfo: deleteInfo
+					},
+					error: function (e) {
+						unlockScreen();
+						console.log(e);
+						showModalTips("服务器错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + e.responseJSON.tables.Session.errorRequestId);
+					},
+					success: function (ret) {
+						unlockScreen();
+
+						if (ret.code == 200) {
+							alert("删除成功！");
+
+							that.deleteInfo = {
+								id: "",
+								appId: "",
+								name: ""
+							};
+
+							that.getList();
+						} else if (ret.tips !== '') {
+							showModalTips(ret.tips);
+						} else {
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
+						}
+					}
+				})
+			}
+		},
+		mounted() {
+			this.getList();
+		},
+	});
+</script>
+{/block}

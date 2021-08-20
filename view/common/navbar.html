@@ -65,14 +65,14 @@
 			<ul class="sidebar-menu" data-widget="tree">
 				<li>
 					<a onclick="window.location.href=window.CONFIG.indexUrl">
-						<i class="fas fa-home"></i> 网站首页
+						<i class="fas fa-fw fa-home"></i> 网站首页
 					</a>
 				</li>
 				<li v-for="fatherInfo in treeData" v-if="fatherInfo['hasChild']!=1 && fatherInfo['type']==1">
 					<a :href="[rootPath+fatherInfo['uri']]">
 						<i v-if="fatherInfo['icon'].substr(0,2)=='b|'"
-						   :class="['fab fa-'+fatherInfo['icon'].substr(2)]"></i>
-						<i v-else :class="['fas fa-'+fatherInfo['icon']]"></i>
+						   :class="['fab fa-fw fa-'+fatherInfo['icon'].substr(2)]"></i>
+						<i v-else :class="['fas fa-fw fa-'+fatherInfo['icon']]"></i>
 						{{fatherInfo['name']}}
 					</a>
 				</li>
@@ -80,18 +80,18 @@
 				<li v-else-if="fatherInfo['type']==1" class="treeview">
 					<a href="#">
 						<i v-if="fatherInfo['icon'].substr(0,2)=='b|'"
-						   :class="['fab fa-'+fatherInfo['icon'].substr(2)]"></i>
-						<i v-else :class="['fas fa-'+fatherInfo['icon']]"></i>
+						   :class="['fab fa-fw fa-'+fatherInfo['icon'].substr(2)]"></i>
+						<i v-else :class="['fas fa-fw fa-'+fatherInfo['icon']]"></i>
 						<span>{{fatherInfo['name']}}</span>
-						<span class="pull-right-container"><i class="fas fa-angle-left pull-right"></i></span>
+						<span class="pull-right-container"><i class="fas fa-fw fa-angle-left pull-right"></i></span>
 					</a>
 					<ul class="treeview-menu">
 						<li v-for="childInfo in fatherInfo['child']"
 							v-if="childInfo['hasChild']!=1 && childInfo['type']==1">
 							<a :href="[rootPath+childInfo['uri']]">
 								<i v-if="childInfo['icon'].substr(0,2)=='b|'"
-								   :class="['fab fa-'+childInfo['icon'].substr(2)]"></i>
-								<i v-else :class="['fas fa-'+childInfo['icon']]"></i>
+								   :class="['fab fa-fw fa-'+childInfo['icon'].substr(2)]"></i>
+								<i v-else :class="['fas fa-fw fa-'+childInfo['icon']]"></i>
 								{{childInfo['name']}}
 							</a>
 						</li>
@@ -99,17 +99,17 @@
 						<li v-else-if="childInfo['type']==1" class="treeview">
 							<a href="#">
 								<i v-if="childInfo['icon'].substr(0,2)=='b|'"
-								   :class="['fab fa-'+childInfo['icon'].substr(2)]"></i>
-								<i v-else :class="['fas fa-'+childInfo['icon']]"></i>
+								   :class="['fab fa-fw fa-'+childInfo['icon'].substr(2)]"></i>
+								<i v-else :class="['fas fa-fw fa-'+childInfo['icon']]"></i>
 								<span>{{childInfo['name']}}</span>
-								<span class="pull-right-container"><i class="fas fa-angle-left pull-right"></i></span>
+								<span class="pull-right-container"><i class="fas fa-fw fa-angle-left pull-right"></i></span>
 							</a>
 							<ul class="treeview-menu">
 								<li v-for="grandsonInfo in childInfo['child']" v-if="grandsonInfo['type']==1">
 									<a :href="[rootPath+grandsonInfo['uri']]">
 										<i v-if="grandsonInfo['icon'].substr(0,2)=='b|'"
-										   :class="['fab fa-'+grandsonInfo['icon'].substr(2)]"></i>
-										<i v-else :class="['fas fa-'+grandsonInfo['icon']]"></i>
+										   :class="['fab fa-fw fa-'+grandsonInfo['icon'].substr(2)]"></i>
+										<i v-else :class="['fas fa-fw fa-'+grandsonInfo['icon']]"></i>
 										{{grandsonInfo['name']}}
 									</a>
 								</li>
@@ -162,7 +162,7 @@
 				lockScreen();
 
 				$.ajax({
-					url: this.apiPath + "user/getCurrentUserInfo",
+					url: this.apiPath + "v3/user/getCurrentUserInfo",
 					dataType: "json",
 					error: function (e) {
 						unlockScreen();
@@ -180,7 +180,7 @@
 						} else if (ret.tips !== '') {
 							showModalTips(ret.tips);
 						} else {
-							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
 						}
 					}
 				});
@@ -190,7 +190,7 @@
 				lockScreen();
 
 				$.ajax({
-					url: this.apiPath + "menu/getCurrentUserMenu",
+					url: this.apiPath + "v3/menu/getCurrentUserMenu",
 					dataType: "json",
 					error: function (e) {
 						unlockScreen();
@@ -212,7 +212,7 @@
 						} else if (ret.tips !== '') {
 							showModalTips(ret.tips);
 						} else {
-							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.requestId);
+							showModalTips("系统错误<br>请联系技术支持并提供以下ID<br>（可截图或直接提供最后5位）<hr><p style='font-size:22px;color:#078cff'>" + ret.data.errorRequestId);
 						}
 					}
 				});

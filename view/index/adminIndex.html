@@ -1,0 +1,26 @@
+<?php
+/**
+ * @name 生蚝科技统一身份认证平台-V-管理员首页
+ * @author Oyster Cheung <master@xshgzs.com>
+ * @since 2021-08-20
+ * @version V3.0 2021-08-20
+ */
+?>
+
+{extend name="/framework" /}
+
+{block name='title'}首页 / {:getSetting('appName')}{/block}
+
+{block name='pageCss'}
+
+{/block}
+
+{block name='vueBody'}
+<h2>尊敬的{:\\think\\facade\\Session::get('userInfo.nickName')}，您好！</h2>
+
+
+{/block}
+
+{block name='js'}
+
+{/block}

@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @name 生蚝科技TP6-RBAC开发框架-C-菜单接口
+ * @name 生蚝科技TP6-RBAC开发框架-A-菜单接口
  * @author Oyster Cheung <master@xshgzs.com>
  * @since 2020-07-12
  * @version 2020-10-22
  */
 
-namespace app\controller\api;
+namespace app\controller\api\v3;
 
 use app\BaseController;
 use think\facade\Session;

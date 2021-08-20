@@ -1,0 +1,116 @@
+<div class="modal fade" id="CUModal" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+				<h3 class="modal-title">
+					{{ CUInfo.operateType=='create'?'新建':'修改' }}应用
+
+					<template v-if="CUInfo.operateType=='update'">
+						&nbsp;[<font color="#fb7312">{{CUInfo.showInfo.name}}</font>]
+					</template>
+				</h3>
+			</div>
+			<div class="modal-body">
+				<div class="row flow">
+					<ul class="dots">
+						<li v-for="(name,index) in CUModalStep.info" :key="'flow'+name" class="item"
+							:class="{'active':(CUModalStep.now>=index?true:false)}">
+							<span class="text">{{name}}</span>
+							<span class="dot"></span>
+						</li>
+						<li class="item" :class="{'active':(CUModalStep.now>=CUModalStep.info.length?true:false)}">
+							<span class="text">完成</span>
+							<span class="dot"></span>
+						</li>
+					</ul>
+				</div>
+
+				<table id="CUTable_step1" v-show="CUModalStep.now==0"
+					   class="table table-striped table-bordered table-hover">
+					<tr v-if="CUInfo.operateType==='update'">
+						<th style="vertical-align: middle;">ID</th>
+						<td><input :value="CUInfo.id" class="form-control" disabled></td>
+					</tr>
+					<tr v-if="CUInfo.operateType==='update'">
+						<th style="vertical-align: middle;">应用ID</th>
+						<td><input :value="CUInfo.showInfo.appId" class="form-control" disabled></td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">应用名称</th>
+						<td><input v-model="CUInfo.name" class="form-control"></td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">应用开放状态</th>
+						<td>
+							<input id="statusSwitch" type="checkbox" checked>
+						</td>
+					</tr>
+					<tr v-if="CUInfo.operateType==='update'">
+						<th style="vertical-align: middle;">创建时间</th>
+						<td><input :value="CUInfo.showInfo.createTime" class="form-control" disabled></td>
+					</tr>
+					<tr v-if="CUInfo.operateType==='update'">
+						<th style="vertical-align: middle;">最后修改时间</th>
+						<td><input :value="CUInfo.showInfo.updateTime" class="form-control" disabled></td>
+					</tr>
+				</table>
+
+				<table id="CUTable_step2" v-show="CUModalStep.now==1"
+					   class="table table-striped table-bordered table-hover">
+					<tr>
+						<th style="vertical-align: middle;">应用是否显示</th>
+						<td>
+							<select v-model="CUInfo.isShow" class="form-control">
+								<option disabled selected>=== 请选择是否显示应用 ===</option>
+								<option value="1">显示</option>
+								<option value="0">隐藏</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">应用主页</th>
+						<td><input v-model="CUInfo.mainPage" class="form-control"></td>
+					</tr>
+					<tr>
+						<th style="vertical-align: middle;">登录回调URL</th>
+						<td><input v-model="CUInfo.redirectUrl" class="form-control"></td>
+					</tr>
+				</table>
+			</div>
+
+			<div class="modal-footer">
+				<button class="btn btn-warning" @click="resetCUInfo" data-dismiss="modal">&lt; 放弃</button>
+				<button class="btn btn-primary" @click="turnStep(-1)"
+						v-if="CUModalStep.now!==0">&lt; 上一步</button>
+				<button class="btn btn-primary" @click="turnStep(1)"
+						v-if="(CUModalStep.now+1)<CUModalStep.info.length">下一步 &gt;</button>
+				<button class="btn btn-success" @click="toCU" v-if="(CUModalStep.now+1)>=CUModalStep.info.length">确认
+					&gt;</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="deleteModal" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+				<h3 class="modal-title">
+					删除确认提示
+				</h3>
+			</div>
+			<div class="modal-body" style="color:#3f51b5;font-size:23px;text-align:center;">
+				请确认您需要删除<br>
+				<b>
+					<font color="#4caf50">{{deleteInfo.name}} ({{deleteInfo.appId}})</font>
+				</b>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-info" data-dismiss="modal">&lt; 放弃</button>
+				<button class="btn btn-danger" @click="toDelete">确认删除 &gt;</button>
+			</div>
+		</div>
+	</div>
+</div>

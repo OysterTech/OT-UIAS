@@ -1,0 +1,37 @@
+input {
+    width: 500px !important;
+}
+
+.reg-icon {
+    padding: 15px 13px;
+}
+
+.reg-form .left_side {
+    border-right: 0px !important;
+}
+
+.reg-form .input_div,
+.reg-form .sub_btn,
+.reg-form .left_side {
+    width: 600px !important;
+}
+
+@media screen and (max-width: 720px) {
+    input {
+        width: inherit !important;
+    }
+
+    .reg-icon {
+        padding: 8px 12px 18px 13px;
+    }
+
+    .reg-form .left_side {
+        border-right: 0px !important;
+        width: 100% !important;
+    }
+
+    .reg-form .input_div,
+    .reg-form .sub_btn {
+        width: inherit !important;
+    }
+}
